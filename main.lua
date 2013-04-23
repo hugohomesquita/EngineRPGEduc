@@ -2,11 +2,13 @@
 flower = require "hanappe/flower"
 tiled = require "hanappe/extensions/tiled"
 widget = require "hanappe/extensions/widget"
+physics = require "hanappe/extensions/physics"
+rpgmap = require "hanappe/RPG"
 Resources = flower.Resources
 
 -- Resources setting
 Resources.addResourceDirectory("assets")
-
+--Resources.addResourceDirectory("maps")
 -- debug
 --[[
 MOAIDebugLines.setStyle ( MOAIDebugLines.TEXT_BOX, 1, 1, 1, 1, 1 )
@@ -23,7 +25,7 @@ local screenDpi = MOAIEnvironment.screenDpi or 120
 local viewScale = math.floor(screenDpi / 240) + 1
 
 -- open window
-flower.openWindow("Flower extensions", screenWidth, screenHeight, viewScale)
+flower.openWindow("Flower extensions", screenWidth, screenHeight, 1.0)
 
 -- open scene
---flower.openScene("main_scene")
+flower.openScene("scenes/game_scene")

@@ -1744,7 +1744,7 @@ function DisplayObject:setParent(parent)
     self:clearAttrLink(MOAIColor.INHERIT_COLOR)
     self:clearAttrLink(MOAITransform.INHERIT_TRANSFORM)
     if parent then
-        self:setAttrLink(MOAIColor.INHERIT_COLOR, parent, MOAIColor.COLOR_TRAIT)
+        --self:setAttrLink(MOAIColor.INHERIT_COLOR, parent, MOAIColor.COLOR_TRAIT) -- TESTE
         self:setAttrLink(MOAITransform.INHERIT_TRANSFORM, parent, MOAITransform.TRANSFORM_TRAIT)
     end
 end
@@ -3024,6 +3024,7 @@ function TouchHandler:onTouch(e)
     
     -- touch down prop
     if e.type == Event.TOUCH_DOWN then
+        prop2 = nil 
         self.touchProps[e.idx] = prop
     elseif e.type == Event.TOUCH_UP then
         self.touchProps[e.idx] = nil

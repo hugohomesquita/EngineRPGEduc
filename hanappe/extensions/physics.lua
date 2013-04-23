@@ -26,7 +26,7 @@ local B2Fixture
 -- variables
 local MOAIBox2DWorldInterface = MOAIBox2DWorld.getInterfaceTable()
 local MOAIBox2DBodyInterface = MOAIBox2DBody.getInterfaceTable()
-local MOAIBox2DFixtureInterface = MOAIBox2DFixture,getInterfaceTable()
+local MOAIBox2DFixtureInterface = MOAIBox2DFixture.getInterfaceTable()
 
 ----------------------------------------------------------------------------------------------------
 -- @type B2World

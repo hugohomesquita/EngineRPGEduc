@@ -1103,6 +1103,7 @@ function IsometricLayerRenderer:createRenderer(x, y, gid)
     self:addChild(renderer)
     self.renderers[y * mapWidth + x + 1] = renderer
     
+    
     return renderer
 end
 
