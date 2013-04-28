@@ -17,6 +17,8 @@ local TileMap = tiled.TileMap
 local TileObject = tiled.TileObject
 local ClassFactory = flower.ClassFactory
 local Group = flower.Group
+local Avatar = require "hanappe/class/Avatar"
+
 -- class
 local RPGMap
 local RPGObject
@@ -39,6 +41,9 @@ function RPG:init()
     
     
     self.world = nil
+    self.objectLayer = nil
+    self.collisionLayer = nil
+    self.avatar = nil
     --self.objectFactory = ClassFactory(RPGObject)    
     --self:initLayer()
     self:initSystems()
@@ -84,13 +89,27 @@ function RPG:onLoadedData(e)
         self.collisionLayer:setVisible(false)
         self:createPhysicsCollision()
     end
+    if self.objectLayer then
+        self:createAvatar()
+    end
+    --self:setInvisibleLayerByName("background")
+end
+
+function RPG:createAvatar()
+    self.avatar = Avatar({tileMap=self,worldPhysics=self.world})
+    self.objectLayer:addObject(self.avatar)
+end
+
+function RPG:setInvisibleLayerByName(layerName)
+    local layer = self:findMapLayerByName(layerName)
+    if layer then
+      for i, object in ipairs(layer.children) do        
+          object:setVisible(false)
+      end
+    end
 end
 
 function RPG:createPhysicsCollision()
-  local backg = self:findMapLayerByName('background')
-    for i, object in ipairs(backg.children) do     
-      object:setVisible(false)
-    end
   for i, object in ipairs(self.collisionLayer.children) do         
     for y = 0, self.mapHeight - 1 do
       for x = 0, self.mapWidth - 1 do
@@ -154,7 +173,6 @@ end
 
 function UpdatingSystem:onUpdate() 
     local objectLayer = self.tileMap:findMapLayerByName('Object')
-    --local objectLayer = self.tileMap.objects
     for i, object in ipairs(objectLayer:getObjects()) do
         if object.controller then
             object:onUpdate()
@@ -176,26 +194,24 @@ end
 function MovementSystem:onUpdate()
     local objectLayer = self.tileMap:findMapLayerByName('Object')
     for i, object in ipairs(objectLayer:getObjects()) do
-        self:moveStep(object)        
+        self:moveStep(object)                   
     end
 end
 --moveStep
 function MovementSystem:moveStep(object)  
     
     --VERIFICA SE TEM CONTROLLER E SE ESTÁ SE MOVIMENTANDO 
-    if not object.controller or object.STATS == object.STATES.IDLE then      
+    if not object.controller then      
         return
     end
-    
-    object:addLoc(object.currentMoveX, object.currentMoveY)
+    object.controller:moveStep()
+    --object:addLoc(object.currentMoveX, object.currentMoveY)
 end
 
 function MovementSystem:collisionWith(object, mapX, mapY)
 end
 function MovementSystem:collisionWithObjects(object, x, y)
 end
-
-
 
 function MovementSystem:collisionWithObjects(object, mapX, mapY)
     for i, object in ipairs(self.objectLayer:getObjects()) do

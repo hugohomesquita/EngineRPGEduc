@@ -45,7 +45,7 @@
    eJztl9EOgCAIRTH//597ajkSFUTU5G5sbpUHBBZGAIgbWIBXwbnde5cs5baYJCasi1hT0uJyJeVKfJDWwArxOleXi3uu1CNUP9fey/nAjaGFm9MqXO4559Y1/1pyraVV69m573cSVi+3V7twW+acdG+NOYd7FhZz5Qlcbn5HxkhpBLf0j3qe/SXeGfmdVc+ncb1/v/L+3beenetcCy6+D1hwccxWzN3tBo2UCt0=
   </data>
  </layer>
- <objectgroup name="event" width="30" height="50" visible="0">
+ <objectgroup name="event" width="30" height="50">
   <object name="to Ice Hall" type="teleport" x="64" y="416" width="32" height="64">
    <properties>
     <property name="hotspot" value="2,13,1,2"/>

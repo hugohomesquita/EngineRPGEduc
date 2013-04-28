@@ -8,6 +8,20 @@ function onCreate(e)
     layer:setScene(scene)
     layer:setTouchEnabled(true)
     layer:setPriority(1)
+       
+    view = widget.UIView {
+        scene = scene,
+    }
+    --view:setPriority(4)
+    
+    joystick = widget.Joystick {
+        stickMode = "digital",
+        parent = view,
+        onStickChanged = joystick_OnStickChanged,
+    }
+    joystick:setPos(5, flower.viewHeight - joystick:getHeight() - 5)
+ 
+    
     camera = flower.Camera()
     layer:setCamera(camera)
     
@@ -50,11 +64,11 @@ function onStart(e)
 end
 
 function joystick_OnStickChanged(e)
-  
+    mapa.avatar.controller:walkByStick(e)
 end
 
 function onUpdate(e)
-  
+  mapa:onUpdate(e) 
 end
 
 function tileMap_OnTouchDown(e) 

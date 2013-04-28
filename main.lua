@@ -6,6 +6,7 @@ physics = require "hanappe/extensions/physics"
 rpgmap = require "hanappe/RPG"
 Resources = flower.Resources
 
+
 -- Resources setting
 Resources.addResourceDirectory("assets")
 --Resources.addResourceDirectory("maps")
