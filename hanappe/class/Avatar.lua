@@ -21,6 +21,7 @@ function M:init(params)
     self.worldPhysics = params.worldPhysics      
     
     self.name = "HugoHenrique"
+    self.type = "Player"
     self.controllerName = "AvatarController" 
     self.controller = nil    
     self.renderer = nil       

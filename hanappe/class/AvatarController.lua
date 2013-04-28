@@ -85,6 +85,7 @@ function M:moveStep()
     x = velocity.x 
     y = velocity.y
     self.tileObject.physics.body:setLinearVelocity(x,y)
+    self.tileObject:setPos(self.tileObject.physics.body:getPosition())
 end
 -- function moveMapLoc-ERPGSPRITE
 function M:walk(direction)
@@ -94,11 +95,7 @@ function M:walk(direction)
                        
     self:setDirection(direction) 
     
-  
-    --print(self:getMapNextPos())
-   
-    
-    --local objectLayer = self.tileObject.tileMap:findMapLayerByName('Object')
+
     
     self.tileObject.currentMoveX = DIRECTIONS[direction].x * self.tileObject.moveSpeed
     self.tileObject.currentMoveY = DIRECTIONS[direction].y * self.tileObject.moveSpeed
@@ -106,32 +103,8 @@ function M:walk(direction)
       x = self.tileObject.currentMoveX,
       y = self.tileObject.currentMoveY,
     }
-    --self.tileObject.physics.body:setLinearVelocity(self.tileObject.currentMoveX,self.tileObject.currentMoveY)
-    
-   --print(self.tileObject:getMapIsoPos())
-    --for i, object in ipairs(objectLayer:getObjects()) do
-     -- if object ~= self.tileObject then
-        ---print(object:getGid())
-        --print(self:collisionByBoundingBox(self.tileObject,object))
-     -- end
-   -- end
-          
-    
-    --print(self.tileObject.mapTileHeight / self.tileObject.moveSpeed)
-    --self.currentMoveCount = self.tileObject.mapTileHeight / self.tileObject.moveSpeed
-    --VERIFICAR SE A ANIMAÇÃO EXISTE
-       
 end
 
-
-
---function M:getMapNextPos()
---    local mapX, mapY = self.tileObject:getMapPos()        
---    local offsetMapX = DIR_NEXT[self.tileObject.currentDirection].x
---    local offsetMapY = DIR_NEXT[self.tileObject.currentDirection].y
---    local offsetX, offsetY = offsetMapX, offsetMapY
---    return mapX + offsetMapX, mapY + offsetMapY
---end
 function M:setDirection(direction)
     --if self.tileObject:isMoving() then
      --   return

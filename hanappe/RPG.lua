@@ -57,10 +57,9 @@ end
 
 function RPG:initLayer()
     local layer = Layer()
-    local camera = Camera()
+    camera = Camera()
     layer:setCamera(camera)
-    self:setLayer(layer)
-    
+    self:setLayer(layer)    
 end
 
 function RPG:initSystems()

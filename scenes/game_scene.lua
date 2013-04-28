@@ -24,13 +24,13 @@ function onCreate(e)
     
     camera = flower.Camera()
     layer:setCamera(camera)
-    
+    camera:addLoc(500,500,0)
     --INIT WORLD PHYSICS
     world = MOAIBox2DWorld.new ()
     --world = physics.B2World()
     world:setGravity ( 0, 0 )
     world:setUnitsToMeters ( 1/30)
-    --world:setDebugDrawEnabled(false)
+    world:setDebugDrawEnabled(false)
     
     world:start()
     
@@ -57,6 +57,22 @@ function onCreate(e)
     mapa:addEventListener("touchUp", tileMap_OnTouchUp)
     mapa:addEventListener("touchMove", tileMap_OnTouchMove)
     mapa:addEventListener("touchCancel", tileMap_OnTouchUp)
+    scrollCameraToFocusObject()
+    
+end
+
+
+function scrollCameraToCenter(x, y)
+    local cx, cy = flower.getViewSize()
+    scrollCamera(x - (cx/2), y - (cy/2))    
+end
+function scrollCamera(x, y)
+  nx,ny = math.floor(x), math.floor(y)
+  camera:setLoc(nx,ny)
+end
+function scrollCameraToFocusObject()
+    local x,y = mapa.avatar:getLoc()
+    scrollCameraToCenter(x, y)
 end
 
 function onStart(e)
@@ -69,6 +85,7 @@ end
 
 function onUpdate(e)
   mapa:onUpdate(e) 
+  scrollCameraToFocusObject()
 end
 
 function tileMap_OnTouchDown(e) 
