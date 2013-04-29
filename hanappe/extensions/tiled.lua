@@ -102,7 +102,7 @@ function TileMap:loadMapData(data)
     
     self:dispatchEvent(TileMap.EVENT_LOADED_DATA, data)
     
-    self:updateRenderOrder()
+    --self:updateRenderOrder()
 end
 
 --------------------------------------------------------------------------------
@@ -738,7 +738,7 @@ end
 --------------------------------------------------------------------------------
 function TileObject:setLoc(x, y, z)
     MOAIPropInterface.setLoc(self, x, y, z)
-    self:updatePriority()
+    --self:updatePriority()
 end
 
 --------------------------------------------------------------------------------
@@ -1099,7 +1099,9 @@ function IsometricLayerRenderer:createRenderer(x, y, gid)
     posX = posX + tileset.tileOffsetX
     posY = posY + tileset.tileOffsetY + tileMap.tileHeight - tileHeight
     renderer:setPos(posX, posY)
-
+    
+    renderer:setPriority(y * mapWidth + x + 1)-- DEFININDO A PRIORIDADE DE ACORDO COM SUA POSIÇÃO NO MAPA
+    
     self:addChild(renderer)
     self.renderers[y * mapWidth + x + 1] = renderer
     

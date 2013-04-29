@@ -41,10 +41,12 @@ function M:init(params)
     
     self:setIsoPos(288,256)
     self:setSize(self.tileWidth,self.tileHeight)       
-    self:createRenderer()
-    self:setPriority(8000)
+    
+    self:createRenderer()    
     self:createPhysics()
     self:createController()   
+    --self.renderer:setPriority(5)
+    
     --print(self:getMapIsoPos())
 end
 
@@ -109,10 +111,7 @@ function M:createRenderer()
     rendererObject:setTileSize(self.tileWidth,self.tileHeight)
     rendererObject:setIndex(1)       
     
-   -- rendererObject:setPos(self.tileWidth-(self.tileWidth/4),-(self.tileHeight+16))
-    rendererObject:setPos(-48,-self:getHeight()+16)--ANCORA NOS PÉS
-    -- rendererObject:setPos(self.tileWidth+8,-(self.tileHeight+12))  PROFESSOR_2.PNG
-    --rendererObject:setPos(0,-self:getHeight()) -- OBJETOS COM ÂNCORA CIMA* 
+    rendererObject:setPos(-48,-self:getHeight()+16)
     
     self.renderer = rendererObject
     
@@ -123,19 +122,25 @@ function M:createRenderer()
 end
 
 function M:vertexZ()
-  local lowestZ = self.tileMap.mapWidth + self.tileMap.mapHeight
-  local tilePosX,tilePosY = self:getMapIsoPos()      
-  local currentZ =  tilePosX + (tilePosY*(lowestZ/2)) - 40  
-  local vertexZ = currentZ 
-  return vertexZ  
+  local px,py = self:getIsoPos() 
+  local z = (py/32) * self.tileMap.mapWidth + (px/32) +1
+  return z  
 end
 
-function M:onUpdate()  
-
+function M:onUpdate()
+    --ATUALIZANDO A ORDEM DE RENDERIZAÇÃO
+    self:setPriority(self:vertexZ())
 end
 
 
-
+function M:getMapIsoPos()
+    local posX, posY = self:getPos()
+    posX = posX - self.tileMap.tileWidth / 2
+    posY = posY - self.tileMap.tileHeight / 2
+    local y = posY - posX / 2
+    local x = posX + y
+    return math.floor((x + self.tileMap.tileHeight / 2)/32), math.floor((y+self.tileMap.tileHeight / 2)/32)
+end
 
 
 return M

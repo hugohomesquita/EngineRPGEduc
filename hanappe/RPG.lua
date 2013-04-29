@@ -91,6 +91,9 @@ function RPG:onLoadedData(e)
     if self.objectLayer then
         self:createAvatar()
     end
+    
+    
+    ---layer:setVisible(false)
     --self:setInvisibleLayerByName("background")
 end
 
@@ -147,18 +150,13 @@ function RPG:onUpdate(e)
     for i, system in ipairs(self.systems) do
         system:onUpdate()
     end
-    self:updateRenderOrdem()
+    
 end
 
 function RPG:updateRenderOrdem()
-   --for i, object in ipairs(self.objectLayer:getObjects()) do
-        --if object.name == "HugoHenrique" then
-         -- self:updateRenderOrder(1)
-          ---object:setPriority(object:vertexZ())
-         -- print('fdfd')
-      --  end    
-        
-   -- end
+    --BACKGROUND
+    local bg = self:findMapLayerByName("background")
+    bg:setPriority(1)   
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -196,7 +194,7 @@ function MovementSystem:onUpdate()
         self:moveStep(object)                   
     end
 end
---moveStep
+
 function MovementSystem:moveStep(object)  
     
     --VERIFICA SE TEM CONTROLLER E SE ESTÁ SE MOVIMENTANDO 
@@ -204,21 +202,7 @@ function MovementSystem:moveStep(object)
         return
     end
     object.controller:moveStep()
-    --object:addLoc(object.currentMoveX, object.currentMoveY)
 end
 
-function MovementSystem:collisionWith(object, mapX, mapY)
-end
-function MovementSystem:collisionWithObjects(object, x, y)
-end
-
-function MovementSystem:collisionWithObjects(object, mapX, mapY)
-    for i, object in ipairs(self.objectLayer:getObjects()) do
-       if target ~= object and object:isCollisionByMapPosition(x, y, w, h) then
-          return true
-       end
-    end
-    return false
-end
 
 return M

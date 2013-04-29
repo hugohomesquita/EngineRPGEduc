@@ -30,7 +30,7 @@ function onCreate(e)
     --world = physics.B2World()
     world:setGravity ( 0, 0 )
     world:setUnitsToMeters ( 1/30)
-    world:setDebugDrawEnabled(false)
+    --world:setDebugDrawEnabled(false)
     
     world:start()
     
@@ -46,10 +46,14 @@ function onCreate(e)
     mapa = rpgmap.RPG()
     mapa:setWorldPhysics(world)
     mapa:loadMapData(mapData)
-    
+    --mapa:updateRenderOrder()
     mapa:setLayer(layer)
     
     layer:setBox2DWorld (world)
+    
+    
+    --PRIORIDADES DE RENDERIZAÇÃO
+    mapa:updateRenderOrdem()
     
     
     
@@ -57,6 +61,7 @@ function onCreate(e)
     mapa:addEventListener("touchUp", tileMap_OnTouchUp)
     mapa:addEventListener("touchMove", tileMap_OnTouchMove)
     mapa:addEventListener("touchCancel", tileMap_OnTouchUp)
+    
     scrollCameraToFocusObject()
     
 end
