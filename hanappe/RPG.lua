@@ -84,18 +84,25 @@ end
 function RPG:onLoadedData(e)
     self.objectLayer = self:findMapLayerByName("Object")
     self.collisionLayer = self:findMapLayerByName("Collision")
+    self.eventLayer = self:findMapLayerByName("event")
     if self.collisionLayer then
         self.collisionLayer:setVisible(false)
-        self:createPhysicsCollision()
+        --self:createPhysicsCollision()
     end
     if self.objectLayer then
         self:createAvatar()
     end
     
+    if self.eventLayer then
+      self:createPhysicsEvent()
+    end  
     
     ---layer:setVisible(false)
-    --self:setInvisibleLayerByName("background")
+    self:setInvisibleLayerByName("background")
+    self:setInvisibleLayerByName("object")
 end
+
+
 
 function RPG:createAvatar()
     self.avatar = Avatar({tileMap=self,worldPhysics=self.world})
@@ -109,6 +116,80 @@ function RPG:setInvisibleLayerByName(layerName)
           object:setVisible(false)
       end
     end
+end
+function string:split(separator)
+    local init = 1
+    return function()
+        if init == nil then return nil end
+        local i, j = self:find(separator, init)
+        local result
+        if i ~= nil then
+            local ax = i - 1
+            result = self:sub(init, ax)
+            init = j + 1
+        else
+            result = self:sub(init)
+            init = nil
+        end
+        return result
+    end
+end
+function RPG:createPhysicsEvent()
+  for i, object in ipairs(self.eventLayer.children) do   
+      print(object.type) 
+      local body = self.world:addBody(MOAIBox2DBody.KINEMATIC)        
+      local posX,posY = object:getPos()
+      local width, height = object:getSize()
+      local xMin, yMin, xMax, yMax = -width / 2, -height / 2, width / 2, height / 2   
+      
+      object:setPos(xMin, yMin)
+      object:setParent(body)   
+      body:setTransform(posX,posY)  
+      
+      local size = {x=1,y=1}
+      if object:getProperty("size") then
+        local i = 0
+        str = object:getProperty("size")        
+        for linha in str:split(",") do
+          if i == 0 then 
+            size.x = linha
+          else
+            size.y = linha
+          end
+          i = i + 1
+        end
+          
+      end   
+                  
+      p2x = 32 * size.x
+      p2y = p2x / 2 - 16
+      
+      p3x = 0
+      p3y = size.y * 32 - 16                
+      
+      p4x = size.y * 32
+      p4y = p4x / 2 - 16
+      
+      if size.x > size.y then
+        p3x = (size.x * 64 / 2) - 32 
+        p3y = 32 * size.x / 2
+      end
+      if size.x < size.y then
+        p3x = -((size.y * 32) - 32)
+        p3y = 32 * size.y / 2
+      end
+      
+      poly = {
+        0, -16, 
+        p2x, p2y, 
+        p3x, p3y, 
+        -p4x, p4y, 
+      }
+      
+      body:addPolygon (poly)
+      body:setFixedRotation(0)  
+      body:resetMassData()  
+  end
 end
 
 function RPG:createPhysicsCollision()
