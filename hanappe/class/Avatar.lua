@@ -19,7 +19,6 @@ M.STATES = {
 function M:init(params)
     TileObject.init(self,params.tileMap)
     self.worldPhysics = params.worldPhysics      
-    
     self.name = "HugoHenrique"
     self.type = "Player"
     self.controllerName = "AvatarController" 
@@ -84,7 +83,42 @@ function M:createPhysics()
     
     self.physics.body:setTransform(x, y)
     self.physics.fixture = self.physics.body:addPolygon(poly2)
+    
+    self.physics.fixture:setCollisionHandler(function(phase, a, b, arbiter)
+                                 self:onCollide(phase, a, b, arbiter)
+                              end, MOAIBox2DArbiter.ALL)
+    
     self.physics.body:resetMassData() 
+end
+
+function M:getEventCollision(fixture)
+  for i, object in ipairs(self.tileMap:findMapLayerByName("event").children) do     
+    if object.physics.fixture == fixture then
+      return object
+    end    
+  end
+  return nil
+end
+
+function M:onCollide(phase, fixtureA, fixtureB, arbiter)
+  if phase == MOAIBox2DArbiter.BEGIN then   
+    object = self:getEventCollision(fixtureB)
+    if object then
+      print(object.type)
+    end  
+	end
+	
+	if phase == MOAIBox2DArbiter.END then
+		--print ( 'end!')
+	end
+	
+	if phase == MOAIBox2DArbiter.PRE_SOLVE then
+		--print ( 'pre!' )
+	end
+	
+	if phase == MOAIBox2DArbiter.POST_SOLVE then
+		--print ( 'post!' )
+	end
 end
 
 

@@ -87,7 +87,7 @@ function RPG:onLoadedData(e)
     self.eventLayer = self:findMapLayerByName("event")
     if self.collisionLayer then
         self.collisionLayer:setVisible(false)
-        --self:createPhysicsCollision()
+        self:createPhysicsCollision()
     end
     if self.objectLayer then
         self:createAvatar()
@@ -136,7 +136,7 @@ function string:split(separator)
 end
 function RPG:createPhysicsEvent()
   for i, object in ipairs(self.eventLayer.children) do   
-      print(object.type) 
+      object.physics = {} 
       local body = self.world:addBody(MOAIBox2DBody.KINEMATIC)        
       local posX,posY = object:getPos()
       local width, height = object:getSize()
@@ -185,12 +185,19 @@ function RPG:createPhysicsEvent()
         p3x, p3y, 
         -p4x, p4y, 
       }
-      
-      body:addPolygon (poly)
       body:setFixedRotation(0)  
-      body:resetMassData()  
+      body:resetMassData()
+      
+      object.physics.fixture = body:addPolygon (poly)
+      object.physics.fixture:setSensor(true)
+      
+      --CALLBACK PARA CHAMADA DO EVENTO
+      --object.physics.fixture:setCollisionHandler(onCollide, MOAIBox2DArbiter.ALL)
+      
+      object.physics.body = body
   end
 end
+
 
 function RPG:createPhysicsCollision()
   for i, object in ipairs(self.collisionLayer.children) do         
