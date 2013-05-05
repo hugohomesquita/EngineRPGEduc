@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="isometric" width="30" height="30" tilewidth="64" tileheight="32">
+ <properties>
+  <property name="location" value="56,69,4"/>
+  <property name="music" value="cave_theme.ogg"/>
+  <property name="name" value="lost_mines"/>
+  <property name="tileset" value="tileset_cave.txt"/>
+  <property name="title" value="Lost Mines Level 1"/>
+ </properties>
+ <tileset firstgid="1" name="tiled_collision.png" tilewidth="64" tileheight="32">
+  <image source="tiled_collision.png" width="960" height="32"/>
+ </tileset>
+ <tileset firstgid="16" name="tiled_cave.png" tilewidth="64" tileheight="128">
+  <image source="tiled_cave.png" width="1024" height="1920"/>
+ </tileset>
+ <tileset firstgid="256" name="set_rules.png" tilewidth="64" tileheight="32">
+  <image source="set_rules.png" width="128" height="128"/>
+ </tileset>
+ <layer name="MapBackground" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJztUosKwjAM7Cdsvupjul/oXgX//8dM8IIxyGRVECEHR0kX7nJZQ3A4HA6Hw+H4L1TE6w88N8TtF70rsJ7pEc8dMYKfgjV76K6JK5wae+KBeCSeQNtT4pvgzZRMrCt7kFkuxI7YomduR+/AWSZiDvccPc4ID9lvUvMN6JFvJeBMY3jO1KoZEubqMcdZ9STclUDvOUKXa87UYKYMH+6RvQ+oZYYlsP/P1vYdSz2g1u9taVbW6TD7ZHzsO97DU2reh+y9NCvr5PB4M1a3VXVCXZJXZ43QGuGRoaXnqtWsHe6aF7o3IR0UAQ==
+  </data>
+ </layer>
+ <layer name="MapCollision" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJztk9EKgDAIRbf1//8cgwS5aLh0g+AekB4Uz2611gghhBDyJ65E7dp72tufOuntRmW9kV2zN+BZ4ZVd3hlkZsBs1ivgXl3Sb85Mxot+7XqbiXitb6fBbIjuW+/9q3cVK3P0fnjZVojeb/2fVhD16qxVeXdkxVnrzs29N6WcAkw=
+  </data>
+ </layer>
+ <objectgroup name="Event" width="30" height="30">
+  <object type="run_once" x="416" y="704" width="32" height="32">
+   <properties>
+    <property name="hotspot" value="location"/>
+    <property name="loot" value="currency,13,23,fixed,5,15"/>
+    <property name="mapmod" value="object,13,22,178"/>
+    <property name="soundfx" value="soundfx/wood_open.ogg"/>
+    <property name="tooltip" value="Barrel"/>
+   </properties>
+  </object>
+  <object type="run_once" x="352" y="672" width="32" height="32">
+   <properties>
+    <property name="hotspot" value="location"/>
+    <property name="loot" value="currency,11,22,fixed,10,25"/>
+    <property name="mapmod" value="object,11,21,177"/>
+    <property name="soundfx" value="soundfx/wood_open.ogg"/>
+    <property name="tooltip" value="Treasure Chest"/>
+   </properties>
+  </object>
+  <object name="necromancer" type="teleport" x="480" y="864" width="32" height="32">
+   <properties>
+    <property name="ToMap" value="flare"/>
+    <property name="ToMapHotSpot" value="1"/>
+    <property name="hotspot" value="1"/>
+   </properties>
+  </object>
+  <object type="run_once" x="800" y="768" width="32" height="32">
+   <properties>
+    <property name="hotspot" value="location"/>
+    <property name="loot" value="currency,25,26,fixed,5,15"/>
+    <property name="mapmod" value="object,26,25,179"/>
+    <property name="soundfx" value="soundfx/wood_open.ogg"/>
+    <property name="tooltip" value="Crate"/>
+   </properties>
+  </object>
+  <object type="run_once" x="800" y="768" width="32" height="32">
+   <properties>
+    <property name="hotspot" value="location"/>
+    <property name="loot" value="currency,25,25,fixed,5,15"/>
+    <property name="mapmod" value="object,26,24,179"/>
+    <property name="soundfx" value="soundfx/wood_open.ogg"/>
+    <property name="tooltip" value="Crate"/>
+   </properties>
+  </object>
+  <object type="run_once" x="800" y="768" width="32" height="32">
+   <properties>
+    <property name="hotspot" value="location"/>
+    <property name="loot" value="currency,25,25,fixed,5,15"/>
+    <property name="mapmod" value="object,25,24,178"/>
+    <property name="soundfx" value="soundfx/wood_open.ogg"/>
+    <property name="tooltip" value="Barrel"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer name="MapObject" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJztlN0KwjAMhfNoE1FUEEQ2r4f4UwX1bdy8nHtRT2mKY3SsLUUQ8sEh6xqWnJSVSBAEQRAE4b84Qcsf11xAOVRAk0T19x7fUlANvaAKmieoW0INGS8X6OjoIeN6T47FSJ8+qM7zm4wv28ONY877dSfamc8ieygd76yvbi1Xjt27RtRVvfV9pN6Do+5Lz6eluLlngfl9Wo4hnvU/eaZhbyFoz2vP3AOZc0rBDlp55Om7YEPmnFL49Z2zvQt8qQbWW2hKX68fxA8iug==
+  </data>
+ </layer>
+ <objectgroup name="Object" width="30" height="30"/>
+</map>

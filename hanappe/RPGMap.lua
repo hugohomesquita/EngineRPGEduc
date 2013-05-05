@@ -32,10 +32,10 @@ local PlayerController
 ----------------------------------------------------------------------------------------------------
 -- @type RPGMap
 ----------------------------------------------------------------------------------------------------
-RPG = class(TileMap)
-M.RPG = RPG
+RPGMap = class(TileMap)
+M.RPGMap = RPGMap
 
-function RPG:init()
+function RPGMap:init()
     TileMap.init(self)
     
     
@@ -44,25 +44,17 @@ function RPG:init()
     self.objectLayer = nil
     self.collisionLayer = nil
     self.avatar = nil
-    --self.objectFactory = ClassFactory(RPGObject)    
-    --self:initLayer()
+    
     self:initSystems()
     self:initEventListeners()    
     
 end
 
-function RPG:setWorldPhysics(world)
+function RPGMap:setWorldPhysics(world)
     self.world = world
 end
 
-function RPG:initLayer()
-    local layer = Layer()
-    camera = Camera()
-    layer:setCamera(camera)
-    self:setLayer(layer)    
-end
-
-function RPG:initSystems()
+function RPGMap:initSystems()
     self.systems = {
         UpdatingSystem(self),
         MovementSystem(self),
@@ -71,45 +63,49 @@ function RPG:initSystems()
     }
 end
 
-function RPG:initEventListeners()
+function RPGMap:initEventListeners()
     self:addEventListener("loadedData", self.onLoadedData, self)
     self:addEventListener("savedData", self.onSavedData, self)
 end
 
-function RPG:isCollison(x, y)
+function RPGMap:isCollison(x, y)
     local gid = self.collisionLayer:getGid(x, y)
     return gid > 0
 end
 
-function RPG:onLoadedData(e)
+function RPGMap:onLoadedData(e)
     self.objectLayer = self:findMapLayerByName("Object")
-    self.collisionLayer = self:findMapLayerByName("Collision")
-    self.eventLayer = self:findMapLayerByName("event")
+    self.collisionLayer = self:findMapLayerByName("MapCollision")
+    self.eventLayer = self:findMapLayerByName("Event")
     if self.collisionLayer then
         self.collisionLayer:setVisible(false)
         self:createPhysicsCollision()
     end
     if self.objectLayer then
-        self:createAvatar()
+       -- self:createAvatar()
     end
     
     if self.eventLayer then
       self:createPhysicsEvent()
     end  
     
-    ---layer:setVisible(false)
-    self:setInvisibleLayerByName("background")
-    self:setInvisibleLayerByName("object")
+    self:setInvisibleLayerByName("MapBackground")
+    --self:setInvisibleLayerByName("MapObject")
 end
 
-
-
-function RPG:createAvatar()
-    self.avatar = Avatar({tileMap=self,worldPhysics=self.world})
-    self.objectLayer:addObject(self.avatar)
+--RETORNA O X,Y DO HOTSPOT
+function RPGMap:getPositionHotSpot(index)
+    for i, event in ipairs(self.eventLayer.children) do
+        if event.type == 'teleport' then
+            local hotspotIndex = event:getProperty('hotspot')             
+            if hotspotIndex == tostring(index) then
+                return event.tileX,event.tileY
+            end
+        end
+    end
 end
 
-function RPG:setInvisibleLayerByName(layerName)
+function RPGMap:setInvisibleLayerByName(layerName)
     local layer = self:findMapLayerByName(layerName)
     if layer then
       for i, object in ipairs(layer.children) do        
@@ -117,6 +113,7 @@ function RPG:setInvisibleLayerByName(layerName)
       end
     end
 end
+
 function string:split(separator)
     local init = 1
     return function()
@@ -134,7 +131,8 @@ function string:split(separator)
         return result
     end
 end
-function RPG:createPhysicsEvent()
+
+function RPGMap:createPhysicsEvent()
   for i, object in ipairs(self.eventLayer.children) do   
       object.physics = {} 
       local body = self.world:addBody(MOAIBox2DBody.KINEMATIC)        
@@ -157,8 +155,7 @@ function RPG:createPhysicsEvent()
             size.y = linha
           end
           i = i + 1
-        end
-          
+        end          
       end   
                   
       p2x = 32 * size.x
@@ -199,7 +196,7 @@ function RPG:createPhysicsEvent()
 end
 
 
-function RPG:createPhysicsCollision()
+function RPGMap:createPhysicsCollision()
   for i, object in ipairs(self.collisionLayer.children) do         
     for y = 0, self.mapHeight - 1 do
       for x = 0, self.mapWidth - 1 do
@@ -229,11 +226,11 @@ function RPG:createPhysicsCollision()
   end
 end
 
-function RPG:onSavedData(e)
+function RPGMap:onSavedData(e)
     
 end
 
-function RPG:onUpdate(e)  
+function RPGMap:onUpdate(e)  
     
     for i, system in ipairs(self.systems) do
         system:onUpdate()
@@ -241,9 +238,9 @@ function RPG:onUpdate(e)
     
 end
 
-function RPG:updateRenderOrdem()
+function RPGMap:updateRenderOrdem()
     --BACKGROUND
-    local bg = self:findMapLayerByName("background")
+    local bg = self:findMapLayerByName("MapBackground")
     bg:setPriority(1)   
 end
 

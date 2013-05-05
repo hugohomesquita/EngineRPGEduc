@@ -661,7 +661,8 @@ function TileObject:loadData(data)
     self.shape = data.shape
     self.gid = data.gid
     self.properties = data.properties
-
+    self.tileX = data.x
+    self.tileY = data.y
     self:setPosByAuto(data.x, data.y)
     self:setSize(data.width, data.height)
     self:createRenderer()

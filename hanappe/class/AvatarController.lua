@@ -151,8 +151,8 @@ function M:walkByStick(e)
     if e.direction == 'center' then            
       self.linearVelocity.x = 0
       self.linearVelocity.y = 0
-      self.renderer:stopAnim()      
-      self.renderer:setIndex(DIRECTIONS_DATA[self.tileObject.currentDirection].index)
+      self.renderer:stopAnim()    
+      --self.renderer:setIndex(DIRECTIONS_DATA[self.tileObject.currentDirection].index)
       return  
     end
     

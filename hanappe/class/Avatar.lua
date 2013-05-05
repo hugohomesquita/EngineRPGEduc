@@ -11,11 +11,12 @@ local TileObject = tiled.TileObject
 
 local M = class(TileObject)
 
-M.STATES = {
-  IDLE = "IDLE",
-  WALKING = "WALKING",
-}
---WALKING = "WALKING"
+-- Events
+M.EVENT_COLLISION_BEGIN = "collisionBegin"
+M.EVENT_COLLISION_END = "collisionEnd"
+M.EVENT_COLLISION_PRE_SOLVE = "collisionPreSolve"
+M.EVENT_COLLISION_POST_SOLVE = "collisionPostSolve"
+
 function M:init(params)
     TileObject.init(self,params.tileMap)
     self.worldPhysics = params.worldPhysics      
@@ -25,7 +26,6 @@ function M:init(params)
     self.controller = nil    
     self.renderer = nil       
     self.physics = {}
-    self.STATS = M.STATES.IDLE
     self.tileWidth = 96 --28 --64 
     self.tileHeight = 96 -- 56 --32    
     --ATRIBUTOS DE MOVIMENTAÇÃO
@@ -34,7 +34,7 @@ function M:init(params)
     self.move = true
         
     self.moveSpeed = 1
-    self.currentDirection = nil
+    self.currentDirection = walkSouth
     self.currentMoveX = 0
     self.currentMoveY = 0         
     
@@ -45,8 +45,21 @@ function M:init(params)
     self:createPhysics()
     self:createController()   
     --self.renderer:setPriority(5)
-    
-    --print(self:getMapIsoPos())
+
+end
+
+function M:toPos(x,y)
+    self:setIsoPos(x,y)  
+    self:createRenderer()  
+    self:createPhysics()    
+    self:createController() 
+end
+
+function M:setTileMap(tileMap)
+    self.tileMap = tileMap
+end
+function M:setWorldPhysics(worldPhysics)
+    self.worldPhysics = worldPhysics
 end
 
 function M:createController(worldPhysics)  
@@ -92,7 +105,7 @@ function M:createPhysics()
 end
 
 function M:getEventCollision(fixture)
-  for i, object in ipairs(self.tileMap:findMapLayerByName("event").children) do     
+  for i, object in ipairs(self.tileMap:findMapLayerByName("Event").children) do     
     if object.physics.fixture == fixture then
       return object
     end    
@@ -101,23 +114,30 @@ function M:getEventCollision(fixture)
 end
 
 function M:onCollide(phase, fixtureA, fixtureB, arbiter)
-  if phase == MOAIBox2DArbiter.BEGIN then   
-    object = self:getEventCollision(fixtureB)
+  local object = self:getEventCollision(fixtureB)
+  
+  if phase == MOAIBox2DArbiter.BEGIN then       
     if object then
-      print(object.type)
+      self:dispatchEvent(M.EVENT_COLLISION_BEGIN, object)
     end  
 	end
 	
 	if phase == MOAIBox2DArbiter.END then
-		--print ( 'end!')
+    if object then
+      self:dispatchEvent(M.EVENT_COLLISION_END, object)
+    end
 	end
 	
 	if phase == MOAIBox2DArbiter.PRE_SOLVE then
-		--print ( 'pre!' )
+    if object then
+      self:dispatchEvent(M.EVENT_COLLISION_PRE_SOLVE, object)
+    end
 	end
 	
 	if phase == MOAIBox2DArbiter.POST_SOLVE then
-		--print ( 'post!' )
+    if object then
+      self:dispatchEvent(M.EVENT_COLLISION_POST_SOLVE, object)
+    end
 	end
 end
 

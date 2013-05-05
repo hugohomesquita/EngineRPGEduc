@@ -3,68 +3,153 @@ module(..., package.seeall)
 --------------------------------------------------------------------------------
 -- Event Handler
 --------------------------------------------------------------------------------
-function onCreate(e)       
-    layer = flower.Layer()
-    layer:setScene(scene)
-    layer:setTouchEnabled(true)
-    layer:setPriority(1)
-       
-    view = widget.UIView {
-        scene = scene,
-    }
-    --view:setPriority(4)
-    
-    joystick = widget.Joystick {
-        stickMode = "digital",
-        parent = view,
-        onStickChanged = joystick_OnStickChanged,
-    }
-    joystick:setPos(5, flower.viewHeight - joystick:getHeight() - 5)
- 
+local Avatar = require "hanappe/class/Avatar"
+local FpsMonitor = require "hanappe/extensions/FpsMonitor"
+
+local AVATAR = nil
+local MAPA = nil
+local PHYSICS = nil
+
+local fpsMonitor = FpsMonitor(1)
+function onCreate(e)    
+    fpsMonitor:play() 
+    MapLayer = flower.Layer()
+    MapLayer:setScene(scene)
+    MapLayer:setTouchEnabled(true)
+    MapLayer:setPriority(1)
     
     camera = flower.Camera()
-    layer:setCamera(camera)
-    camera:addLoc(500,500,0)
-    --INIT WORLD PHYSICS
-    world = MOAIBox2DWorld.new ()
-    --world = physics.B2World()
-    world:setGravity ( 0, 0 )
-    world:setUnitsToMeters ( 1/30)
-    --world:setDebugDrawEnabled(false)
-    
-    world:start()
+    MapLayer:setCamera(camera)
+    --camera:addLoc(500,500,0)
     
     
-    -- TODO: Tile Map Editor 0.9 Bug
-    mapData = dofile("assets/flare.lue")
+    createHUD()
+    PHYSICS = createWorldPhysics()
+    MAPA = initMap()
+    initAvatar()                  
+  
+    scrollCameraToFocusObject()
+    
+end
+
+
+function initAvatar()
+    AVATAR = Avatar({tileMap=MAPA,worldPhysics=PHYSICS})
+    AVATAR:addEventListener("collisionBegin",onCollisionBegin)    
+    AVATAR:addEventListener("collisionEnd",onCollisionEnd)
+    MAPA.objectLayer:addObject(AVATAR)    
+    MAPA.avatar = AVATAR
+end
+
+function initMap()    
+   -- TODO: Tile Map Editor 0.9 Bug
+    local mapData = dofile("assets/flare.lue")
     mapData.tilesets[7].tileoffsetx = 0
     mapData.tilesets[7].tileoffsety = 48
     
     mapData.tilesets[4].tileoffsetx = 0
     mapData.tilesets[4].tileoffsety = 16
     
-    mapa = rpgmap.RPG()
-    mapa:setWorldPhysics(world)
+    local mapa = rpgmap.RPGMap()
+    mapa:setWorldPhysics(PHYSICS)
     mapa:loadMapData(mapData)
-    --mapa:updateRenderOrder()
-    mapa:setLayer(layer)
-    
-    layer:setBox2DWorld (world)
-    
+    mapa:setLayer(MapLayer)
     
     --PRIORIDADES DE RENDERIZAÇÃO
     mapa:updateRenderOrdem()
-    
-    
-    
-    mapa:addEventListener("touchDown", tileMap_OnTouchDown)
-    mapa:addEventListener("touchUp", tileMap_OnTouchUp)
-    mapa:addEventListener("touchMove", tileMap_OnTouchMove)
-    mapa:addEventListener("touchCancel", tileMap_OnTouchUp)
-    
-    scrollCameraToFocusObject()
-    
+    MapLayer:setBox2DWorld (PHYSICS)
+
+    return mapa
 end
+
+colidindo = false
+
+function onCollisionBegin(e)
+  if e.data.type == 'teleport' and not colidindo then
+      local toMap = e.data:getProperty('ToMap')
+      local ToMapHotSpot = e.data:getProperty('ToMapHotSpot')
+      if toMap and toMpa ~= MAPA:getProperty('name')  and ToMapHotSpot then
+        colidindo = true
+        changeMap(toMap,ToMapHotSpot)
+      end
+  end
+end
+function onCollisionEnd(e)
+  colidindo = false
+end
+function changeMap(toMap,ToMapHotSpot)   
+   local mapName = assert(toMap)
+   local hotspot = assert(ToMapHotSpot)
+   
+   local mapFile = dofile("assets/"..mapName..".lue")
+   --REINICIANDO FÍSICA
+   PHYSICS = createWorldPhysics()
+   
+   
+   local mapData = rpgmap.RPGMap()
+   mapData:setWorldPhysics(PHYSICS) --MUDAR E COLOCAR NO CONSTRUTOR
+   mapData:loadMapData(mapFile)
+   
+   local px,py = mapData:getPositionHotSpot(hotspot)
+   
+   --LIMPANDO A LAYER
+
+   MapLayer:clear()
+   
+   
+   
+   
+   AVATAR:setWorldPhysics(PHYSICS)
+      
+   AVATAR:toPos(px,py)
+   mapData:setLayer(MapLayer)
+  
+   --PRIORIDADES DE RENDERIZAÇÃO
+   mapData:updateRenderOrdem()
+
+   
+   AVATAR:setTileMap(mapData)
+   mapData.objectLayer:addObject(AVATAR)    
+   mapData.avatar = AVATAR
+    
+   MapLayer:setBox2DWorld (PHYSICS)
+   MAPA = mapData
+   --layer:removeProp(image1)
+end
+
+function createWorldPhysics()
+    local world = MOAIBox2DWorld.new ()
+    world:setGravity ( 0, 0 )
+    world:setUnitsToMeters ( 1/30)
+    --world:setDebugDrawEnabled(false)
+    world:start()
+    return world
+end
+
+function createHUD()
+    view = widget.UIView {
+        scene = scene,
+    }
+    --HUD
+    infoBar = widget.UIGroup {
+      size = {100,100},
+      parent = view,
+      pos = {10,10},
+    }
+    
+    label1 = flower.Label("Hello World!!", 200, 30, "arial-rounded.ttf")
+    
+    label1:setPos(0,flower.viewHeight-20)
+    view:addChild(label1)
+    --CONTROLES
+    joystick = widget.Joystick {
+        stickMode = "digital",
+        parent = view,
+        onStickChanged = joystick_OnStickChanged,
+    }
+    joystick:setPos(5, flower.viewHeight - joystick:getHeight() - 5)
+end
+
 
 
 function scrollCameraToCenter(x, y)
@@ -76,7 +161,7 @@ function scrollCamera(x, y)
   camera:setLoc(nx,ny)
 end
 function scrollCameraToFocusObject()
-    local x,y = mapa.avatar:getLoc()
+    local x,y = MAPA.avatar:getLoc()
     scrollCameraToCenter(x, y)
 end
 
@@ -85,49 +170,11 @@ function onStart(e)
 end
 
 function joystick_OnStickChanged(e)
-    mapa.avatar.controller:walkByStick(e)
+    MAPA.avatar.controller:walkByStick(e)
 end
 
 function onUpdate(e)
-  mapa:onUpdate(e) 
+  MAPA:onUpdate(e) 
   scrollCameraToFocusObject()
-end
-
-function tileMap_OnTouchDown(e) 
-    --print(e.x,e.y)
-    if mapa.lastTouchEvent then
-        return
-    end
-    mapa.lastTouchIdx = e.idx
-    mapa.lastTouchX = e.x
-    mapa.lastTouchY = e.y
-end
-function tileMap_OnTouchUp(e)
-    
-    if not mapa.lastTouchIdx then
-        return
-    end
-    if mapa.lastTouchIdx ~= e.idx then
-        return
-    end
-    mapa.lastTouchIdx = nil
-    mapa.lastTouchX = nil
-    mapa.lastTouchY = nil    
-end
-
-function tileMap_OnTouchMove(e)
-    if not mapa.lastTouchIdx then
-        return
-    end
-    if mapa.lastTouchIdx ~= e.idx then
-        return
-    end
-    
-    local moveX = e.x - mapa.lastTouchX
-    local moveY = e.y - mapa.lastTouchY
-    camera:addLoc(-moveX, -moveY, 0)
-
-    mapa.lastTouchX = e.x
-    mapa.lastTouchY = e.y
 end
 

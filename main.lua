@@ -3,12 +3,13 @@ flower = require "hanappe/flower"
 tiled = require "hanappe/extensions/tiled"
 widget = require "hanappe/extensions/widget"
 physics = require "hanappe/extensions/physics"
-rpgmap = require "hanappe/RPG"
+rpgmap = require "hanappe/RPGMap"
 Resources = flower.Resources
 
 
 -- Resources setting
 Resources.addResourceDirectory("assets")
+Resources.addResourceDirectory("assets/fonts")
 --Resources.addResourceDirectory("maps")
 -- debug
 --[[
@@ -25,7 +26,14 @@ local screenHeight = MOAIEnvironment.verticalResolution or 600
 local screenDpi = MOAIEnvironment.screenDpi or 120
 local viewScale = math.floor(screenDpi / 240) + 1
 
+MOAISim.setHistogramEnabled(true) -- debug
+MOAISim.setStep(1 / 60)
+MOAISim.clearLoopFlags()
+MOAISim.setLoopFlags(MOAISim.SIM_LOOP_ALLOW_BOOST)
+MOAISim.setLoopFlags(MOAISim.SIM_LOOP_LONG_DELAY)
+MOAISim.setBoostThreshold(0)
 -- open window
+
 flower.openWindow("Flower extensions", screenWidth, screenHeight, 1.0)
 
 -- open scene
