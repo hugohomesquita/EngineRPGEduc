@@ -31,12 +31,18 @@
   <tileoffset x="0" y="48"/>
   <image source="stairs.png" width="1024" height="256"/>
  </tileset>
+ <tileset firstgid="288" name="0001" tilewidth="64" tileheight="128">
+  <image source="../../../../Desktop/MAPAS/out_walls/0001.png" width="64" height="128"/>
+ </tileset>
+ <tileset firstgid="289" name="tileset" tilewidth="64" tileheight="128">
+  <image source="../../../../Desktop/MAPAS/DESING BACKUP/out_walls/tileset.png" width="320" height="384"/>
+ </tileset>
  <layer name="MapBackground" width="30" height="50">
   <data encoding="base64" compression="zlib">
    eJztWFtugzAQ3P71E/AFnATyAJLc/3ZlpRl545pIYHAVqSOt6jrODvsY20TkM1BN5ic7/fNmw03WgCO2GpwnrHEz6yp8vgTq+zDZMWE672Fza6wtAXN5nqyb7GJicJjvJ2sRkz7nDetarNM1S2tBXvX5lJD3Gv+fzZytSWt4XQYvOe+TjfBZm/j4WQ/uq4R6dxm8jM/BD/3XGPfgbfBcts9y4tV8smbqn310SNhRQh/w2dbyDhLqd8GcM7Ey/gYcDuvcAt6URjXGB/wwb8zhKCHfTkIfjpGPWOMxUholH+OyfmyvMz+9+Q7nYo3HSNXrCt8VYicv7WziUI4OcTLeVD+8A2N7GM4Kc9QRealdj3Enr/2wBKxXje8/JOgxtSezlswN1+ToN+7n1J7MfujwjGptBi/rW8Mn66njO0yfa8CYte3BvZbXnmeMndoheDYwJ9Q8+2Et702CZrknqn1/hbU1PtO1I/hzziPG2iCum4Se0TxSvz3GVwm5XnMuqK+5fZh9xd59t2dveReitpkLv6Hvd6C2tY7cw0qAtdf6MvaSvNqva87YJbB3KHJpDw/y+4zaEvHZ4iWcd15e984twdyqfrlv0jTfg+yT81jPOu5gNg971po9zLPC78hlYfW7dz9b2Lvmmj04l1f/PnfmndMvz9jS+k3dVbeEvW/xbsP3P95v9sj5nH6dlNcv7zN+Ry4Le7cepbyO7HtgSV6Nd83dPJeXfVyal78rlOKlppSbGioFvuv5gpyKv/pt9JPxA35cPig=
   </data>
  </layer>
- <layer name="MapCollision" width="30" height="50">
+ <layer name="MapCollision" width="30" height="50" visible="0">
   <data encoding="base64" compression="zlib">
    eJztl9EOgCAIRTH//597ajkSFUTU5G5sbpUHBBZGAIgbWIBXwbnde5cs5baYJCasi1hT0uJyJeVKfJDWwArxOleXi3uu1CNUP9fey/nAjaGFm9MqXO4559Y1/1pyraVV69m573cSVi+3V7twW+acdG+NOYd7FhZz5Qlcbn5HxkhpBLf0j3qe/SXeGfmdVc+ncb1/v/L+3beenetcCy6+D1hwccxWzN3tBo2UCt0=
   </data>
@@ -50,7 +56,7 @@
     <property name="soundfx" value="soundfx/door_open.ogg,0,0"/>
    </properties>
   </object>
-  <object name="to Sacrifice Room" type="teleport" x="448" y="480" width="64" height="32">
+  <object name="to Sacrifice Room" type="minigame" x="448" y="480" width="64" height="32">
    <properties>
     <property name="intermap" value="brothers_lair_sacrifice_room.txt,9,41"/>
     <property name="size" value="2,1"/>
@@ -108,7 +114,7 @@
  </objectgroup>
  <layer name="MapObject" width="30" height="50">
   <data encoding="base64" compression="zlib">
-   eJztmM9OAjEQxoe3UPBhRv4YMGqC3PBAwgETL7wDB57ExCsivp9tpGGclM5Ot1vZhS+Z0HSG/rYDH20AqIfQRLsF0DHRzchdkHFOLlbIfTQxMHHriRGpuz9S48Ku8aTg9gO5Dzb+EtbS9AQVtZK03O1+vIxg0ffE7lfqo6S69LmM7Ge0+QculcS1fnuFg0ffEzBXcPC4W5vrupUAVECcc1WC+62o5ZweiSGE+3xT4Bl38NvnFxMTEiGhic9AfhvIcT0ralFRe27cjZCP5ZY9F3L1mX/nNNzQua/xqpb7AH/9zL3NxT1KY6Z8zmNCz5xmT7FaeOZycDEjl95rR5781MQY9PdWSW8Fatzvx11C7nz/ug7UuFzKntP9hs6p1FzqZ8m/qfzKhZ65i3/T6JT969Q0/0qq0r87lm+yfy/cZnPtHbfMHTlW1lP0LLQeqso7XEjGOfZK5f4Lrpt+AAsLQhQ=
+   eJxjYBgaQIeRgUEKiKUZIWx62ouNPZTt1QSap40DayHZpY5HHQxrkOA2BTxql6OxNxMwi5QwwWcvqYBUezdB2flk2IWsh1z/EgpHQmCohDMlABRHGwbAXmRAyF70PLqECnY2MWDmcXQgSacyD90eCQrs3UqCWnR7nJGwBwP+cJYhwo1bGCDhHA3EwUgYHwClq4145DfhkUMHQSSopWZ6Hm72biAgT669lNYL9Apn9DRHLXtJyauk2ouv/YKt3YKeR5FxPInuxAWwlfOk+GnUXtzAlwF7OxYGooA4EIhdgdiPivZmEaEGVn64UdHeJCjdhkcNTI6aYY7sX3z1FLXt9WFArZvRAXL+pVZ+RQcOWMTokY/SBsheBzraC8q/oLzpCMSeWOQHMv/CwHDLv4QALfPvFjT54Zx/R+0d3va6MFDWRiYXgPIUcl0IykO0yjvowAGJTQ+/IgPYWPBQAwCHLzrx
   </data>
  </layer>
  <objectgroup name="Enemy" width="30" height="50"/>

@@ -89,7 +89,7 @@ function RPGMap:onLoadedData(e)
       self:createPhysicsEvent()
     end  
     
-    self:setInvisibleLayerByName("MapBackground")
+   -- self:setInvisibleLayerByName("MapBackground")
     --self:setInvisibleLayerByName("MapObject")
 end
 

@@ -12,7 +12,7 @@ local PHYSICS = nil
 
 local fpsMonitor = FpsMonitor(1)
 function onCreate(e)    
-    fpsMonitor:play() 
+    --fpsMonitor:play() 
     MapLayer = flower.Layer()
     MapLayer:setScene(scene)
     MapLayer:setTouchEnabled(true)
@@ -64,7 +64,9 @@ end
 
 colidindo = false
 
-function onCollisionBegin(e)
+function onCollisionBegin(e)  
+  
+  
   if e.data.type == 'teleport' and not colidindo then
       local toMap = e.data:getProperty('ToMap')
       local ToMapHotSpot = e.data:getProperty('ToMapHotSpot')
@@ -73,6 +75,20 @@ function onCollisionBegin(e)
         changeMap(toMap,ToMapHotSpot)
       end
   end
+  if e.data.type == 'on_load' then
+      USER_DATA.xp = USER_DATA.xp + 20
+  end
+  
+  if e.data.type == 'minigame' then
+    clase = require "minigames/quiz"
+    MINIGAME = flower.openScene("minigames/quiz", {sceneFactory = flower.ClassFactory(clase)}) 
+    MINIGAME:addEventListener("onClose",onCloseMiniGame)
+    stopWorld()
+  end
+end
+function onCloseMiniGame(e)    
+    USER_DATA.xp = USER_DATA.xp + e.data.XP
+    PHYSICS:start()
 end
 function onCollisionEnd(e)
   colidindo = false
@@ -137,10 +153,19 @@ function createHUD()
       pos = {10,10},
     }
     
-    label1 = flower.Label("Hello World!!", 200, 30, "arial-rounded.ttf")
+    --LOAD PLAYER INFO
     
-    label1:setPos(0,flower.viewHeight-20)
-    view:addChild(label1)
+    GAME_FILE = savefiles.get "user"
+    USER_DATA = GAME_FILE.data
+    
+    lbNome = flower.Label(USER_DATA.nome, 100, 30, "arial-rounded.ttf")    
+    lbNome:setPos(0,0)
+    view:addChild(lbNome)
+    
+    lbXP = flower.Label("XP:"..USER_DATA.xp, 100, 30, "arial-rounded.ttf",18)    
+    lbXP:setPos(0,30)
+    view:addChild(lbXP)
+    
     --CONTROLES
     joystick = widget.Joystick {
         stickMode = "digital",
@@ -150,7 +175,9 @@ function createHUD()
     joystick:setPos(5, flower.viewHeight - joystick:getHeight() - 5)
 end
 
-
+function updateHUD()
+    lbXP:setString("XP:"..tostring(USER_DATA.xp))
+end
 
 function scrollCameraToCenter(x, y)
     local cx, cy = flower.getViewSize()
@@ -169,12 +196,22 @@ function onStart(e)
   
 end
 
-function joystick_OnStickChanged(e)
-    MAPA.avatar.controller:walkByStick(e)
+function stopWorld()
+  joystick:setCenterKnob()
+  e = {}
+  
+  e.direction = "center"
+  MAPA.avatar.controller:walkByStick(e)
+  PHYSICS:stop()
 end
 
-function onUpdate(e)
+function joystick_OnStickChanged(e)
+    MAPA.avatar.controller:walkByStick(e)    
+end
+
+function onUpdate(e)  
   MAPA:onUpdate(e) 
+  updateHUD()
   scrollCameraToFocusObject()
 end
 

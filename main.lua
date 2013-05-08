@@ -5,13 +5,14 @@ widget = require "hanappe/extensions/widget"
 physics = require "hanappe/extensions/physics"
 rpgmap = require "hanappe/RPGMap"
 Resources = flower.Resources
-
+require "hanappe/extensions/savefile-manager"
 
 -- Resources setting
 Resources.addResourceDirectory("assets")
 Resources.addResourceDirectory("assets/fonts")
---Resources.addResourceDirectory("maps")
--- debug
+--Resources.addResourceDirectory("maps") debug
+
+
 --[[
 MOAIDebugLines.setStyle ( MOAIDebugLines.TEXT_BOX, 1, 1, 1, 1, 1 )
 MOAIDebugLines.setStyle ( MOAIDebugLines.TEXT_BOX_LAYOUT, 1, 0, 0, 1, 1 )
@@ -19,6 +20,15 @@ MOAIDebugLines.setStyle ( MOAIDebugLines.TEXT_BOX_BASELINES, 1, 1, 0, 0, 1 )
 MOAIDebugLines.setStyle ( MOAIDebugLines.PROP_MODEL_BOUNDS, 2, 1, 1, 1 )
 MOAIDebugLines.setStyle ( MOAIDebugLines.PROP_WORLD_BOUNDS, 2, 0.75, 0.75, 0.75 )
 ]]
+
+
+GAME_FILE = savefiles.get "user"
+--[[USER_DATA = {
+  nome = "",
+  xp = 0  
+}
+GAME_FILE.data = USER_DATA
+GAME_FILE:saveGame()]]
 
 -- Screen setting
 local screenWidth = MOAIEnvironment.horizontalResolution or 800
