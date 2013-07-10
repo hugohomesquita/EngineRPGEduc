@@ -19,6 +19,11 @@ local ClassFactory = flower.ClassFactory
 local Group = flower.Group
 local Avatar = require "hanappe/class/Avatar"
 
+-- VARIABLES GUI
+local UIView = widget.UIView
+local Joystick = widget.Joystick
+local Button = widget.Button
+local ImageButton = widget.ImageButton
 -- class
 local RPGMap
 local RPGObject
@@ -57,7 +62,7 @@ end
 function RPGMap:initSystems()
     self.systems = {
         UpdatingSystem(self),
-        MovementSystem(self),
+        MovementSystem(self),        
         --CameraSystem(self),
         --RenderSystem(self),
     }
@@ -288,6 +293,166 @@ function MovementSystem:moveStep(object)
     end
     object.controller:moveStep()
 end
+
+--------------------------------------------------------------------------------
+-- @type RPGMapControlView
+--------------------------------------------------------------------------------
+RPGMapControlView = class(UIView)
+M.RPGMapControlView = RPGMapControlView
+
+function RPGMapControlView:_createChildren()
+    RPGMapControlView.__super._createChildren(self)
+
+    --JOYSTICK
+    self.joystick = Joystick {
+        stickMode = "digital",
+        parent = self,        
+        color = {0.6, 0.6, 0.6, 0.6},
+        OnStickChanged = function(e)          
+          self:dispatchEvent('OnStickChanged', e)
+        end,
+    }
+   
+    --BUTTON ENTER
+    self.enterButton = Button {
+        size = {100, 50},
+        color = {0.6, 0.6, 0.6, 0.6},
+        text = "Enter",
+        parent = self,
+        onClick = function(e)
+            self:dispatchEvent("enter")
+        end,
+    }
+    
+    --BUTTON OPTION
+    self.optionButton = ImageButton {
+        pos = {self:getWidth()-43, 5},
+        normalTexture = "skins/bt_option.png",
+        selectedTexture = "skins/bt_option_selected.png",
+        disabledTexture = "skins/bt_option.png",
+        parent = self,
+        onClick = function(e)
+          self:dispatchEvent("buttonOption_Click")
+        end,
+    }
+    --BUTTON PROFILE
+    self.profileButton = ImageButton {
+        pos = {self.optionButton:getLeft()-43, 5},
+        normalTexture = "skins/bt_profile.png",
+        selectedTexture = "skins/bt_profile_selected.png",
+        disabledTexture = "skins/bt_profile.png",
+        parent = self,
+        onClick = function(e)
+          self:dispatchEvent("buttonProfile_Click")
+        end,
+    }
+    
+end
+
+function RPGMapControlView:updateDisplay()
+    RPGMapControlView.__super.updateDisplay(self)
+    
+    local vw, vh = flower.getViewSize()
+    local joystick = self.joystick
+    local enterButton = self.enterButton
+    
+    joystick:setPos(10, vh - joystick:getHeight() - 10)
+    enterButton:setPos(vw - enterButton:getWidth() - 10, vh - enterButton:getHeight() - 10)
+end
+
+function RPGMapControlView:getDirection()
+    if InputMgr:keyIsDown(KeyCode.LEFT) then
+        return "left"
+    end
+    if InputMgr:keyIsDown(KeyCode.UP) then
+        return "up"
+    end
+    if InputMgr:keyIsDown(KeyCode.RIGHT) then
+        return "right"
+    end
+    if InputMgr:keyIsDown(KeyCode.DOWN) then
+        return "down"
+    end
+    return STICK_TO_DIR[self.joystick:getStickDirection()]
+end
+
+
+
+
+
+
+
+--------------------------------------------------------------------------------
+-- @type RPGMapPlayerInfo
+--------------------------------------------------------------------------------
+RPGMapPlayerInfo = class(UIView)
+M.RPGMapPlayerInfo = RPGMapPlayerInfo
+
+RPGMapPlayerInfo.NAME = "null"
+RPGMapPlayerInfo.XP = 0 
+
+function RPGMapPlayerInfo:_createChildren()
+    RPGMapPlayerInfo.__super._createChildren(self)
+    
+    self.playerPanel = widget.Panel {
+        size = {250, 90},
+        pos = {5, 5},
+        parent = self,
+        backgroundTexture = "skins/panel_playerinfo.png",
+        backgroundVisible = "skins/panel_playerinfo.png"
+    }
+    
+    -- AVATAR IMAGE
+    self.avatarImage = flower.NineImage("avatars/avatar5.png")
+    self.avatarImage:setPos(0,0)
+    self.avatarImage:setSize(80,85)
+    self.playerPanel:addChild(self.avatarImage)  
+    
+    self.lbNome = flower.Label(RPGMapPlayerInfo.NAME, 100, 30, "arial-rounded.ttf")    
+    self.lbNome:setPos(80,5)
+    self.playerPanel:addChild(self.lbNome)
+    
+    self.labelLVL = flower.Label("LVL", 100, 30, "arial-rounded.ttf",14)
+    self.labelLVL:setPos(80,35)
+    self.playerPanel:addChild(self.labelLVL)    
+      
+    self.lbLVL = flower.Label(tostring(RPGMapPlayerInfo.XP), 100, 30, "arial-rounded.ttf",18)    
+    self.lbLVL:setPos(112,33)
+    self.playerPanel:addChild(self.lbLVL)    
+
+    self.barXP = flower.NineImage("skins/barXp.png")
+    self.barXP:setPos(80,55)
+    self.barXP:setSize(165,26)
+    self.playerPanel:addChild(self.barXP)  
+
+    self.barXPbar = flower.NineImage("skins/barXpbar.png")
+    self.barXPbar:setPos(124,57)
+    self.barXPbar:setSize(80,22)
+    self.playerPanel:addChild(self.barXPbar)
+end
+
+function RPGMapPlayerInfo:updateDisplay()
+    RPGMapPlayerInfo.__super.updateDisplay(self)
+    
+    local vw, vh = flower.getViewSize()    
+end
+
+function RPGMapPlayerInfo:setName(name)
+  RPGMapPlayerInfo.NAME = name
+  
+end
+function RPGMapPlayerInfo:setXP(xp)
+  RPGMapPlayerInfo.XP = xp  
+end  
+
+function RPGMapPlayerInfo:onUpdate()
+    self.lbNome:setString(RPGMapPlayerInfo.NAME)
+    self.lbLVL:setString(tostring(RPGMapPlayerInfo.XP))
+end
+
+
+
+
 
 
 return M

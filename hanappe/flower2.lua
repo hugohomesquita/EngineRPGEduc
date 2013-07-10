@@ -1,13 +1,12 @@
 ----------------------------------------------------------------------------------------------------
 -- Flower library is a lightweight library for Moai SDK.
--- https://github.com/makotok/Hanappe
 --
 -- MEMO:
--- English documentation has been updated.  Please contact github://Cloven with
+-- English documentation has been updated.  Please contact github://Cloven with 
 -- issues, questions, or problems regarding the documentation.
 --
 -- @author Makoto
--- @release V2.1.2
+-- @release V2.1.1
 ----------------------------------------------------------------------------------------------------
 
 -- module
@@ -28,7 +27,6 @@ local Runtime
 local InputMgr
 local RenderMgr
 local SceneMgr
-local DeckMgr
 local DisplayObject
 local Group
 local Scene
@@ -51,31 +49,13 @@ local TouchHandler
 ----------------------------------------------------------------------------------------------------
 
 -- Sensors
-local pointerSensor = MOAIInputMgr.device.pointer
-local mouseLeftSensor = MOAIInputMgr.device.mouseLeft
-local touchSensor = MOAIInputMgr.device.touch
-local keyboardSensor = MOAIInputMgr.device.keyboard
+local pointerSensor     = MOAIInputMgr.device.pointer
+local mouseLeftSensor   = MOAIInputMgr.device.mouseLeft
+local touchSensor       = MOAIInputMgr.device.touch
+local keyboardSensor    = MOAIInputMgr.device.keyboard
 
 -- interfaces
 local MOAIPropInterface = MOAIProp.getInterfaceTable()
-local MOAILayerInterface = MOAILayer.getInterfaceTable()
-local MOAICameraInterface = MOAICamera.getInterfaceTable()
-local MOAITextureInterface = MOAITexture.getInterfaceTable()
-local MOAITextBoxInterface = MOAITextBox.getInterfaceTable()
-local MOAIFontInterface = MOAIFont.getInterfaceTable()
-
-----------------------------------------------------------------------------------------------------
--- Public Const
-----------------------------------------------------------------------------------------------------
-
---- default width of the screen
-M.DEFAULT_SCREEN_WIDTH = MOAIEnvironment.horizontalResolution or 320
-
---- default height of the screen
-M.DEFAULT_SCREEN_HEIGHT = MOAIEnvironment.verticalResolution or 480
-
---- default scale of the viewport
-M.DEFAULT_VIEWPORT_SCALE = 1
 
 ----------------------------------------------------------------------------------------------------
 -- Public functions
@@ -90,12 +70,12 @@ M.DEFAULT_VIEWPORT_SCALE = 1
 -- @param scale (Option)Scale of the Viewport to the Screen
 --------------------------------------------------------------------------------
 function M.openWindow(title, width, height, scale)
-    width = width or M.DEFAULT_SCREEN_WIDTH
-    height = height or M.DEFAULT_SCREEN_HEIGHT
-    scale = scale or M.DEFAULT_VIEWPORT_SCALE
-
+    width = width or MOAIEnvironment.horizontalResolution
+    height = height or MOAIEnvironment.verticalResolution
+    scale = scale or 1.0
+    
     M.updateDisplaySize(width, height, scale)
-
+    
     Runtime:initialize()
     InputMgr:initialize()
     RenderMgr:initialize()
@@ -117,7 +97,7 @@ function M.updateDisplaySize(width, height, scale)
     M.viewScale = scale or M.viewScale
     M.viewWidth = M.screenWidth / M.viewScale
     M.viewHeight = M.screenHeight / M.viewScale
-
+    
     M.viewport = M.viewport or MOAIViewport.new()
     M.viewport:setSize(M.screenWidth, M.screenHeight)
     M.viewport:setScale(M.viewWidth, -M.viewHeight)
@@ -157,6 +137,16 @@ end
 --------------------------------------------------------------------------------
 function M.getTexture(path)
     return Resources.getTexture(path)
+end
+
+--------------------------------------------------------------------------------
+-- Reads TexturePacker output files and returns a texture atlas.
+-- @param luaFilePath TexturePacker lua file path
+-- @param texture (option)Path of the texture or Texture instance
+-- @return Texture atlas
+--------------------------------------------------------------------------------
+function M.getTextureAtlas(luaFilePath, texture)
+    return Resources.getTextureAtlas(luaFilePath, texture)
 end
 
 --------------------------------------------------------------------------------
@@ -203,7 +193,7 @@ end
 
 --------------------------------------------------------------------------------
 -- Executes a function in a MOAICoroutine.
--- This variant of the function family will run the func immediately
+-- This variant of the function family will run the func immediately 
 -- upon the next coroutine.yield().
 -- @param func function object
 -- @param ... (option)function arguments
@@ -214,7 +204,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type class
---
+-- 
 -- This implements object-oriented style classes in Lua, including multiple inheritance.
 -- This particular variation of class implementation copies the base class
 -- functions into this class, which improves speed over other implementations
@@ -227,7 +217,7 @@ setmetatable(class, class)
 M.class = class
 
 --------------------------------------------------------------------------------
--- This allows you to define a class by calling 'class' as a function,
+-- This allows you to define a class by calling 'class' as a function, 
 -- specifying the superclasses as a list.  For example:
 -- mynewclass = class(superclass1, superclass2)
 -- @param ... Base class list.
@@ -241,47 +231,41 @@ function class:__call(...)
     end
     clazz.__super = bases[1]
     clazz.__call = function(self, ...)
-        return self:__new(...)
+        return self:new(...)
     end
     return setmetatable(clazz, clazz)
 end
 
 --------------------------------------------------------------------------------
 -- Generic constructor function for classes.
--- Note that __new() will call init() if it is available in the class.
+-- Note that new() will call init() if it is available in the class.
 -- @return Instance
 --------------------------------------------------------------------------------
-function class:__new(...)
-    local obj = self:__object_factory()
-
+function class:new(...)
+    local obj
+    if self.__factory then
+        obj = self.__factory.new()
+        obj.__class = self
+        table.copy(self, obj)
+    else
+        obj = {__index = self}
+        obj.__class = self
+        setmetatable(obj, obj)
+    end
+    
     if obj.init then
         obj:init(...)
     end
 
+    obj.new = nil
+    obj.init = nil
+    
     return obj
-end
-
---------------------------------------------------------------------------------
--- Returns the new object.
--- @return object
---------------------------------------------------------------------------------
-function class:__object_factory()
-    local moai_class = self.__moai_class
-
-    if moai_class then
-        local obj = moai_class.new()
-        obj.__class = self
-        obj:setInterface(self)
-        return obj
-    end
-
-    local obj = {__index = self, __class = self}
-    return setmetatable(obj, obj)
 end
 
 ----------------------------------------------------------------------------------------------------
 -- @type table
---
+-- 
 -- The next group of functions extends the default lua table implementation
 -- to include some additional useful methods.
 ----------------------------------------------------------------------------------------------------
@@ -391,7 +375,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type math
---
+-- 
 -- This set of functions extends the native lua 'math' function set with
 -- additional useful methods.
 ----------------------------------------------------------------------------------------------------
@@ -437,7 +421,7 @@ end
 function math.distance( x0, y0, x1, y1 )
     if not x1 then x1 = 0 end
     if not y1 then y1 = 0 end
-
+    
     local dX = x1 - x0
     local dY = y1 - y0
     local dist = math.sqrt((dX * dX) + (dY * dY))
@@ -445,8 +429,8 @@ function math.distance( x0, y0, x1, y1 )
 end
 
 --------------------------------------------------------------------------------
--- Get the normal vector
--- @param x
+-- Get the normal vector 
+-- @param x 
 -- @param y
 -- @return x/d, y/d
 --------------------------------------------------------------------------------
@@ -457,7 +441,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Executors
---
+-- 
 -- This is a utility class for asynchronous (coroutine-style) execution.
 ----------------------------------------------------------------------------------------------------
 Executors = {}
@@ -474,14 +458,14 @@ function Executors.callLoop(func, ...)
     local thread = MOAICoroutine.new()
     local args = {...}
     thread:run(
-    function()
-        while true do
-            if func(unpack(args)) then
-                break
+        function()
+            while true do
+                if func(unpack(args)) then
+                    break
+                end
+                coroutine.yield()
             end
-            coroutine.yield()
         end
-    end
     )
     return thread
 end
@@ -509,13 +493,13 @@ function Executors.callLaterFrame(frame, func, ...)
     local args = {...}
     local count = 0
     thread:run(
-    function()
-        while count < frame do
-            count = count + 1
-            coroutine.yield()
+        function()
+            while count < frame do
+                count = count + 1
+                coroutine.yield()
+            end
+            func(unpack(args))
         end
-        func(unpack(args))
-    end
     )
     return thread
 end
@@ -536,26 +520,9 @@ function Executors.callLaterTime(time, func, ...)
     return timer
 end
 
---------------------------------------------------------------------------------
--- Run the specified function in loop by a span time over and over again
--- @param time loop seconds.
--- @param func Target function.
--- @param ... Arguments.
--- @return MOAITimer object
---------------------------------------------------------------------------------
-function Executors.callLoopTime(time, func, ...)
-    local args = {...}
-    local timer = MOAITimer.new()
-    timer:setMode(MOAITimer.LOOP)
-    timer:setSpan(time) -- EVENT_TIMER_LOOP
-    timer:setListener(MOAITimer.EVENT_TIMER_BEGIN_SPAN, function() func(unpack(args)) end)
-    timer:start()
-    return timer
-end
-
 ----------------------------------------------------------------------------------------------------
 -- @type Resources
---
+-- 
 -- A resource management system that caches loaded resources to maximize performance.
 ----------------------------------------------------------------------------------------------------
 Resources = {}
@@ -580,7 +547,7 @@ end
 
 --------------------------------------------------------------------------------
 -- Returns the filePath from fileName.
--- @param fileName
+-- @param fileName 
 -- @return file path
 --------------------------------------------------------------------------------
 function Resources.getResourceFilePath(fileName)
@@ -606,7 +573,7 @@ function Resources.getTexture(path)
     if type(path) == "userdata" then
         return path
     end
-
+    
     local cache = Resources.textureCache
     local filepath = Resources.getResourceFilePath(path)
     if cache[filepath] == nil then
@@ -628,7 +595,7 @@ function Resources.getFont(path, charcodes, points, dpi)
     if type(path) == "userdata" then
         return path
     end
-
+    
     local cache = Resources.fontCache
     path = path or Font.DEFAULT_FONT
     path = Resources.getResourceFilePath(path)
@@ -642,6 +609,169 @@ function Resources.getFont(path, charcodes, points, dpi)
         cache[uid] = font
     end
     return cache[uid]
+end
+
+--------------------------------------------------------------------------------
+-- Reads TexturePacker output files (or obtains the result from its cache) 
+-- and returns the texture atlas.
+-- @param luaFilePath TexturePacker lua file path
+-- @param texture (option)Path of the texture or Texture instance
+-- @return Texture atlas
+--------------------------------------------------------------------------------
+function Resources.getTextureAtlas(luaFilePath, texture)
+    local filePath = Resources.getResourceFilePath(luaFilePath)
+    local cache = Resources.atlasCache
+    if cache[filePath] then
+        return cache[filePath]
+    end
+
+    local frames = dofile(filePath).frames
+    local data = {}
+    data.frames = {}
+    data.names = {}
+    data.texture = texture and Resources.getTexture(texture)
+    data.useBounds = false
+
+    for i, frame in ipairs(frames) do
+        data.names[frame.name] = i
+        data.frames[i] = {}
+
+        local uv = frame.uvRect
+        local r = frame.spriteColorRect
+        local b = frame.spriteSourceSize
+        local dataFrame = data.frames[i]
+        if frame.textureRotated then
+            dataFrame.quad = {uv.u0, uv.v0, uv.u0, uv.v1, uv.u1, uv.v1, uv.u1, uv.v0}
+        else
+            dataFrame.quad = {uv.u0, uv.v1, uv.u1, uv.v1, uv.u1, uv.v0, uv.u0, uv.v0}
+        end
+        dataFrame.rect = {r.x, r.y, r.x + r.width, r.y + r.height}
+        dataFrame.bounds = {0, 0, 0, b.width, b.height, 0}
+        data.useBounds = data.useBounds or frame.spriteTrimmed
+    end
+    cache[filePath] = data
+    return data
+end
+
+--------------------------------------------------------------------------------
+-- Returns the Deck to draw NineImage.
+-- For caching, you must not change the Deck.
+-- @param fileName fileName
+-- @return MOAIStretchPatch2D instance
+--------------------------------------------------------------------------------
+function Resources.getNineImageDeck(fileName)
+    local filePath = Resources.getResourceFilePath(fileName)
+    local cache = Resources.nineImageDeckCache
+
+    if not cache[filePath] then
+        cache[filePath] = Resources.createNineImageDeck(filePath)
+    end
+
+    return cache[filePath]
+end
+
+--------------------------------------------------------------------------------
+-- Create the Deck to draw NineImage.
+-- @param fileName fileName
+-- @return MOAIStretchPatch2D instance
+--------------------------------------------------------------------------------
+function Resources.createNineImageDeck(fileName)
+    local filePath = Resources.getResourceFilePath(fileName)
+
+    local image = MOAIImage.new()
+    image:load(filePath)
+    
+    local imageWidth, imageHeight = image:getSize()
+    local displayWidth, displayHeight = imageWidth - 2, imageHeight - 2
+    local stretchRows = Resources.createStretchRowsOrColumns(image, true)
+    local stretchColumns = Resources.createStretchRowsOrColumns(image, false)
+    local contentPadding = Resources.getNineImageContentPadding(image)
+    local texture = Resources.getTexture(filePath)
+    local uvRect = {1 / imageWidth, 1 / imageHeight, (imageWidth - 1) / imageWidth, (imageHeight - 1) / imageHeight}
+
+    local deck = MOAIStretchPatch2D.new()
+    deck.imageWidth = imageWidth
+    deck.imageHeight = imageHeight
+    deck.displayWidth = displayWidth
+    deck.displayHeight = displayHeight
+    deck.contentPadding = contentPadding
+    deck:reserveUVRects(1)
+    deck:setTexture(texture)
+    deck:setRect(0, 0, displayWidth, displayHeight)
+    deck:setUVRect(1, unpack(uvRect))
+    deck:reserveRows(#stretchRows)
+    deck:reserveColumns(#stretchColumns)
+    
+    for i, row in ipairs(stretchRows) do
+        deck:setRow(i, row.weight, row.stretch)
+    end
+    for i, column in ipairs(stretchColumns) do
+        deck:setColumn(i, column.weight, column.stretch)
+    end
+    
+    return deck
+end
+
+function Resources.createStretchRowsOrColumns(image, isRow)
+    local stretchs = {}
+    local imageWidth, imageHeight = image:getSize()
+    local targetSize = isRow and imageHeight or imageWidth
+    local stretchSize = 0
+    local pr, pg, pb, pa = image:getRGBA(0, 1)
+    
+    for i = 1, targetSize - 2 do
+        local r, g, b, a = image:getRGBA(isRow and 0 or i, isRow and i or 0)
+        stretchSize = stretchSize + 1
+        
+        if pa ~= a then
+            table.insert(stretchs, {weight = stretchSize / (targetSize - 2), stretch = pa > 0})
+            pa, stretchSize = a, 0
+        end
+    end
+    if stretchSize > 0 then
+        table.insert(stretchs, {weight = stretchSize / (targetSize - 2), stretch = pa > 0})
+    end
+    
+    return stretchs
+end
+
+function Resources.getNineImageContentPadding(image)
+    local imageWidth, imageHeight = image:getSize()
+    local paddingLeft = 0
+    local paddingTop = 0
+    local paddingRight = 0
+    local paddingBottom = 0
+    
+    for x = 0, imageWidth - 2 do
+        local r, g, b, a = image:getRGBA(x + 1, imageHeight - 1)
+        if a > 0 then
+            paddingLeft = x
+            break
+        end
+    end
+    for x = 0, imageWidth - 2 do
+        local r, g, b, a = image:getRGBA(imageWidth - x - 2, imageHeight - 1)
+        if a > 0 then
+            paddingRight = x
+            break
+        end
+    end
+    for y = 0, imageHeight - 2 do
+        local r, g, b, a = image:getRGBA(imageWidth - 1, y + 1)
+        if a > 0 then
+            paddingTop = y
+            break
+        end
+    end
+    for y = 0, imageHeight - 2 do
+        local r, g, b, a = image:getRGBA(imageWidth - 1, imageHeight - y - 2)
+        if a > 0 then
+            paddingBottom = y
+            break
+        end
+    end
+    
+    return {paddingLeft, paddingTop, paddingRight, paddingBottom}
 end
 
 --------------------------------------------------------------------------------
@@ -666,17 +796,6 @@ end
 function Resources.dofile(fileName)
     local filePath = Resources.getResourceFilePath(fileName)
     return dofile(filePath)
-end
-
---------------------------------------------------------------------------------
--- Destroys the reference when the module.
--- @param m module
---------------------------------------------------------------------------------
-function Resources.destroyModule(m)
-    if m and m._M and m._NAME and package.loaded[m._NAME] then
-        package.loaded[m._NAME] = nil
-        _G[m._NAME] = nil
-    end
 end
 
 ----------------------------------------------------------------------------------------------------
@@ -725,7 +844,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type ClassFactory
---
+-- 
 -- Factory that creates an instance of the Class.
 ----------------------------------------------------------------------------------------------------
 ClassFactory = class()
@@ -763,7 +882,7 @@ function ClassFactory:copyPropertiesToObject(properties, obj, fieldAccess)
     for k, v in pairs(properties) do
         local setterName = "set" .. k:sub(1, 1):upper() .. (#k > 1 and k:sub(2) or "")
         local setter = obj[setterName]
-
+        
         if not fieldAccess and setter then
             setter(obj, v)
         else
@@ -775,9 +894,9 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Event
---
+-- 
 -- A class for events, which are communicated to, and handled by, event handlers
--- Holds the data of the Event.
+-- Holds the data of the Event. 
 ----------------------------------------------------------------------------------------------------
 Event = class()
 M.Event = Event
@@ -816,7 +935,7 @@ function Event:init(eventType)
 end
 
 --------------------------------------------------------------------------------
--- INTERNAL USE ONLY -- Sets the event listener via EventDispatcher.
+-- INTERNAL USE ONLY -- Sets the event listener via EventDispatcher. 
 --------------------------------------------------------------------------------
 function Event:setListener(callback, source)
     self.callback = callback
@@ -832,7 +951,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type EventListener
---
+-- 
 -- A virtual superclass for EventListeners.
 -- Classes which inherit from this class become able to receive events.
 -- Currently intended for internal use only.
@@ -868,7 +987,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type EventDispatcher
---
+-- 
 -- This class is responsible for event notifications.
 ----------------------------------------------------------------------------------------------------
 EventDispatcher = class()
@@ -885,8 +1004,8 @@ function EventDispatcher:init()
 end
 
 --------------------------------------------------------------------------------
--- Adds an event listener.
--- will now catch the events that are sent in the dispatchEvent.
+-- Adds an event listener. 
+-- will now catch the events that are sent in the dispatchEvent. 
 -- @param eventType Target event type.
 -- @param callback The callback function.
 -- @param source (option)The first argument passed to the callback function.
@@ -927,9 +1046,9 @@ end
 function EventDispatcher:removeEventListener(eventType, callback, source)
     assert(eventType)
     assert(callback)
-
+    
     local listeners = self.eventListenersMap[eventType] or {}
-
+    
     for i, listener in ipairs(listeners) do
         if listener.type == eventType and listener.callback == callback and listener.source == source then
             table.remove(listeners, i)
@@ -948,16 +1067,16 @@ end
 --------------------------------------------------------------------------------
 function EventDispatcher:hasEventListener(eventType, callback, source)
     assert(eventType)
-
+    
     local listeners = self.eventListenersMap[eventType]
     if not listeners or #listeners == 0 then
         return false
     end
-
+    
     if callback == nil and source == nil then
         return true
     end
-
+    
     for i, listener in ipairs(listeners) do
         if listener.callback == callback and listener.source == source then
             return true
@@ -977,17 +1096,15 @@ function EventDispatcher:dispatchEvent(event, data)
         event = EventDispatcher.EVENT_CACHE[eventName] or Event(eventName)
         EventDispatcher.EVENT_CACHE[eventName] = nil
     end
-
+    
     assert(event.type)
 
+    event.data = data or event.data
     event.stopFlag = false
     event.target = self.eventTarget or self
-    if data ~= nil then
-        event.data = data
-    end
-
+    
     local listeners = self.eventListenersMap[event.type] or {}
-
+    
     for key, obj in ipairs(listeners) do
         if obj.type == event.type then
             event:setListener(obj.callback, obj.source)
@@ -997,7 +1114,7 @@ function EventDispatcher:dispatchEvent(event, data)
             end
         end
     end
-
+    
     if eventName then
         EventDispatcher.EVENT_CACHE[eventName] = event
     end
@@ -1012,7 +1129,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Runtime
---
+-- 
 -- This is a utility class which starts immediately upon library load
 -- and acts as the single handler for ENTER_FRAME events (which occur
 -- whenever Moai yields control to the Lua subsystem on each frame).
@@ -1044,7 +1161,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type InputMgr
---
+-- 
 -- This singleton class manages all input events (touch, key, cursor).
 ----------------------------------------------------------------------------------------------------
 InputMgr = EventDispatcher()
@@ -1081,35 +1198,35 @@ function InputMgr:initialize()
         event.x = x
         event.y = y
         event.tapCount = tapCount
-
+    
         self:dispatchEvent(event)
     end
-
+    
     -- Pointer Handler
     local onPointer = function(x, y)
         self.pointer.x = x
         self.pointer.y = y
-
+    
         if self.pointer.down then
             onTouch(MOAITouchSensor.TOUCH_MOVE, 1, x, y, 1)
         end
     end
-
+    
     -- Click Handler
     local onClick = function(down)
         self.pointer.down = down
         local eventType = down and MOAITouchSensor.TOUCH_DOWN or MOAITouchSensor.TOUCH_UP
-
+        
         onTouch(eventType, 1, self.pointer.x, self.pointer.y, 1)
     end
-
+    
     -- Keyboard Handler
     local onKeyboard = function(key, down)
         local event = InputMgr.KEYBOARD_EVENT
         event.type = down and Event.KEY_DOWN or Event.KEY_UP
         event.key = key
         event.down = down
-
+    
         self:dispatchEvent(event)
     end
 
@@ -1140,7 +1257,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type RenderMgr
---
+-- 
 -- This is a singleton class that manages the rendering object.
 ----------------------------------------------------------------------------------------------------
 RenderMgr = EventDispatcher()
@@ -1206,7 +1323,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type SceneMgr
---
+-- 
 -- This is a singleton class to manage the scene object.
 ----------------------------------------------------------------------------------------------------
 SceneMgr = EventDispatcher()
@@ -1235,7 +1352,7 @@ function SceneMgr:initialize()
     InputMgr:addEventListener(Event.TOUCH_CANCEL, self.onTouch, self)
     Runtime:addEventListener(Event.ENTER_FRAME, self.onEnterFrame, self)
     RenderMgr:addChild(self)
-
+    
     self.sceneFactory = self.sceneFactory or ClassFactory(Scene)
 end
 
@@ -1278,35 +1395,35 @@ function SceneMgr:internalOpenScene(sceneName, params, currentCloseFlag)
         return
     end
     self.transitioning = true
-
+    
     -- stop
     if self.currentScene then
         self.currentScene:stop(params)
     end
-
+    
     -- create next scene
     self.nextScene = self:createScene(sceneName, params)
     self.nextScene:open(params)
-
+    
     -- scene animation
     Executors.callOnce(
-    function()
-        local animation = self:getSceneAnimationByName(params.animation)
-        animation(self.currentScene or Scene(), self.nextScene, params)
-
-        if self.currentScene and currentCloseFlag then
-            self.currentScene:close(params)
+        function()
+            local animation = self:getSceneAnimationByName(params.animation)
+            animation(self.currentScene or Scene(), self.nextScene, params)
+            
+            if self.currentScene and currentCloseFlag then
+                self.currentScene:close(params)
+            end
+            
+            self.currentScene = self.nextScene
+            self.nextScene = nil
+            self.transitioning = false
+            self.currentScene:start(params)
+            
+            self:dispatchEvent(Event.OPEN_COMPLETE)
         end
-
-        self.currentScene = self.nextScene
-        self.nextScene = nil
-        self.transitioning = false
-        self.currentScene:start(params)
-
-        self:dispatchEvent(Event.OPEN_COMPLETE)
-    end
     )
-
+    
     return self.nextScene
 end
 
@@ -1330,13 +1447,13 @@ function SceneMgr:closeScene(params)
         return
     end
     self.transitioning = true
-
+    
     -- set next scene
     local backSceneName = params.backScene
     local backSceneCount = params.backSceneCount or 1
     self.nextScene = backSceneName and assert(self:getSceneByName(backSceneName)) or self.scenes[#self.scenes - backSceneCount]
     self.nextSceneIndex = table.indexOf(self.scenes, self.nextScene)
-
+    
     -- set closing scenes
     self.closingSceneSize = #self.scenes - self.nextSceneIndex
     self.closingSceneGroup = Scene()
@@ -1344,35 +1461,35 @@ function SceneMgr:closeScene(params)
         local scene = self.scenes[#self.scenes - i]
         self.closingSceneGroup:addChild(scene)
     end
-
+    
     -- stop current scene
     self.currentScene:stop(params)
 
     Executors.callOnce(
-    function()
-        local animation = self:getSceneAnimationByName(params.animation)
-        animation(self.closingSceneGroup, self.nextScene or Scene(), params)
+        function()
+            local animation = self:getSceneAnimationByName(params.animation)
+            animation(self.closingSceneGroup, self.nextScene or Scene(), params) 
+            
+            -- close scens
+            for i, scene in ipairs(self.closingSceneGroup.children) do
+                scene:close(params)
+            end
+            
+            self.closingSceneGroup = nil
+            self.closingSceneSize = nil
+            self.currentScene = self.nextScene
+            self.nextScene = nil
+            self.transitioning = false
 
-        -- close scens
-        for i, scene in ipairs(self.closingSceneGroup.children) do
-            scene:close(params)
+            if self.currentScene then
+                self.currentScene:start(params)
+            end
+
+            self:dispatchEvent(Event.CLOSE_COMPLETE)
         end
-
-        self.closingSceneGroup = nil
-        self.closingSceneSize = nil
-        self.currentScene = self.nextScene
-        self.nextScene = nil
-        self.transitioning = false
-
-        if self.currentScene then
-            self.currentScene:start(params)
-        end
-
-        self:dispatchEvent(Event.CLOSE_COMPLETE)
-    end
     )
-
-    return true
+    
+    return true    
 end
 
 --------------------------------------------------------------------------------
@@ -1469,7 +1586,7 @@ function SceneMgr:onEnterFrame(e)
     if not self.sceneUpdateEnabled then
         return
     end
-
+    
     for i, scene in ipairs(self.scenes) do
         if scene.sceneUpdateEnabled then
             scene:dispatchEvent(Event.UPDATE)
@@ -1478,291 +1595,12 @@ function SceneMgr:onEnterFrame(e)
 end
 
 ----------------------------------------------------------------------------------------------------
--- @type DeckMgr
---
--- This is a singleton class that manages MOAIDeck.
-----------------------------------------------------------------------------------------------------
-DeckMgr = {}
-M.DeckMgr = DeckMgr
-
--- Deck Caches
-DeckMgr.imageDecks = setmetatable({}, {__mode = "v"})
-DeckMgr.tileImageDecks = setmetatable({}, {__mode = "v"})
-DeckMgr.atlasDecks = setmetatable({}, {__mode = "v"})
-DeckMgr.nineImageDecks = {} -- setmetatable({}, {__mode = "v"})
-
---------------------------------------------------------------------------------
--- Return the Deck to be used in the Image.
--- @param width width
--- @param height height
--- @return deck
---------------------------------------------------------------------------------
-function DeckMgr:getImageDeck(width, height)
-    local key = width .. "$" .. height
-    local cache = DeckMgr.imageDecks
-
-    if not cache[key] then
-        cache[key] = self:createImageDeck(width, height)
-    end
-    return cache[key]
-end
-
---------------------------------------------------------------------------------
--- Create the Deck to be used in the Image.
--- @param width width
--- @param height height
--- @return deck
---------------------------------------------------------------------------------
-function DeckMgr:createImageDeck(width, height)
-    local deck = MOAIGfxQuad2D.new()
-    deck:setUVRect(0, 0, 1, 1)
-    deck:setRect(0, 0, width, height)
-    return deck
-end
-
---------------------------------------------------------------------------------
--- Return the Deck to be used in the SheetImage.
--- @param textureWidth texture width
--- @param textureHeight texture height
--- @param tileWidth tile width
--- @param tileHeight tile height
--- @param spacing spacing
--- @param margin margin
--- @param gridFlag grid flag
--- @return deck
---------------------------------------------------------------------------------
-function DeckMgr:getTileImageDeck(textureWidth, textureHeight, tileWidth, tileHeight, spacing, margin, gridFlag)
-    local tw, th = textureWidth, textureHeight
-    local key = tw .. "$" .. th .. "$" .. tileWidth .. "$" .. tileHeight .. "$" .. spacing .. "$" .. margin .. "$" .. tostring(gridFlag)
-    local cache = DeckMgr.tileImageDecks
-
-    if not cache[key] then
-        cache[key] = self:createTileImageDeck(tw, th, tileWidth, tileHeight, spacing, margin, gridFlag)
-    end
-    return cache[key]
-end
-
---------------------------------------------------------------------------------
--- Create the Deck to be used in the SheetImage.
--- @param textureWidth texture width
--- @param textureHeight texture height
--- @param tileWidth tile width
--- @param tileHeight tile height
--- @param spacing spacing
--- @param margin margin
--- @param gridFlag grid flag
--- @return deck
---------------------------------------------------------------------------------
-function DeckMgr:createTileImageDeck(textureWidth, textureHeight, tileWidth, tileHeight, spacing, margin, gridFlag)
-    local tw, th = textureWidth, textureHeight
-    local tileX = math.floor((tw - margin) / (tileWidth + spacing))
-    local tileY = math.floor((th - margin) / (tileHeight + spacing))
-
-    local deck = MOAIGfxQuadDeck2D.new()
-    deck.sheetSize = tileX * tileY
-    deck:reserve(deck.sheetSize)
-
-    local i = 1
-    for y = 1, tileY do
-        for x = 1, tileX do
-            local sx = (x - 1) * (tileWidth + spacing) + margin
-            local sy = (y - 1) * (tileHeight + spacing) + margin
-            local ux0 = sx / tw
-            local uy0 = sy / th
-            local ux1 = (sx + tileWidth) / tw
-            local uy1 = (sy + tileHeight) / th
-
-            if not gridFlag then
-                deck:setRect(i, 0, 0, tileWidth, tileHeight)
-            end
-            deck:setUVRect(i, ux0, uy0, ux1, uy1)
-            i = i + 1
-        end
-    end
-
-    return deck
-end
-
---------------------------------------------------------------------------------
--- Return the Deck for displaying TextureAtlas.
--- @param luaFilePath TexturePacker lua file path
--- @return Texture atlas deck
---------------------------------------------------------------------------------
-function DeckMgr:getAtlasDeck(luaFilePath)
-    local key = luaFilePath
-    local cache = DeckMgr.atlasDecks
-
-    if not cache[key] then
-        cache[key] = self:createAtlasDeck(luaFilePath)
-    end
-    return cache[key]
-end
-
---------------------------------------------------------------------------------
--- Create the Deck for displaying TextureAtlas.
--- @param luaFilePath TexturePacker lua file path
--- @return Texture atlas deck
---------------------------------------------------------------------------------
-function DeckMgr:createAtlasDeck(luaFilePath)
-    local frames = Resources.dofile(luaFilePath).frames
-    local boundsDeck = MOAIBoundsDeck.new()
-    boundsDeck:reserveBounds(#frames)
-    boundsDeck:reserveIndices(#frames)
-
-    local deck = MOAIGfxQuadDeck2D.new()
-    deck:setBoundsDeck(boundsDeck)
-    deck:reserve(#frames)
-    deck.frames = frames
-    deck.names = {}
-
-    for i, frame in ipairs(frames) do
-        local uv = frame.uvRect
-        local r = frame.spriteColorRect
-        local b = frame.spriteSourceSize
-
-        if frame.textureRotated then
-            deck:setUVQuad(i, uv.u0, uv.v0, uv.u0, uv.v1, uv.u1, uv.v1, uv.u1, uv.v0)
-        else
-            deck:setUVQuad(i, uv.u0, uv.v1, uv.u1, uv.v1, uv.u1, uv.v0, uv.u0, uv.v0)
-        end
-
-        deck.names[frame.name] = i
-        deck:setRect(i, r.x, r.y, r.x + r.width, r.y + r.height)
-        boundsDeck:setBounds(i, 0, 0, 0, b.width, b.height, 0)
-        boundsDeck:setIndex(i, i)
-    end
-
-    return deck
-end
-
---------------------------------------------------------------------------------
--- Returns the Deck to draw NineImage.
--- For caching, you must not change the Deck.
--- @param fileName fileName
--- @return MOAIStretchPatch2D instance
---------------------------------------------------------------------------------
-function DeckMgr:getNineImageDeck(fileName)
-    local filePath = Resources.getResourceFilePath(fileName)
-    local cache = DeckMgr.nineImageDecks
-
-    if not cache[filePath] then
-        cache[filePath] = self:createNineImageDeck(filePath)
-    end
-    return cache[filePath]
-end
-
---------------------------------------------------------------------------------
--- Create the Deck to draw NineImage.
--- @param fileName fileName
--- @return MOAIStretchPatch2D instance
---------------------------------------------------------------------------------
-function DeckMgr:createNineImageDeck(fileName)
-    local filePath = Resources.getResourceFilePath(fileName)
-
-    local image = MOAIImage.new()
-    image:load(filePath)
-
-    local imageWidth, imageHeight = image:getSize()
-    local displayWidth, displayHeight = imageWidth - 2, imageHeight - 2
-    local stretchRows = self:_createStretchRowsOrColumns(image, true)
-    local stretchColumns = self:_createStretchRowsOrColumns(image, false)
-    local contentPadding = self:_getNineImageContentPadding(image)
-    local texture = Resources.getTexture(filePath)
-    local uvRect = {1 / imageWidth, 1 / imageHeight, (imageWidth - 1) / imageWidth, (imageHeight - 1) / imageHeight}
-
-    local deck = MOAIStretchPatch2D.new()
-    deck.imageWidth = imageWidth
-    deck.imageHeight = imageHeight
-    deck.displayWidth = displayWidth
-    deck.displayHeight = displayHeight
-    deck.contentPadding = contentPadding
-    deck:reserveUVRects(1)
-    deck:setTexture(texture)
-    deck:setRect(0, 0, displayWidth, displayHeight)
-    deck:setUVRect(1, unpack(uvRect))
-    deck:reserveRows(#stretchRows)
-    deck:reserveColumns(#stretchColumns)
-
-    for i, row in ipairs(stretchRows) do
-        deck:setRow(i, row.weight, row.stretch)
-    end
-    for i, column in ipairs(stretchColumns) do
-        deck:setColumn(i, column.weight, column.stretch)
-    end
-
-    return deck
-end
-
-function DeckMgr:_createStretchRowsOrColumns(image, isRow)
-    local stretchs = {}
-    local imageWidth, imageHeight = image:getSize()
-    local targetSize = isRow and imageHeight or imageWidth
-    local stretchSize = 0
-    local pr, pg, pb, pa = image:getRGBA(0, 1)
-
-    for i = 1, targetSize - 2 do
-        local r, g, b, a = image:getRGBA(isRow and 0 or i, isRow and i or 0)
-        stretchSize = stretchSize + 1
-
-        if pa ~= a then
-            table.insert(stretchs, {weight = stretchSize / (targetSize - 2), stretch = pa > 0})
-            pa, stretchSize = a, 0
-        end
-    end
-    if stretchSize > 0 then
-        table.insert(stretchs, {weight = stretchSize / (targetSize - 2), stretch = pa > 0})
-    end
-
-    return stretchs
-end
-
-function DeckMgr:_getNineImageContentPadding(image)
-    local imageWidth, imageHeight = image:getSize()
-    local paddingLeft = 0
-    local paddingTop = 0
-    local paddingRight = 0
-    local paddingBottom = 0
-
-    for x = 0, imageWidth - 2 do
-        local r, g, b, a = image:getRGBA(x + 1, imageHeight - 1)
-        if a > 0 then
-            paddingLeft = x
-            break
-        end
-    end
-    for x = 0, imageWidth - 2 do
-        local r, g, b, a = image:getRGBA(imageWidth - x - 2, imageHeight - 1)
-        if a > 0 then
-            paddingRight = x
-            break
-        end
-    end
-    for y = 0, imageHeight - 2 do
-        local r, g, b, a = image:getRGBA(imageWidth - 1, y + 1)
-        if a > 0 then
-            paddingTop = y
-            break
-        end
-    end
-    for y = 0, imageHeight - 2 do
-        local r, g, b, a = image:getRGBA(imageWidth - 1, imageHeight - y - 2)
-        if a > 0 then
-            paddingBottom = y
-            break
-        end
-    end
-
-    return {paddingLeft, paddingTop, paddingRight, paddingBottom}
-end
-
-----------------------------------------------------------------------------------------------------
 -- @type DisplayObject
---
+-- 
 -- The base class of the display object, adding several useful methods.
 ----------------------------------------------------------------------------------------------------
 DisplayObject = class(EventDispatcher)
-DisplayObject.__index = MOAIPropInterface
-DisplayObject.__moai_class = MOAIProp
+DisplayObject.__factory = MOAIProp
 M.DisplayObject = DisplayObject
 
 --------------------------------------------------------------------------------
@@ -1807,7 +1645,7 @@ function DisplayObject:setPos(left, top)
     local xMin, yMin, zMin, xMax, yMax, zMax = self:getBounds()
     xMin = math.min(xMin or 0, xMax or 0)
     yMin = math.min(yMin or 0, yMax or 0)
-
+    
     local pivX, pivY, pivZ = self:getPiv()
     local locX, locY, locZ = self:getLoc()
     self:setLoc(left + pivX - xMin, top + pivY - yMin, locZ)
@@ -1822,7 +1660,7 @@ function DisplayObject:getPos()
     local xMin, yMin, zMin, xMax, yMax, zMax = self:getBounds()
     xMin = math.min(xMin or 0, xMax or 0)
     yMin = math.min(yMin or 0, yMax or 0)
-
+    
     local pivX, pivY, pivZ = self:getPiv()
     local locX, locY, locZ = self:getLoc()
     return locX - pivX + xMin, locY - pivY + yMin
@@ -1897,38 +1735,17 @@ function DisplayObject:getVisible()
 end
 
 --------------------------------------------------------------------------------
--- Sets the visibility.
--- TODO:I avoid the bug of display settings MOAIProp.(2013/05/20 last build)
--- @param value visible
---------------------------------------------------------------------------------
-function DisplayObject:setVisible(visible)
-    MOAIPropInterface.setVisible(self, visible)
-    self:forceUpdate()
-end
-
---------------------------------------------------------------------------------
 -- Sets the object's parent, inheriting its color and transform.
 -- @param parent parent
 --------------------------------------------------------------------------------
 function DisplayObject:setParent(parent)
     self.parent = parent
-
+ 
     self:clearAttrLink(MOAIColor.INHERIT_COLOR)
     self:clearAttrLink(MOAITransform.INHERIT_TRANSFORM)
-
-    -- Conditions compatibility
-    if MOAIProp.INHERIT_VISIBLE then
-        self:clearAttrLink(MOAIProp.INHERIT_VISIBLE)
-    end
-
     if parent then
-        --self:setAttrLink(MOAIColor.INHERIT_COLOR, parent, MOAIColor.COLOR_TRAIT)
+        --self:setAttrLink(MOAIColor.INHERIT_COLOR, parent, MOAIColor.COLOR_TRAIT) -- TESTE
         self:setAttrLink(MOAITransform.INHERIT_TRANSFORM, parent, MOAITransform.TRANSFORM_TRAIT)
-
-        -- Conditions compatibility
-        if MOAIProp.INHERIT_VISIBLE then
-            self:setAttrLink(MOAIProp.INHERIT_VISIBLE, parent, MOAIProp.ATTR_VISIBLE)
-        end
     end
 end
 
@@ -1954,25 +1771,24 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Layer
---
+-- 
 -- This is flower's idea of a Layer, which is a superclass of the MOAI concept of Layer.
 ----------------------------------------------------------------------------------------------------
 Layer = class(DisplayObject)
-Layer.__index = MOAILayerInterface
-Layer.__moai_class = MOAILayer
+Layer.__factory = MOAILayer
 M.Layer = Layer
 
 --------------------------------------------------------------------------------
 -- The constructor.
 --------------------------------------------------------------------------------
-function Layer:init(viewport)
+function Layer:init()
     DisplayObject.init(self)
 
     local partition = MOAIPartition.new()
     self:setPartition(partition)
     self.partition = partition
-
-    self:setViewport(viewport or M.viewport)
+    
+    self:setViewport(M.viewport)
     self.touchEnabled = false
     self.touchHandler = nil
 end
@@ -2003,7 +1819,7 @@ function Layer:setScene(scene)
     if self.scene then
         self.scene:removeChild(self)
     end
-
+    
     self.scene = scene
 
     if self.scene then
@@ -2020,12 +1836,11 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Camera
---
+-- 
 -- flower's idea of a Camera, which is a superclass of the Moai Camera.
 ----------------------------------------------------------------------------------------------------
 Camera = class()
-Camera.__index = MOAICameraInterface
-Camera.__moai_class = MOAICamera
+Camera.__factory = MOAICamera
 M.Camera = Camera
 
 --------------------------------------------------------------------------------
@@ -2035,7 +1850,7 @@ M.Camera = Camera
 -- @param far (option)far plane
 --------------------------------------------------------------------------------
 function Camera:init(ortho, near, far)
-    ortho = ortho == nil and true or ortho
+    ortho = ortho ~= nil and ortho or true
     near = near or 1
     far = far or -1
 
@@ -2046,7 +1861,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Group
---
+-- 
 -- A class to manage and control sets of DisplayObjects.
 ----------------------------------------------------------------------------------------------------
 Group = class(DisplayObject)
@@ -2064,7 +1879,7 @@ function Group:init(layer, width, height)
     self.isGroup = true
     self.layer = layer
     self:setSize(width or 0, height or 0)
-
+    
     self:setPivToCenter()
 end
 
@@ -2111,7 +1926,7 @@ function Group:removeChild(child)
         elseif self.layer then
             self.layer:removeProp(child)
         end
-
+        
         return true
     end
     return false
@@ -2178,13 +1993,10 @@ end
 -- @param value visible
 --------------------------------------------------------------------------------
 function Group:setVisible(value)
-    DisplayObject.setVisible(self, value)
-
-    -- Compatibility
-    if not MOAIProp.INHERIT_VISIBLE then
-        for i, v in ipairs(self.children) do
-            v:setVisible(value)
-        end
+    MOAIPropInterface.setVisible(self, value)
+    
+    for i, v in ipairs(self.children) do
+        v:setVisible(value)
     end
 end
 
@@ -2195,7 +2007,7 @@ end
 --------------------------------------------------------------------------------
 function Group:setPriority(priority)
     MOAIPropInterface.setPriority(self, priority)
-
+    
     for i, v in ipairs(self.children) do
         v:setPriority(priority)
     end
@@ -2203,19 +2015,14 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Scene
---
+-- 
 -- A scene class, handling display on one or more layers and receiving events from the EventMgr.
 -- Object is controlled by SceneMgr; use that class to manipulate scenes.
 ----------------------------------------------------------------------------------------------------
 Scene = class(Group)
 M.Scene = Scene
 
---- Touch Event Cache
 Scene.TOUCH_EVENT = Event()
-
---- Default scene destroy enabled
-Scene.DEFAULT_DESTROY_ENABLED = true
-
 
 --------------------------------------------------------------------------------
 -- The constructor.
@@ -2230,25 +2037,24 @@ function Scene:init(sceneName, params)
     self.started = false
     self.sceneUpdateEnabled = false
     self.sceneTouchEnabled = false
-    self.sceneDestroyEnabled = Scene.DEFAULT_DESTROY_ENABLED
     self.controller = self:createController(params)
     self.controller.scene = self
     self:initListeners()
-
+    
     self:dispatchEvent(Event.CREATE, params)
 end
 
 --------------------------------------------------------------------------------
--- INTERNAL USE ONLY -- create the scene controller.
+-- INTERNAL USE ONLY -- create the scene controller. 
 --------------------------------------------------------------------------------
 function Scene:createController(params)
     params = params or {}
-
+    
     local sceneController = params.sceneController
     if sceneController then
         return type(sceneController) == "string" and require(sceneController) or sceneController
     end
-
+    
     local sceneName = self.name
     return sceneName and require(sceneName) or {}
 end
@@ -2283,7 +2089,7 @@ function Scene:open(params)
     if self.opened then
         return
     end
-
+    
     self:dispatchEvent(Event.OPEN, params)
     self.opened = true
     SceneMgr:addScene(self)
@@ -2298,13 +2104,8 @@ function Scene:close(params)
         return
     end
     self:stop()
-    self.opened = false
     self:dispatchEvent(Event.CLOSE, params)
     SceneMgr:removeScene(self)
-
-    if self.sceneDestroyEnabled then
-        Resources.destroyModule(self.controller)
-    end
 end
 
 --------------------------------------------------------------------------------
@@ -2399,7 +2200,7 @@ function SceneAnimations.fade(currentScene, nextScene, params)
 
     MOAICoroutine.blockOnAction(currentScene:seekColor(0, 0, 0, 0, sec, easeType))
     MOAICoroutine.blockOnAction(nextScene:seekColor(1, 1, 1, 1, sec, easeType))
-
+    
     currentScene:setVisible(false)
 end
 
@@ -2410,11 +2211,11 @@ function SceneAnimations.crossFade(currentScene, nextScene, params)
 
     nextScene:setVisible(true)
     nextScene:setColor(0, 0, 0, 0)
-
+    
     local action1 = currentScene:seekColor(0, 0, 0, 0, sec, easeType)
     local action2 = nextScene:seekColor(1, 1, 1, 1, sec, easeType)
     MOAICoroutine.blockOnAction(action1)
-
+    
     currentScene:setVisible(false)
 end
 
@@ -2422,7 +2223,7 @@ end
 function SceneAnimations.popIn(currentScene, nextScene, params)
     local sec = params.second or 0.5
     local easeType = params.easeType
-
+    
     nextScene:setVisible(true)
     nextScene:setScl(0.5, 0.5, 0.5)
     nextScene:setColor(0, 0, 0, 0)
@@ -2450,7 +2251,7 @@ function SceneAnimations.slideLeft(currentScene, nextScene, params)
 
     nextScene:setVisible(true)
     nextScene:setPos(sw, 0)
-
+    
     local action1 = currentScene:moveLoc(-sw, 0, 0, sec, easeType)
     local action2 = nextScene:moveLoc(-sw, 0, 0, sec, easeType)
     MOAICoroutine.blockOnAction(action1)
@@ -2467,11 +2268,11 @@ function SceneAnimations.slideRight(currentScene, nextScene, params)
 
     nextScene:setVisible(true)
     nextScene:setPos(-sw, 0)
-
+    
     local action1 = currentScene:moveLoc(sw, 0, 0, sec, easeType)
     local action2 = nextScene:moveLoc(sw, 0, 0, sec, easeType)
     MOAICoroutine.blockOnAction(action1)
-
+    
     currentScene:setVisible(false)
     nextScene:setPos(0, 0)
 end
@@ -2484,11 +2285,11 @@ function SceneAnimations.slideTop(currentScene, nextScene, params)
 
     nextScene:setVisible(true)
     nextScene:setPos(0, sh)
-
+    
     local action1 = currentScene:moveLoc(0, -sh, 0, sec, easeType)
     local action2 = nextScene:moveLoc(0, -sh, 0, sec, easeType)
     MOAICoroutine.blockOnAction(action1)
-
+    
     currentScene:setVisible(false)
     nextScene:setPos(0, 0)
 end
@@ -2501,7 +2302,7 @@ function SceneAnimations.slideBottom(currentScene, nextScene, params)
 
     nextScene:setVisible(true)
     nextScene:setPos(0, -sh)
-
+    
     local action1 = currentScene:moveLoc(0, sh, 0, sec, easeType)
     local action2 = nextScene:moveLoc(0, sh, 0, sec, easeType)
     MOAICoroutine.blockOnAction(action1)
@@ -2525,13 +2326,23 @@ M.Image = Image
 --------------------------------------------------------------------------------
 function Image:init(texture, width, height)
     DisplayObject.init(self)
+    
+    texture = Resources.getTexture(texture)
+    local tw, th = texture:getSize()
 
-    self:setTexture(texture)
+    width = width or tw
+    height = height or th
 
-    if width or height then
-        local tw, th = self.texture:getSize()
-        self:setSize(width or tw, height or th)
-    end
+    local deck = MOAIGfxQuad2D.new()
+    deck:setUVRect(0, 0, 1, 1)
+    deck:setRect(0, 0, width, height)
+    deck:setTexture(texture)
+    
+    self:setDeck(deck)
+    self.deck = deck
+    self.texture = texture
+    
+    self:setPivToCenter()
 end
 
 --------------------------------------------------------------------------------
@@ -2540,8 +2351,7 @@ end
 -- @param height Height of image.
 --------------------------------------------------------------------------------
 function Image:setSize(width, height)
-    local deck = DeckMgr:getImageDeck(width, height)
-    self:setDeck(deck)
+    self.deck:setRect(0, 0, width, height)
     self:setPivToCenter()
 end
 
@@ -2551,14 +2361,14 @@ end
 --------------------------------------------------------------------------------
 function Image:setTexture(texture)
     self.texture = Resources.getTexture(texture)
-    MOAIPropInterface.setTexture(self, self.texture)
+    self.deck:setTexture(texture)
     local tw, th = self.texture:getSize()
     self:setSize(tw, th)
 end
 
 ----------------------------------------------------------------------------------------------------
 -- @type SheetImage
---
+-- 
 -- Class that displays an image from a sheet of images, supporting TexturePacker's format.
 ----------------------------------------------------------------------------------------------------
 SheetImage = class(DisplayObject)
@@ -2572,11 +2382,18 @@ M.SheetImage = SheetImage
 --------------------------------------------------------------------------------
 function SheetImage:init(texture, sizeX, sizeY)
     DisplayObject.init(self)
+    
+    texture = Resources.getTexture(texture)
 
-    self:setTexture(texture)
+    local deck = MOAIGfxQuadDeck2D.new()
+    deck:setTexture(texture)
+    
+    self:setDeck(deck)
+    self.deck = deck
+    self.texture = texture
     self.sheetSize = 0
     self.sheetNames = {}
-
+    
     if sizeX and sizeY then
         self:setSheetSize(sizeX, sizeY)
     end
@@ -2588,18 +2405,46 @@ end
 --------------------------------------------------------------------------------
 function SheetImage:setTexture(texture)
     self.texture = Resources.getTexture(texture)
-    MOAIPropInterface.setTexture(self, self.texture)
+    self.deck:setTexture(texture)
 end
 
 --------------------------------------------------------------------------------
 -- Parses TexturePacker atlases and sets up the texture as a deck of images in the atlas.
 -- @param atlas Texture atlas
+-- @param texture Texture path, or texture
 --------------------------------------------------------------------------------
-function SheetImage:setTextureAtlas(atlas)
-    local deck = DeckMgr:getAtlasDeck(atlas)
-    self:setDeck(deck)
-    self.sheetSize = #deck.frames
-    self.sheetNames = deck.names
+function SheetImage:setTextureAtlas(atlas, texture)
+    if type(atlas) == "string" then
+        atlas = Resources.getTextureAtlas(atlas, texture)
+    end
+    self.sheetSize = #atlas.frames
+    self.sheetNames = atlas.names
+    
+    local deck = self.deck
+    deck:reserve(self.sheetSize)
+    if atlas.texture then
+        deck:setTexture(atlas.texture)
+        self.texture = atlas.texture
+    end
+    
+    local boundsDeck = nil
+    if atlas.useBounds then
+        boundsDeck = MOAIBoundsDeck.new()
+        boundsDeck:reserveBounds(self.sheetSize)
+        boundsDeck:reserveIndices(self.sheetSize)
+        deck:setBoundsDeck(boundsDeck)
+    end
+
+    for i, frame in ipairs ( atlas.frames ) do
+        if not self.grid then
+            deck:setRect(i, unpack(frame.rect))
+        end
+        deck:setUVQuad(i, unpack(frame.quad))
+        if boundsDeck then
+            boundsDeck:setBounds(i, unpack(frame.bounds))
+            boundsDeck:setIndex(i, i)
+        end
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -2623,12 +2468,34 @@ end
 -- @param margin (option)Margin of the sheet
 --------------------------------------------------------------------------------
 function SheetImage:setTileSize(tileWidth, tileHeight, spacing, margin)
+    spacing = spacing or 0
+    margin = margin or 0
+    
     local tw, th = self.texture:getSize()
-    local gridFlag = self.grid and true or false
-    local deck = DeckMgr:getTileImageDeck(tw, th, tileWidth, tileHeight, spacing or 0, margin or 0, gridFlag)
-    self:setDeck(deck)
-    self.sheetSize = deck.sheetSize
-    self.sheetNames = {}
+    local tileX = math.floor((tw - margin) / (tileWidth + spacing))
+    local tileY = math.floor((th - margin) / (tileHeight + spacing))
+
+    local deck = self.deck
+    self.sheetSize = tileX * tileY
+    deck:reserve(self.sheetSize)
+    
+    local i = 1
+    for y = 1, tileY do
+        for x = 1, tileX do
+            local sx = (x - 1) * (tileWidth + spacing) + margin
+            local sy = (y - 1) * (tileHeight + spacing) + margin
+            local ux0 = sx / tw
+            local uy0 = sy / th
+            local ux1 = (sx + tileWidth) / tw
+            local uy1 = (sy + tileHeight) / th
+
+            if not self.grid then
+                deck:setRect(i, 0, 0, tileWidth, tileHeight)
+            end
+            deck:setUVRect(i, ux0, uy0, ux1, uy1)
+            i = i + 1
+        end
+    end
 end
 
 --------------------------------------------------------------------------------
@@ -2637,7 +2504,7 @@ end
 --------------------------------------------------------------------------------
 function SheetImage:setIndexByName(name)
     if type(name) == "string" then
-        local index = self.sheetNames[name] or self:getIndex()
+        local index = self.sheetNames[name] or self:getIndex()        
         self:setIndex(index)
     elseif type(name) == "number" then
         self:setIndex(index)
@@ -2646,7 +2513,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type MapImage
---
+-- 
 -- Class that loads a tiled map of images (see MOAIGrid).
 ----------------------------------------------------------------------------------------------------
 MapImage = class(SheetImage)
@@ -2664,10 +2531,10 @@ M.MapImage = MapImage
 --------------------------------------------------------------------------------
 function MapImage:init(texture, gridWidth, gridHeight, tileWidth, tileHeight, spacing, margin)
     SheetImage.init(self, texture)
-
+    
     self.grid = MOAIGrid.new()
     self:setGrid(self.grid)
-
+    
     if gridWidth and gridHeight and tileWidth and tileHeight then
         self:setMapSize(gridWidth, gridHeight, tileWidth, tileHeight, spacing, margin)
     end
@@ -2784,7 +2651,7 @@ function MovieClip:setAnimData(name, data)
     anim:setMode(mode)
     anim:setLink(1, curve, self, MOAIProp.ATTR_INDEX )
     anim:setCurve(curve)
-
+    
     self.animTable[name] = anim
 end
 
@@ -2806,7 +2673,7 @@ end
 function MovieClip:playAnim(name)
     local currentAnim = self.currentAnim
     local animTable = self.animTable
-
+    
     if currentAnim and currentAnim:isBusy() then
         currentAnim:stop()
     end
@@ -2848,11 +2715,11 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type NineImage
---
+-- 
 -- This class displays the NinePatch of Android.
 -- The following restrictions exist.
 -- In many cases, to solve by wrapping it in Group class.
---
+-- 
 -- <ol>
 --   <li>setPiv function does not work.</li>
 --   <li>Scale should not be set directly.<li>
@@ -2874,7 +2741,7 @@ function NineImage:init(imagePath, width, height)
 
     self:setImage(imagePath, width, height)
     if not width or not height then
-        self:setSize(width or self.displayWidth, height or self.displayHeight)
+        self:setSize(width or self.deck.displayWidth, height or self.deck.displayHeight)
     end
 end
 
@@ -2885,20 +2752,17 @@ end
 -- @param height (option) Height of image.
 --------------------------------------------------------------------------------
 function NineImage:setImage(imagePath, width, height)
-    local deck = imagePath
-    if type(deck) == "string" then
-        deck = DeckMgr:getNineImageDeck(imagePath)
+    if type(imagePath) == "string" then
+        self.deck = Resources.getNineImageDeck(imagePath)
+    else
+        self.deck = imagePath
     end
-
+    
     local orgWidth, orgHeight = self:getSize()
     width = width or orgWidth
     height = height or orgHeight
-
-    self:setDeck(deck)
-    self.displayWidth = deck.displayWidth
-    self.displayHeight = deck.displayHeight
-    self.contentPadding = deck.contentPadding
     
+    self:setDeck(self.deck)
     self:setSize(width, height)
 end
 
@@ -2909,10 +2773,10 @@ end
 -- @param height Height of image.
 --------------------------------------------------------------------------------
 function NineImage:setSize(width, height)
-    local iw, ih = self.displayWidth, self.displayHeight
+    local iw, ih = self.deck.displayWidth, self.deck.displayHeight
     local left, top = self:getPos()
     local sclX, sclY, sclZ = width / iw, height / ih, 1
-
+    
     self._scaledWidth = width
     self._scaledHeight = height
     self:setScl(sclX, sclY, sclZ)
@@ -2957,7 +2821,7 @@ end
 --------------------------------------------------------------------------------
 function NineImage:getContentRect()
     local width, height = self:getSize()
-    local padding = self.contentPadding
+    local padding = self.deck.contentPadding
     local xMin = padding[1]
     local yMin = padding[2]
     local xMax = width - padding[3]
@@ -2973,32 +2837,19 @@ end
 -- @return paddingBottom
 --------------------------------------------------------------------------------
 function NineImage:getContentPadding()
-    local padding = self.contentPadding
+    local padding = self.deck.contentPadding
     return unpack(padding)
 end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Label
---
+-- 
 -- Label for text display.
 -- Based on MOAITextBox.
 ----------------------------------------------------------------------------------------------------
 Label = class(DisplayObject)
-Label.__index = MOAITextBoxInterface
-Label.__moai_class = MOAITextBox
+Label.__factory = MOAITextBox
 M.Label = Label
-
---- Max width for fit size.
-Label.MAX_FIT_WIDTH = 10000000
-
---- Max height for fit size.
-Label.MAX_FIT_HEIGHT = 10000000
-
---- default fit length.
-Label.DEFAULT_FIT_LENGTH = 10000000
-
---- default fit padding.
-Label.DEFAULT_FIT_PADDING = 2
 
 --------------------------------------------------------------------------------
 -- Constructor.
@@ -3010,17 +2861,13 @@ Label.DEFAULT_FIT_PADDING = 2
 --------------------------------------------------------------------------------
 function Label:init(text, width, height, font, textSize)
     DisplayObject.init(self)
-
+    
     font = Resources.getFont(font, nil, textSize)
 
     self:setFont(font)
-    self:setRect(0, 0, width or 10, height or 10)
+    self:setRect(0, 0, width, height)
     self:setTextSize(textSize or Font.DEFAULT_POINTS)
     self:setString(text)
-
-    if not width or not height then
-        self:fitSize(#text)
-    end
 end
 
 --------------------------------------------------------------------------------
@@ -3032,50 +2879,9 @@ function Label:setSize(width, height)
     self:setRect(0, 0, width, height)
 end
 
---------------------------------------------------------------------------------
--- Sets the fit size.
--- @param lenfth (Option)Length of the text.
--- @param maxWidth (Option)maxWidth of the text.
--- @param maxHeight (Option)maxHeight of the text.
--- @param padding (Option)padding of the text.
---------------------------------------------------------------------------------
-function Label:fitSize(length, maxWidth, maxHeight, padding)
-    length = length or Label.DEFAULT_FIT_LENGTH
-    maxWidth = maxWidth or Label.MAX_FIT_WIDTH
-    maxHeight = maxHeight or Label.MAX_FIT_HEIGHT
-    padding = padding or Label.DEFAULT_FIT_PADDING
-
-    self:setSize(maxWidth, maxHeight)
-    local left, top, right, bottom = self:getStringBounds(1, length)
-    left, top, right, bottom = left or 0, top or 0, right or 0, bottom or 0
-    local width, height = right - left + padding, bottom - top + padding
-
-    self:setSize(width, height)
-end
-
---------------------------------------------------------------------------------
--- Sets the fit height.
--- @param lenfth (Option)Length of the text.
--- @param maxHeight (Option)maxHeight of the text.
--- @param padding (Option)padding of the text.
---------------------------------------------------------------------------------
-function Label:fitHeight(length, maxHeight, padding)
-    self:fitSize(length, self:getWidth(), maxHeight, padding)
-end
-
---------------------------------------------------------------------------------
--- Sets the fit height.
--- @param lenfth (Option)Length of the text.
--- @param maxWidth (Option)maxWidth of the text.
--- @param padding (Option)padding of the text.
---------------------------------------------------------------------------------
-function Label:fitWidth(length, maxWidth, padding)
-    self:fitSize(length, maxWidth, self:getHeight(), padding)
-end
-
 ----------------------------------------------------------------------------------------------------
 -- @type Rect
---
+-- 
 -- Class to fill a rectangle. <br>
 -- NOTE: This uses immediate mode drawing and so has a high performance impact when
 -- used on mobile devices.  You may wish to use a 1-pixel high Image instead if you
@@ -3094,17 +2900,17 @@ function Rect:init(width, height)
 
     local deck = MOAIScriptDeck.new()
     deck:setRect(0, 0, width, height)
-
+    
     self:setDeck(deck)
     self.deck = deck
-
+    
     deck:setDrawCallback(
-    function(index, xOff, yOff, xFlip, yFlip)
-        local w, h, d = self:getSize()
-
-        MOAIGfxDevice.setPenColor(self:getColor())
-        MOAIDraw.fillRect(0, 0, w, h)
-    end
+        function(index, xOff, yOff, xFlip, yFlip)
+            local w, h, d = self:getSize()
+            
+            MOAIGfxDevice.setPenColor(self:getColor())
+            MOAIDraw.fillRect(0, 0, w, h)
+        end
     )
 end
 
@@ -3119,12 +2925,11 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Texture
---
+-- 
 -- Texture class.
 ----------------------------------------------------------------------------------------------------
 Texture = class()
-Texture.__index = MOAITextureInterface
-Texture.__moai_class = MOAITexture
+Texture.__factory = MOAITexture
 M.Texture = Texture
 
 --- Default Texture filter
@@ -3145,13 +2950,11 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type Font
---
+-- 
 -- Font class.
 ----------------------------------------------------------------------------------------------------
 Font = class()
-Font.__index = MOAIFontInterface
-Font.__moai_class = MOAIFont
-M.Font = Font
+Font.__factory = MOAIFont
 
 --- Default font
 Font.DEFAULT_FONT = "VL-PGothic.ttf"
@@ -3175,7 +2978,7 @@ function Font:init(path, charcodes, points, dpi)
     self.charcodes = charcodes
     self.points = points
     self.dpi = dpi
-
+    
     if charcodes and points then
         self:preloadGlyphs(charcodes, points, dpi)
     end
@@ -3183,7 +2986,7 @@ end
 
 ----------------------------------------------------------------------------------------------------
 -- @type TouchHandler
---
+-- 
 -- Class to perform the handling of touch events emitted from a layer.
 ----------------------------------------------------------------------------------------------------
 TouchHandler = class()
@@ -3199,7 +3002,7 @@ TouchHandler.TOUCH_EVENT = Event()
 function TouchHandler:init(layer)
     self.touchLayer = assert(layer)
     self.touchProps = {}
-
+    
     layer:addEventListener(Event.TOUCH_DOWN, self.onTouch, self)
     layer:addEventListener(Event.TOUCH_UP, self.onTouch, self)
     layer:addEventListener(Event.TOUCH_MOVE, self.onTouch, self)
@@ -3214,21 +3017,21 @@ function TouchHandler:onTouch(e)
     if not self.touchLayer.touchEnabled then
         return
     end
-
+    
     -- screen to world location.
     local prop = self:getTouchableProp(e)
     local prop2 = self.touchProps[e.idx]
-
+    
     -- touch down prop
     if e.type == Event.TOUCH_DOWN then
-        prop2 = nil
+        prop2 = nil 
         self.touchProps[e.idx] = prop
     elseif e.type == Event.TOUCH_UP then
         self.touchProps[e.idx] = nil
     elseif e.type == Event.TOUCH_CANCEL then
         self.touchProps[e.idx] = nil
     end
-
+    
     -- touch event
     local e2 = table.copy(e, self.TOUCH_EVENT)
 
@@ -3270,9 +3073,6 @@ function TouchHandler:dispatchTouchEvent(e, o)
         if o.dispatchEvent then
             o:dispatchEvent(e)
         end
-        if e.stopFlag then
-            break
-        end
         o = o.parent
     end
 end
@@ -3282,7 +3082,7 @@ end
 --------------------------------------------------------------------------------
 function TouchHandler:dispose()
     local layer = self.touchLayer
-
+    
     layer:removeEventListener(Event.TOUCH_DOWN, self.onTouch, self)
     layer:removeEventListener(Event.TOUCH_UP, self.onTouch, self)
     layer:removeEventListener(Event.TOUCH_MOVE, self.onTouch, self)

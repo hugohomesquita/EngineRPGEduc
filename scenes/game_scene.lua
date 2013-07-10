@@ -6,6 +6,11 @@ module(..., package.seeall)
 local Avatar = require "hanappe/class/Avatar"
 local FpsMonitor = require "hanappe/extensions/FpsMonitor"
 
+local RPGMapControlView = rpgmap.RPGMapControlView
+local RPGMapPlayerInfo = rpgmap.RPGMapPlayerInfo
+
+local mapPlayerInfo = nil
+
 local AVATAR = nil
 local MAPA = nil
 local PHYSICS = nil
@@ -23,15 +28,34 @@ function onCreate(e)
     --camera:addLoc(500,500,0)
     
     
-    createHUD()
+    
     PHYSICS = createWorldPhysics()
     MAPA = initMap()
     initAvatar()                  
   
     scrollCameraToFocusObject()
     
+    
+    --INICIALIZANDO A GUI    
+    mapControlView = RPGMapControlView()
+    mapControlView:setScene(scene)
+    mapControlView:addEventListener("enter", onEnter)
+    mapControlView:addEventListener("OnStickChanged", joystick_OnStickChanged)
+    
+    mapControlView:addEventListener("buttonProfile_Click", buttonProfile_Click)
+    mapControlView:addEventListener("buttonOption_Click", buttonOption_Click)
+    
+    --INFO PLAYER
+    mapPlayerInfo = RPGMapPlayerInfo()
+    mapPlayerInfo:setScene(scene)
+    
+    createHUD()
+    
 end
 
+function onEnter(e)
+  print('ENTER')
+end
 
 function initAvatar()
     AVATAR = Avatar({tileMap=MAPA,worldPhysics=PHYSICS})
@@ -121,7 +145,7 @@ function changeMap(toMap,ToMapHotSpot)
    mapData:setLayer(MapLayer)
   
    --PRIORIDADES DE RENDERIZAÇÃO
-   mapData:updateRenderOrdem()
+   --mapData:updateRenderOrdem()
 
    
    AVATAR:setTileMap(mapData)
@@ -143,40 +167,20 @@ function createWorldPhysics()
 end
 
 function createHUD()
-    view = widget.UIView {
-        scene = scene,
-    }
-    --HUD
-    infoBar = widget.UIGroup {
-      size = {100,100},
-      parent = view,
-      pos = {10,10},
-    }
-    
     --LOAD PLAYER INFO
     
     GAME_FILE = savefiles.get "user"
     USER_DATA = GAME_FILE.data
     
-    lbNome = flower.Label(USER_DATA.nome, 100, 30, "arial-rounded.ttf")    
-    lbNome:setPos(0,0)
-    view:addChild(lbNome)
     
-    lbXP = flower.Label("XP:"..USER_DATA.xp, 100, 30, "arial-rounded.ttf",18)    
-    lbXP:setPos(0,30)
-    view:addChild(lbXP)
-    
-    --CONTROLES
-    joystick = widget.Joystick {
-        stickMode = "digital",
-        parent = view,
-        onStickChanged = joystick_OnStickChanged,
-    }
-    joystick:setPos(5, flower.viewHeight - joystick:getHeight() - 5)
+    mapPlayerInfo:setName(USER_DATA.nome)
+    mapPlayerInfo:setXP(USER_DATA.xp)
+  
 end
 
 function updateHUD()
-    lbXP:setString("XP:"..tostring(USER_DATA.xp))
+    --lbXP:setString("XP:"..tostring(USER_DATA.xp))
+    mapPlayerInfo:onUpdate()
 end
 
 function scrollCameraToCenter(x, y)
@@ -205,8 +209,18 @@ function stopWorld()
   PHYSICS:stop()
 end
 
-function joystick_OnStickChanged(e)
-    MAPA.avatar.controller:walkByStick(e)    
+--CONTROLLER LISTENER
+function buttonProfile_Click(e)
+  print('buttonProfile_Click')
+end
+
+function buttonOption_Click(e)
+  print('buttonOption_Click')
+end
+
+
+function joystick_OnStickChanged(e)    
+    MAPA.avatar.controller:walkByStick(e.data)    
 end
 
 function onUpdate(e)  

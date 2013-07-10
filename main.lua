@@ -1,5 +1,6 @@
 -- import
 flower = require "hanappe/flower"
+themes = require "hanappe/extensions/themes"
 tiled = require "hanappe/extensions/tiled"
 widget = require "hanappe/extensions/widget"
 physics = require "hanappe/extensions/physics"

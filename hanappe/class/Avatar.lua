@@ -183,6 +183,7 @@ end
 
 function M:onUpdate()
     --ATUALIZANDO A ORDEM DE RENDERIZAÇÃO
+    --print(self:vertexZ())
     self:setPriority(self:vertexZ())
 end
 
