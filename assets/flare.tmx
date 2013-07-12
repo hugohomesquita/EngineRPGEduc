@@ -31,11 +31,11 @@
   <tileoffset x="0" y="48"/>
   <image source="stairs.png" width="1024" height="256"/>
  </tileset>
- <tileset firstgid="288" name="0001" tilewidth="64" tileheight="128">
-  <image source="../../../../Desktop/MAPAS/out_walls/0001.png" width="64" height="128"/>
- </tileset>
- <tileset firstgid="289" name="tileset" tilewidth="64" tileheight="128">
+ <tileset firstgid="288" name="tileset" tilewidth="64" tileheight="128">
   <image source="../../../../Desktop/MAPAS/DESING BACKUP/out_walls/tileset.png" width="320" height="384"/>
+ </tileset>
+ <tileset firstgid="303" name="human" tilewidth="96" tileheight="96">
+  <image source="human.png" width="864" height="768"/>
  </tileset>
  <layer name="MapBackground" width="30" height="50">
   <data encoding="base64" compression="zlib">
@@ -114,9 +114,11 @@
  </objectgroup>
  <layer name="MapObject" width="30" height="50">
   <data encoding="base64" compression="zlib">
-   eJxjYBgaQIeRgUEKiKUZIWx62ouNPZTt1QSap40DayHZpY5HHQxrkOA2BTxql6OxNxMwi5QwwWcvqYBUezdB2flk2IWsh1z/EgpHQmCohDMlABRHGwbAXmRAyF70PLqECnY2MWDmcXQgSacyD90eCQrs3UqCWnR7nJGwBwP+cJYhwo1bGCDhHA3EwUgYHwClq4145DfhkUMHQSSopWZ6Hm72biAgT669lNYL9Apn9DRHLXtJyauk2ouv/YKt3YKeR5FxPInuxAWwlfOk+GnUXtzAlwF7OxYGooA4EIhdgdiPivZmEaEGVn64UdHeJCjdhkcNTI6aYY7sX3z1FLXt9WFArZvRAXL+pVZ+RQcOWMTokY/SBsheBzraC8q/oLzpCMSeWOQHMv/CwHDLv4QALfPvFjT54Zx/R+0d3va6MFDWRiYXgPIUcl0IykO0yjvowAGJTQ+/IgPYWPBQAwCHLzrx
+   eJxjYBgaQJuRgUEKiKUZIWx62ouNPZTt1QCap4UDayLZpYZHHQyrU8lty9HYmwmop2dcUGLvJiidT4ZdyHrI9S+hcCQEhko4UwJAcbRhAOxFBoTsRc+jS6hgZxMDZh5HB5J0Cg90eyQosHcrCWrR7XFGwh4M+MNZhgg3bmGAhHM0EAcjYUJgIx65TXjk0EEQCWqpCYabvRsIyJNrL6X1Ar3CGT3NUcteUvIqqfbia79ga7eg51FkHE+iO3EBbOU8PeJwJNjry4C9HQsDUUAcCMSuQOxHRXuziFADKz/cqGhvEpRuw6MGJkfNMEf2L756itr2+jCg1s3oADn/Uiu/ogMHLGL0yEdpA2SvAx3tBeVfUN50BGJPLPIDmX9hYLjlX0KAlvl3C5r8cM6/o/YOb3tdGGjXRsYHQHkKuS4E5SFa5R104IDEpnd/DzYWPNQAAAiTOO4=
   </data>
  </layer>
  <objectgroup name="Enemy" width="30" height="50"/>
- <objectgroup name="Object" width="30" height="50"/>
+ <objectgroup name="Object" width="30" height="50">
+  <object name="hugo" type="Player" gid="321" x="288" y="320"/>
+ </objectgroup>
 </map>

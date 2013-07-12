@@ -8,8 +8,11 @@ local FpsMonitor = require "hanappe/extensions/FpsMonitor"
 
 local RPGMapControlView = rpgmap.RPGMapControlView
 local RPGMapPlayerInfo = rpgmap.RPGMapPlayerInfo
+local RPGMap = rpgmap.RPGMap
 
 local mapPlayerInfo = nil
+local rpgMap = nil
+
 
 local AVATAR = nil
 local MAPA = nil
@@ -17,30 +20,25 @@ local PHYSICS = nil
 
 local fpsMonitor = FpsMonitor(1)
 function onCreate(e)    
-    --fpsMonitor:play() 
-    MapLayer = flower.Layer()
-    MapLayer:setScene(scene)
-    MapLayer:setTouchEnabled(true)
-    MapLayer:setPriority(1)
+   
     
-    camera = flower.Camera()
-    MapLayer:setCamera(camera)
-    --camera:addLoc(500,500,0)
+    rpgMap = RPGMap()
+    rpgMap:setScene(scene)
+    loadRPGMap("assets/flare.lue")    
     
-    
-    
-    PHYSICS = createWorldPhysics()
-    MAPA = initMap()
-    initAvatar()                  
+    playerObject = rpgMap.objectLayer:findObjectByName("hugo")
+    --PHYSICS = createWorldPhysics()
+    --MAPA = initMap()
+    --initAvatar()                  
   
-    scrollCameraToFocusObject()
+    --scrollCameraToFocusObject()
     
     
     --INICIALIZANDO A GUI    
     mapControlView = RPGMapControlView()
     mapControlView:setScene(scene)
     mapControlView:addEventListener("enter", onEnter)
-    mapControlView:addEventListener("OnStickChanged", joystick_OnStickChanged)
+    --mapControlView:addEventListener("OnStickChanged", joystick_OnStickChanged)
     
     mapControlView:addEventListener("buttonProfile_Click", buttonProfile_Click)
     mapControlView:addEventListener("buttonOption_Click", buttonOption_Click)
@@ -51,6 +49,21 @@ function onCreate(e)
     
     createHUD()
     
+end
+
+function loadRPGMap(mapName)
+    local mapData = dofile(mapName)
+    --mapData.tilesets[7].tileoffsetx = 0
+    --mapData.tilesets[7].tileoffsety = 48
+    
+    --mapData.tilesets[4].tileoffsetx = 0
+    --mapData.tilesets[4].tileoffsety = 16
+    
+    mapData.tilesets[9].tileoffsetx = 32
+    mapData.tilesets[9].tileoffsety = 96
+    
+    rpgMap:loadMapData(mapData)
+    playerObject = rpgMap.objectLayer:findObjectByName("Player")
 end
 
 function onEnter(e)
@@ -74,7 +87,7 @@ function initMap()
     mapData.tilesets[4].tileoffsetx = 0
     mapData.tilesets[4].tileoffsety = 16
     
-    local mapa = rpgmap.RPGMap()
+    local mapa = RPGMap()
     mapa:setWorldPhysics(PHYSICS)
     mapa:loadMapData(mapData)
     mapa:setLayer(MapLayer)
@@ -218,14 +231,22 @@ function buttonOption_Click(e)
   print('buttonOption_Click')
 end
 
-
-function joystick_OnStickChanged(e)    
-    MAPA.avatar.controller:walkByStick(e.data)    
-end
-
 function onUpdate(e)  
-  MAPA:onUpdate(e) 
+  --MAPA:onUpdate(e) 
   updateHUD()
-  scrollCameraToFocusObject()
+  updateMap()
+  updatePlayer()
+  --scrollCameraToFocusObject()
 end
+
+function updateMap()
+    rpgMap:onUpdate(e)
+end
+
+function updatePlayer()
+    local direction = mapControlView:getDirection()
+    --print(direction)
+    playerObject:walkMap(direction)
+end
+
 

@@ -12,6 +12,7 @@ local tiled = require "hanappe/extensions/tiled"
 local class = flower.class
 local table = flower.table
 local Layer = flower.Layer
+local InputMgr = flower.InputMgr
 local Camera = flower.Camera
 local TileMap = tiled.TileMap
 local TileObject = tiled.TileObject
@@ -31,8 +32,23 @@ local UpdatingSystem
 local MovementSystem
 local CameraSystem
 local RenderSystem
-local ActorController
-local PlayerController
+--local ActorController
+--local PlayerController
+
+-- KeyCode
+local KeyCode = {}
+KeyCode.LEFT = string.byte("a")
+KeyCode.RIGHT = string.byte("d")
+KeyCode.UP = string.byte("w")
+KeyCode.DOWN = string.byte("s")
+
+-- stick to dir map
+local STICK_TO_DIR = {
+    top = "north",    
+    left = "west",
+    right = "east",
+    bottom = "south"    
+}
 
 ----------------------------------------------------------------------------------------------------
 -- @type RPGMap
@@ -42,17 +58,45 @@ M.RPGMap = RPGMap
 
 function RPGMap:init()
     TileMap.init(self)
+    self.objectFactory = ClassFactory(RPGObject)
     
     
-    
-    self.world = nil
+    RPGMap.WORLD = nil
     self.objectLayer = nil
     self.collisionLayer = nil
     self.avatar = nil
     
+    self:initLayer()
+    self:initPhysics()
     self:initSystems()
     self:initEventListeners()    
-    
+end
+
+
+function RPGMap:initLayer()
+    self.camera = Camera()
+
+    local layer = Layer()
+    --layer:setPriority(1)
+    layer:setSortMode(MOAILayer.SORT_PRIORITY_ASCENDING)
+    layer:setCamera(self.camera)
+    self.camera:addLoc(-150,20,0)
+    self:setLayer(layer)
+end
+
+function RPGMap:initPhysics()
+    local world = MOAIBox2DWorld.new ()
+    world:setGravity ( 0, 0 )
+    world:setUnitsToMeters ( 1/30)
+    --world:setDebugDrawEnabled(false)
+    world:start()
+    RPGMap.WORLD = world
+    self.layer:setBox2DWorld(RPGMap.WORLD)
+end
+
+function RPGMap:setScene(scene)
+    self.scene = scene
+    self.layer:setScene(scene)
 end
 
 function RPGMap:setWorldPhysics(world)
@@ -94,7 +138,7 @@ function RPGMap:onLoadedData(e)
       self:createPhysicsEvent()
     end  
     
-   -- self:setInvisibleLayerByName("MapBackground")
+    self:setInvisibleLayerByName("MapBackground")
     --self:setInvisibleLayerByName("MapObject")
 end
 
@@ -140,7 +184,7 @@ end
 function RPGMap:createPhysicsEvent()
   for i, object in ipairs(self.eventLayer.children) do   
       object.physics = {} 
-      local body = self.world:addBody(MOAIBox2DBody.KINEMATIC)        
+      local body = RPGMap.WORLD:addBody(MOAIBox2DBody.KINEMATIC)        
       local posX,posY = object:getPos()
       local width, height = object:getSize()
       local xMin, yMin, xMax, yMax = -width / 2, -height / 2, width / 2, height / 2   
@@ -207,7 +251,7 @@ function RPGMap:createPhysicsCollision()
       for x = 0, self.mapWidth - 1 do
         objeto = object.renderers[y * self.mapWidth + x + 1]
         if objeto then
-          local body = self.world:addBody(MOAIBox2DBody.STATIC)        
+          local body = RPGMap.WORLD:addBody(MOAIBox2DBody.STATIC)        
           local posX,posY = objeto:getPos()
           local width, height = objeto:getSize()
           local xMin, yMin, xMax, yMax = -width / 2, -height / 2, width / 2, height / 2   
@@ -248,6 +292,8 @@ function RPGMap:updateRenderOrdem()
     local bg = self:findMapLayerByName("MapBackground")
     bg:setPriority(1)   
 end
+
+
 
 ----------------------------------------------------------------------------------------------------
 -- @type UpdatingSystem
@@ -376,12 +422,6 @@ function RPGMapControlView:getDirection()
     return STICK_TO_DIR[self.joystick:getStickDirection()]
 end
 
-
-
-
-
-
-
 --------------------------------------------------------------------------------
 -- @type RPGMapPlayerInfo
 --------------------------------------------------------------------------------
@@ -449,6 +489,253 @@ function RPGMapPlayerInfo:onUpdate()
     self.lbNome:setString(RPGMapPlayerInfo.NAME)
     self.lbLVL:setString(tostring(RPGMapPlayerInfo.XP))
 end
+
+----------------------------------------------------------------------------------------------------
+-- @type CameraSystem
+----------------------------------------------------------------------------------------------------
+CameraSystem = class()
+CameraSystem.MARGIN_HEIGHT = 140
+
+function CameraSystem:init(tileMap)
+    self.tileMap = tileMap
+end
+
+function CameraSystem:onLoadedData(e)
+    self:onUpdate()
+end
+
+function CameraSystem:onUpdate()
+    local player = self.tileMap.playerObject
+    
+    local vw, vh = self.tileMap:getViewSize()
+    local mw, mh = self.tileMap:getSize()
+    local x, y = player:getPos()
+
+    x, y = x - vw / 2, y - vh / 2
+    x, y = self:getAdjustCameraLoc(x, y)
+
+    self.tileMap.camera:setLoc(x, y, 0)
+end
+
+function CameraSystem:getAdjustCameraLoc(x, y)
+    local vw, vh = self.tileMap:getViewSize()
+    local mw, mh = self.tileMap:getSize()    
+
+    mh = mh + CameraSystem.MARGIN_HEIGHT
+    
+    x = math.min(x, mw - vw)
+    x = math.max(x, 0)
+    x = math.floor(x)
+    y = math.min(y, mh - vh)
+    y = math.max(y, 0)
+    y = math.floor(y)
+    
+    return x, y
+end
+
+
+
+
+
+----------------------------------------------------------------------------------------------------
+-- @type RPGObject
+----------------------------------------------------------------------------------------------------
+RPGObject = class(TileObject)
+M.RPGObject = RPGObject
+
+-- Constranits
+RPGObject.ACTOR_ANIM_DATAS = {
+    {name = "walkNorth", frames = {2, 3, 4, 5, 6, 7, 8, 9}, sec = 0.1},
+    {name = "walkSouth", frames = {38, 39, 40, 41, 42, 43, 44, 45}, sec = 0.1},   
+    {name = "walkEast",  frames = {20, 21, 22, 23, 24, 25, 26, 27}, sec = 0.1},
+    {name = "walkWest",  frames = {56, 57, 58, 59, 60, 61, 62, 63}, sec = 0.1}, 
+}
+
+-- Events
+RPGObject.EVENT_MOVE_START = "moveStart"
+RPGObject.EVENT_MOVE_END = "moveEnd"
+
+-- Direction
+RPGObject.DIR_UP = "up"
+RPGObject.DIR_LEFT = "left"
+RPGObject.DIR_RIGHT = "right"
+RPGObject.DIR_DONW = "down"
+
+-- Move speed
+RPGObject.MOVE_SPEED = 4
+
+-- Direction to AnimationName
+RPGObject.DIR_TO_ANIM = {
+    north = "walkNorth",
+    south = "walkSouth",
+    east = "walkEast",
+    west = "walkWest",
+}
+
+-- Direction to LinerVelocity
+RPGObject.DIR_TO_VELOCITY = {
+    up = {x = 0, y = -1},
+    left = {x = -1, y = 0},
+    right = {x = 1, y = 0},
+    down = {x = 0, y = 1},
+}
+
+function RPGObject:init(tileMap)
+    TileObject.init(self, tileMap)
+    self.isRPGObject = true
+    self.mapX = 0
+    self.mapY = 0
+    self.physics = {}
+    self.linerVelocity = {}
+    self.linerVelocity.stepX = 0
+    self.linerVelocity.stepX = 0
+    self.linerVelocity.stepCount = 0
+end
+
+function RPGObject:loadData(data)
+    TileObject.loadData(self, data)
+    print('RPGObject:loadData')
+    self.mapX = math.floor(data.x / self.tileMap.tileWidth)
+    self.mapY = math.floor(data.y / self.tileMap.tileHeight) - 1
+
+    if self.type == "Actor" or self.type == "Player" then
+        self:initActor(data)
+        self:createPhysics()
+    end
+end
+
+function RPGObject:initActor(data)    
+    if self.renderer then
+        self.renderer:setAnimDatas(RPGObject.ACTOR_ANIM_DATAS)
+        self:playAnim(self:getCurrentAnimName())
+    end
+end
+
+function RPGObject:getMapPos()
+    return self.mapX, self.mapY
+end
+
+function RPGObject:getNextMapPos()
+    local mapX, mapY = self:getMapPos()
+    local velocity = RPGObject.DIR_TO_VELOCITY[self.direction]
+    return mapX + velocity.x, mapY + velocity.y
+end
+
+function RPGObject:isMoving()
+    return self.linerVelocity.stepCount > 0
+end
+
+function RPGObject:getCurrentAnimName()
+    if not self.renderer then
+        return
+    end
+
+    local index = self.renderer:getIndex()
+    if 1 <= index and index <= 3 then
+        return "walkDown"
+    end
+    if 4 <= index and index <= 6 then
+        return "walkLeft"
+    end
+    if 7 <= index and index <= 9 then
+        return "walkRight"
+    end
+    if 10 <= index and index <= 12 then
+        return "walkUp"
+    end
+end
+
+function RPGObject:playAnim(animName)
+    if self.renderer and not self.renderer:isCurrentAnim(animName) then
+        self.renderer:playAnim(animName)
+    end
+end
+
+function RPGObject:stopAnim()
+    if self.renderer then
+      self.renderer:stopAnim()
+    end
+end
+function RPGObject:walkMap(dir)
+    if self:isMoving() then
+        return
+    end
+    --print(dir)
+    if not RPGObject.DIR_TO_ANIM[dir] then
+      
+       -- print(dir)
+        --self:stopAnim()
+        return
+    end
+    
+    self:setDirection(dir)
+    
+    --if self:hitTestFromMap() then
+    --    return
+    --end
+    
+    --local velocity = RPGObject.DIR_TO_VELOCITY[dir]
+    --local tileWidth = self.tileMap.tileWidth
+    --local tileHeight = self.tileMap.tileHeight
+    --local moveSpeed = RPGObject.MOVE_SPEED
+    
+    --self.mapX = self.mapX + velocity.x
+    --self.mapY = self.mapY + velocity.y
+    --self.linerVelocity.stepX = moveSpeed * velocity.x
+    --self.linerVelocity.stepY = moveSpeed * velocity.y
+    --self.linerVelocity.stepCount = tileWidth / moveSpeed  -- TODO:TileWidthしか使用していない
+    return true
+end
+
+function RPGObject:setDirection(dir)
+    if not RPGObject.DIR_TO_ANIM[dir] then
+        return
+    end       
+    
+    local animName = RPGObject.DIR_TO_ANIM[dir]
+    self:playAnim(animName)
+    self.direction = dir
+end
+
+function RPGObject:hitTestFromMap()
+    if self.tileMap:isCollisionForMap(self:getNextMapPos()) then
+        return true
+    end
+    if self.tileMap:isCollisionForObjects(self, self:getNextMapPos()) then
+        return true
+    end
+end
+
+function RPGObject:isCollision(mapX, mapY)
+    local nowMapX, nowMapY = self:getMapPos()
+    return nowMapX == mapX and nowMapY == mapY
+end
+
+function RPGObject:createPhysics()           
+    local poly = {
+        0, -16,
+        32, 0,
+        0, 16,
+        -32, 0,
+    } 
+    self.physics.body = RPGMap.WORLD:addBody(MOAIBox2DBody.DYNAMIC)
+    self.renderer:setParent(self.physics.body)
+    
+    local x,y = self:getPos()
+    local width, height = self.renderer:getSize()
+   -- local xMin, yMin, xMax, yMax = -width / 2, -height / 2, width / 2, height / 2 
+    
+    self.physics.body:setTransform(x, y)
+    self.physics.fixture = self.physics.body:addPolygon(poly)
+    
+    self.physics.fixture:setCollisionHandler(function(phase, a, b, arbiter)
+                                 self:onCollide(phase, a, b, arbiter)
+                              end, MOAIBox2DArbiter.ALL)
+    
+    self.physics.body:resetMassData() 
+end
+
+
 
 
 
