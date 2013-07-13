@@ -107,7 +107,7 @@ function RPGMap:initSystems()
     self.systems = {
         UpdatingSystem(self),
         MovementSystem(self),        
-        --CameraSystem(self),
+        CameraSystem(self),
         --RenderSystem(self),
     }
 end
@@ -123,9 +123,10 @@ function RPGMap:isCollison(x, y)
 end
 
 function RPGMap:onLoadedData(e)
-    self.objectLayer = self:findMapLayerByName("Object")
-    self.collisionLayer = self:findMapLayerByName("MapCollision")
-    self.eventLayer = self:findMapLayerByName("Event")
+    self.objectLayer = assert(self:findMapLayerByName("Object"))
+    self.playerObject = assert(self.objectLayer:findObjectByName("hugo"))
+    self.collisionLayer = assert(self:findMapLayerByName("MapCollision"))
+    self.eventLayer = assert(self:findMapLayerByName("Event"))
     if self.collisionLayer then
         self.collisionLayer:setVisible(false)
         self:createPhysicsCollision()
@@ -505,36 +506,22 @@ function CameraSystem:onLoadedData(e)
 end
 
 function CameraSystem:onUpdate()
-    local player = self.tileMap.playerObject
-    
-    local vw, vh = self.tileMap:getViewSize()
-    local mw, mh = self.tileMap:getSize()
-    local x, y = player:getPos()
-
-    x, y = x - vw / 2, y - vh / 2
-    x, y = self:getAdjustCameraLoc(x, y)
-
-    self.tileMap.camera:setLoc(x, y, 0)
+    self:scrollCameraToFocusObject()
 end
 
-function CameraSystem:getAdjustCameraLoc(x, y)
-    local vw, vh = self.tileMap:getViewSize()
-    local mw, mh = self.tileMap:getSize()    
-
-    mh = mh + CameraSystem.MARGIN_HEIGHT
-    
-    x = math.min(x, mw - vw)
-    x = math.max(x, 0)
-    x = math.floor(x)
-    y = math.min(y, mh - vh)
-    y = math.max(y, 0)
-    y = math.floor(y)
-    
-    return x, y
+function CameraSystem:scrollCameraToCenter(x, y)
+    local cx, cy = flower.getViewSize()
+    self:scrollCamera(x - (cx/2), y - (cy/2))    
+end
+function CameraSystem:scrollCamera(x, y)
+  nx,ny = math.floor(x), math.floor(y)
+  self.tileMap.camera:setLoc(nx,ny)
 end
 
-
-
+function CameraSystem:scrollCameraToFocusObject()
+    local x,y = self.tileMap.playerObject:getLoc()
+    self:scrollCameraToCenter(x, y)
+end
 
 
 ----------------------------------------------------------------------------------------------------
@@ -690,7 +677,7 @@ function RPGObject:walkMap(dir)
     self.linerVelocity.stepY = moveSpeed * velocity.y    
     
     self.physics.body:setLinearVelocity(self.linerVelocity.stepX, self.linerVelocity.stepY)
-    
+    self:setPos(self.physics.body:getPosition())
     return true
 end
 
