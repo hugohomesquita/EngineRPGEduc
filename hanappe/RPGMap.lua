@@ -80,7 +80,7 @@ function RPGMap:initLayer()
     --layer:setPriority(1)
     layer:setSortMode(MOAILayer.SORT_PRIORITY_ASCENDING)
     layer:setCamera(self.camera)
-    self.camera:addLoc(-150,20,0)
+    self.camera:addLoc(-400,-150,0)
     self:setLayer(layer)
 end
 
@@ -138,7 +138,7 @@ function RPGMap:onLoadedData(e)
       self:createPhysicsEvent()
     end  
     
-    self:setInvisibleLayerByName("MapBackground")
+    --self:setInvisibleLayerByName("MapBackground")
     --self:setInvisibleLayerByName("MapObject")
 end
 
@@ -555,6 +555,11 @@ RPGObject.ACTOR_ANIM_DATAS = {
 RPGObject.EVENT_MOVE_START = "moveStart"
 RPGObject.EVENT_MOVE_END = "moveEnd"
 
+RPGObject.EVENT_COLLISION_BEGIN = "collisionBegin"
+RPGObject.EVENT_COLLISION_END = "collisionEnd"
+RPGObject.EVENT_COLLISION_PRE_SOLVE = "collisionPreSolve"
+RPGObject.EVENT_COLLISION_POST_SOLVE = "collisionPostSolve"
+
 -- Direction
 RPGObject.DIR_UP = "up"
 RPGObject.DIR_LEFT = "left"
@@ -562,7 +567,7 @@ RPGObject.DIR_RIGHT = "right"
 RPGObject.DIR_DONW = "down"
 
 -- Move speed
-RPGObject.MOVE_SPEED = 4
+RPGObject.MOVE_SPEED = 50
 
 -- Direction to AnimationName
 RPGObject.DIR_TO_ANIM = {
@@ -574,10 +579,10 @@ RPGObject.DIR_TO_ANIM = {
 
 -- Direction to LinerVelocity
 RPGObject.DIR_TO_VELOCITY = {
-    up = {x = 0, y = -1},
-    left = {x = -1, y = 0},
-    right = {x = 1, y = 0},
-    down = {x = 0, y = 1},
+    north = {x = 0, y = -1},
+    west = {x = -1, y = 0},
+    east = {x = 1, y = 0},
+    south = {x = 0, y = 1},
 }
 
 function RPGObject:init(tileMap)
@@ -588,7 +593,7 @@ function RPGObject:init(tileMap)
     self.physics = {}
     self.linerVelocity = {}
     self.linerVelocity.stepX = 0
-    self.linerVelocity.stepX = 0
+    self.linerVelocity.stepY = 0
     self.linerVelocity.stepCount = 0
 end
 
@@ -600,14 +605,19 @@ function RPGObject:loadData(data)
 
     if self.type == "Actor" or self.type == "Player" then
         self:initActor(data)
+
         self:createPhysics()
+        self:setPriority(999999)
+        
     end
 end
 
 function RPGObject:initActor(data)    
     if self.renderer then
+        self.renderer:setPos(-32,-16)
+        self:setIsoPos(96,96)        
         self.renderer:setAnimDatas(RPGObject.ACTOR_ANIM_DATAS)
-        self:playAnim(self:getCurrentAnimName())
+        --self:playAnim(self:getCurrentAnimName())        
     end
 end
 
@@ -653,37 +663,34 @@ end
 
 function RPGObject:stopAnim()
     if self.renderer then
-      self.renderer:stopAnim()
+        self.renderer:stopAnim()
     end
 end
+
 function RPGObject:walkMap(dir)
+    
+    self.linerVelocity.stepX = 0
+    self.linerVelocity.stepY = 0
+    self.physics.body:setLinearVelocity(self.linerVelocity.stepX, self.linerVelocity.stepY)
+    
     if self:isMoving() then
         return
     end
-    --print(dir)
-    if not RPGObject.DIR_TO_ANIM[dir] then
-      
-       -- print(dir)
-        --self:stopAnim()
+  
+    if not RPGObject.DIR_TO_ANIM[dir] then      
         return
     end
     
     self:setDirection(dir)
+            
+    local velocity = RPGObject.DIR_TO_VELOCITY[dir]        
+    local moveSpeed = RPGObject.MOVE_SPEED
+        
+    self.linerVelocity.stepX = moveSpeed * velocity.x
+    self.linerVelocity.stepY = moveSpeed * velocity.y    
     
-    --if self:hitTestFromMap() then
-    --    return
-    --end
+    self.physics.body:setLinearVelocity(self.linerVelocity.stepX, self.linerVelocity.stepY)
     
-    --local velocity = RPGObject.DIR_TO_VELOCITY[dir]
-    --local tileWidth = self.tileMap.tileWidth
-    --local tileHeight = self.tileMap.tileHeight
-    --local moveSpeed = RPGObject.MOVE_SPEED
-    
-    --self.mapX = self.mapX + velocity.x
-    --self.mapY = self.mapY + velocity.y
-    --self.linerVelocity.stepX = moveSpeed * velocity.x
-    --self.linerVelocity.stepY = moveSpeed * velocity.y
-    --self.linerVelocity.stepCount = tileWidth / moveSpeed  -- TODO:TileWidthしか使用していない
     return true
 end
 
@@ -693,7 +700,7 @@ function RPGObject:setDirection(dir)
     end       
     
     local animName = RPGObject.DIR_TO_ANIM[dir]
-    self:playAnim(animName)
+    --self:playAnim(animName)
     self.direction = dir
 end
 
@@ -722,8 +729,7 @@ function RPGObject:createPhysics()
     self.renderer:setParent(self.physics.body)
     
     local x,y = self:getPos()
-    local width, height = self.renderer:getSize()
-   -- local xMin, yMin, xMax, yMax = -width / 2, -height / 2, width / 2, height / 2 
+    local width, height = self.renderer:getSize()   
     
     self.physics.body:setTransform(x, y)
     self.physics.fixture = self.physics.body:addPolygon(poly)
@@ -735,9 +741,49 @@ function RPGObject:createPhysics()
     self.physics.body:resetMassData() 
 end
 
+function RPGObject:getEventCollision(fixture)
+  for i, object in ipairs(self.tileMap:findMapLayerByName("Event").children) do     
+    if object.physics.fixture == fixture then
+      return object
+    end    
+  end
+  return nil
+end
+
+function RPGObject:onCollide(phase, fixtureA, fixtureB, arbiter)
+  local object = self:getEventCollision(fixtureB)
+  
+  if phase == MOAIBox2DArbiter.BEGIN then           
+    if object then
+      self:dispatchEvent(RPGObject.EVENT_COLLISION_BEGIN, object)
+    end  
+	end
+	
+	if phase == MOAIBox2DArbiter.END then
+    if object then
+      self:dispatchEvent(RPGObject.EVENT_COLLISION_END, object)
+    end
+	end
+	
+	if phase == MOAIBox2DArbiter.PRE_SOLVE then
+    if object then
+      self:dispatchEvent(RPGObject.EVENT_COLLISION_PRE_SOLVE, object)
+    end
+	end
+	
+	if phase == MOAIBox2DArbiter.POST_SOLVE then
+    if object then
+      self:dispatchEvent(RPGObject.EVENT_COLLISION_POST_SOLVE, object)
+    end
+	end
+end
 
 
-
+function RPGObject:vertexZ()
+  local px,py = self:getIsoPos() 
+  local z = (py/32) * self.tileMap.mapWidth + (px/32) +1
+  return z  
+end
 
 
 

@@ -53,14 +53,14 @@ end
 
 function loadRPGMap(mapName)
     local mapData = dofile(mapName)
-    --mapData.tilesets[7].tileoffsetx = 0
-    --mapData.tilesets[7].tileoffsety = 48
+    mapData.tilesets[7].tileoffsetx = 0
+    mapData.tilesets[7].tileoffsety = 48
     
-    --mapData.tilesets[4].tileoffsetx = 0
-    --mapData.tilesets[4].tileoffsety = 16
+    mapData.tilesets[4].tileoffsetx = 0
+    mapData.tilesets[4].tileoffsety = 16
     
-    mapData.tilesets[9].tileoffsetx = 32
-    mapData.tilesets[9].tileoffsety = 96
+   -- mapData.tilesets[9].tileoffsetx = 32
+    --mapData.tilesets[9].tileoffsety = 96
     
     rpgMap:loadMapData(mapData)
     playerObject = rpgMap.objectLayer:findObjectByName("Player")
@@ -246,7 +246,9 @@ end
 function updatePlayer()
     local direction = mapControlView:getDirection()
     --print(direction)
+
     playerObject:walkMap(direction)
+    --playerObject:setPriority(0)    
 end
 
 

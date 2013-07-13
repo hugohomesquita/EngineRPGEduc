@@ -39,12 +39,12 @@
  </tileset>
  <layer name="MapBackground" width="30" height="50">
   <data encoding="base64" compression="zlib">
-   eJztWFtugzAQ3P71E/AFnATyAJLc/3ZlpRl545pIYHAVqSOt6jrODvsY20TkM1BN5ic7/fNmw03WgCO2GpwnrHEz6yp8vgTq+zDZMWE672Fza6wtAXN5nqyb7GJicJjvJ2sRkz7nDetarNM1S2tBXvX5lJD3Gv+fzZytSWt4XQYvOe+TjfBZm/j4WQ/uq4R6dxm8jM/BD/3XGPfgbfBcts9y4tV8smbqn310SNhRQh/w2dbyDhLqd8GcM7Ey/gYcDuvcAt6URjXGB/wwb8zhKCHfTkIfjpGPWOMxUholH+OyfmyvMz+9+Q7nYo3HSNXrCt8VYicv7WziUI4OcTLeVD+8A2N7GM4Kc9QRealdj3Enr/2wBKxXje8/JOgxtSezlswN1+ToN+7n1J7MfujwjGptBi/rW8Mn66njO0yfa8CYte3BvZbXnmeMndoheDYwJ9Q8+2Et702CZrknqn1/hbU1PtO1I/hzziPG2iCum4Se0TxSvz3GVwm5XnMuqK+5fZh9xd59t2dveReitpkLv6Hvd6C2tY7cw0qAtdf6MvaSvNqva87YJbB3KHJpDw/y+4zaEvHZ4iWcd15e984twdyqfrlv0jTfg+yT81jPOu5gNg971po9zLPC78hlYfW7dz9b2Lvmmj04l1f/PnfmndMvz9jS+k3dVbeEvW/xbsP3P95v9sj5nH6dlNcv7zN+Ry4Le7cepbyO7HtgSV6Nd83dPJeXfVyal78rlOKlppSbGioFvuv5gpyKv/pt9JPxA35cPig=
+   eJztmNuOozAMQD3SPuwjND+QzpZOhzLt///dYslH8WQCFbe87FqyGkHwwbckVETk11tZj5Qp5hS3GTWO+uc/dxfuyRi5tsZU1TlhYl5j95dw1fZ51PeCns3fODPH6xIusbyO2o364XwIdr0f9WI+6Xt+2ryLzbvKfC58LnOu2nwaC/tPs8k1fhtjwg0vuCWBC/Nr1MFsts4/7vXGvknKd7eBi3/B7GC/tXFv3JO9l6+zLf5qPMmZ2qeOzgV9l1QHvNta7l1S/j7sWnC+4v/JGMHmhQXcUo+qjw+zQ9yI4SAp3kFSHQ6ZjbzHcyn1KDz88nZ8rROf3j3DtbzHcynl62a2G/MdLnp1fiijMz/xt1QPc4JvD8ds7Bp9BJfejTbu5Hs9LBHy1drzD0n9WFqTySWxYc6W/s3rubQmUw+dvaPqZQOX/LZmk3zq+MtU3+tuY3LbG3st1+9n+E7vIOwNxISepx7Wcj8l9SxrourvtzS3tXs6dzD+q/3oFRfOxexSMxpH+re38U1SrNfsC2prah2mrqjduTV761nIC71NLOKOtueE3tY8sobVEHKv+cX3mlyt1zV77BLxZyhYWsN3+blH7Sn53hIl7XdRvq+dewqx1f5l3UQ13nc5JuZ5P+u4M/VxODLX1DB7RTyQ5cX379H17MWfNdeswVu5+vs8mDvVv+yxtfu3dFbdU/x5i7MN33+cb46I+VT/Bqnfv5xn4oEsL/5sPUj9PvLfgTW56u+as/lWLnVcm8v/CrW49JSy6aFawrderMhU2es/yn9J/gIDwj8A
   </data>
  </layer>
- <layer name="MapCollision" width="30" height="50" visible="0">
+ <layer name="MapCollision" width="30" height="50">
   <data encoding="base64" compression="zlib">
-   eJztl9EOgCAIRTH//597ajkSFUTU5G5sbpUHBBZGAIgbWIBXwbnde5cs5baYJCasi1hT0uJyJeVKfJDWwArxOleXi3uu1CNUP9fey/nAjaGFm9MqXO4559Y1/1pyraVV69m573cSVi+3V7twW+acdG+NOYd7FhZz5Qlcbn5HxkhpBLf0j3qe/SXeGfmdVc+ncb1/v/L+3beenetcCy6+D1hwccxWzN3tBo2UCt0=
+   eJztl9sOgCAIhrPe/527cjUSOYgHkn9jcwv9RGDpcch0GZlUCYyDq+cmwrh+2SziPZExJiuuVFpuol2qc7zF24tbMs3ZeuPCnqv1CNbPlF9pD9IYONySVuFKz7k0pvbHybWVVq3n4D7zNKxWbqu8cDn3nPfa0nuO1DCuxdq7c6X57Rkjph7c2j8qf/tLvDPyO6ued+NG/34V/eu3noMb3BFc+B4YwYUxj2J6txtCTAnu
   </data>
  </layer>
  <objectgroup name="Event" width="30" height="50">
@@ -119,6 +119,6 @@
  </layer>
  <objectgroup name="Enemy" width="30" height="50"/>
  <objectgroup name="Object" width="30" height="50">
-  <object name="hugo" type="Player" gid="321" x="288" y="320"/>
+  <object name="hugo" type="Player" gid="256" x="32" y="32"/>
  </objectgroup>
 </map>
