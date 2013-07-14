@@ -28,6 +28,7 @@ local ImageButton = widget.ImageButton
 -- class
 local RPGMap
 local RPGObject
+local RPGMapControlView
 local UpdatingSystem
 local MovementSystem
 local CameraSystem
@@ -347,6 +348,12 @@ end
 RPGMapControlView = class(UIView)
 M.RPGMapControlView = RPGMapControlView
 
+RPGMapControlView.JOYSTICK = nil
+RPGMapControlView.ENTER_BUTTON = nil
+RPGMapControlView.OPTION_BUTTON = nil
+RPGMapControlView.PROFILE_BUTTON = nil
+
+
 function RPGMapControlView:_createChildren()
     RPGMapControlView.__super._createChildren(self)
 
@@ -394,6 +401,25 @@ function RPGMapControlView:_createChildren()
         end,
     }
     
+    RPGMapControlView.JOYSTICK = self.joystick    
+    RPGMapControlView.ENTER_BUTTON = self.enterButton
+    RPGMapControlView.OPTION_BUTTON = self.optionButton
+    RPGMapControlView.PROFILE_BUTTON = self.profileButton
+end
+
+function RPGMapControlView:updateLayout()
+    local vw, vh = flower.getViewSize()
+    
+    local joystick = RPGMapControlView.JOYSTICK
+    local enterButton = RPGMapControlView.ENTER_BUTTON
+    local optionButton = RPGMapControlView.OPTION_BUTTON
+    local profileButton = RPGMapControlView.PROFILE_BUTTON         
+        
+    joystick:setPos(10, vh - joystick:getHeight() - 10)
+    enterButton:setPos(vw - enterButton:getWidth() - 10, vh - enterButton:getHeight() - 10)
+    
+    optionButton:setPos(vw-43, 5)
+    profileButton:setPos(optionButton:getLeft()-43, 5)
 end
 
 function RPGMapControlView:updateDisplay()

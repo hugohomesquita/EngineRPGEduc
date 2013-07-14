@@ -43,6 +43,7 @@ function onCreate(e)
     mapControlView:addEventListener("buttonProfile_Click", buttonProfile_Click)
     mapControlView:addEventListener("buttonOption_Click", buttonOption_Click)
     
+    flower.Runtime:addEventListener("resize", onResize)
     --INFO PLAYER
     mapPlayerInfo = RPGMapPlayerInfo()
     mapPlayerInfo:setScene(scene)
@@ -64,6 +65,11 @@ function loadRPGMap(mapName)
     
     rpgMap:loadMapData(mapData)
     playerObject = rpgMap.objectLayer:findObjectByName("Player")
+end
+
+function onResize(e)
+  --RPGMapPlayerInfo:updateDisplay()
+   RPGMapControlView:updateLayout()
 end
 
 function onEnter(e)
