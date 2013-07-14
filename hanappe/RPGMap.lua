@@ -620,7 +620,7 @@ function RPGObject:loadData(data)
         self:initActor(data)
 
         self:createPhysics()
-        self:setPriority(999999)
+      --  self:setPriority(999999)
         
     end
 end
@@ -628,7 +628,7 @@ end
 function RPGObject:initActor(data)    
     if self.renderer then
         self.renderer:setPos(-32,-16)
-        self:setIsoPos(96,96)        
+        self:setIsoPos(320,224)        
         self.renderer:setAnimDatas(RPGObject.ACTOR_ANIM_DATAS)
         --self:playAnim(self:getCurrentAnimName())        
     end
@@ -636,12 +636,6 @@ end
 
 function RPGObject:getMapPos()
     return self.mapX, self.mapY
-end
-
-function RPGObject:getNextMapPos()
-    local mapX, mapY = self:getMapPos()
-    local velocity = RPGObject.DIR_TO_VELOCITY[self.direction]
-    return mapX + velocity.x, mapY + velocity.y
 end
 
 function RPGObject:isMoving()
@@ -704,6 +698,9 @@ function RPGObject:walkMap(dir)
     
     self.physics.body:setLinearVelocity(self.linerVelocity.stepX, self.linerVelocity.stepY)
     self:setPos(self.physics.body:getPosition())
+    
+    --UPDATE VERTEZ Z
+    self:setPriority(self:vertexZ())
     return true
 end
 
@@ -715,20 +712,6 @@ function RPGObject:setDirection(dir)
     local animName = RPGObject.DIR_TO_ANIM[dir]
     --self:playAnim(animName)
     self.direction = dir
-end
-
-function RPGObject:hitTestFromMap()
-    if self.tileMap:isCollisionForMap(self:getNextMapPos()) then
-        return true
-    end
-    if self.tileMap:isCollisionForObjects(self, self:getNextMapPos()) then
-        return true
-    end
-end
-
-function RPGObject:isCollision(mapX, mapY)
-    local nowMapX, nowMapY = self:getMapPos()
-    return nowMapX == mapX and nowMapY == mapY
 end
 
 function RPGObject:createPhysics()           

@@ -31,20 +31,17 @@
   <tileoffset x="0" y="48"/>
   <image source="stairs.png" width="1024" height="256"/>
  </tileset>
- <tileset firstgid="288" name="tileset" tilewidth="64" tileheight="128">
-  <image source="../../../../Desktop/MAPAS/DESING BACKUP/out_walls/tileset.png" width="320" height="384"/>
- </tileset>
- <tileset firstgid="303" name="human" tilewidth="96" tileheight="96">
+ <tileset firstgid="288" name="human" tilewidth="96" tileheight="96">
   <image source="human.png" width="864" height="768"/>
  </tileset>
  <layer name="MapBackground" width="30" height="50">
   <data encoding="base64" compression="zlib">
-   eJztmNuOozAMQD3SPuwjND+QzpZOhzLt///dYslH8WQCFbe87FqyGkHwwbckVETk11tZj5Qp5hS3GTWO+uc/dxfuyRi5tsZU1TlhYl5j95dw1fZ51PeCns3fODPH6xIusbyO2o364XwIdr0f9WI+6Xt+2ryLzbvKfC58LnOu2nwaC/tPs8k1fhtjwg0vuCWBC/Nr1MFsts4/7vXGvknKd7eBi3/B7GC/tXFv3JO9l6+zLf5qPMmZ2qeOzgV9l1QHvNta7l1S/j7sWnC+4v/JGMHmhQXcUo+qjw+zQ9yI4SAp3kFSHQ6ZjbzHcyn1KDz88nZ8rROf3j3DtbzHcynl62a2G/MdLnp1fiijMz/xt1QPc4JvD8ds7Bp9BJfejTbu5Hs9LBHy1drzD0n9WFqTySWxYc6W/s3rubQmUw+dvaPqZQOX/LZmk3zq+MtU3+tuY3LbG3st1+9n+E7vIOwNxISepx7Wcj8l9SxrourvtzS3tXs6dzD+q/3oFRfOxexSMxpH+re38U1SrNfsC2prah2mrqjduTV761nIC71NLOKOtueE3tY8sobVEHKv+cX3mlyt1zV77BLxZyhYWsN3+blH7Sn53hIl7XdRvq+dewqx1f5l3UQ13nc5JuZ5P+u4M/VxODLX1DB7RTyQ5cX379H17MWfNdeswVu5+vs8mDvVv+yxtfu3dFbdU/x5i7MN33+cb46I+VT/Bqnfv5xn4oEsL/5sPUj9PvLfgTW56u+as/lWLnVcm8v/CrW49JSy6aFawrderMhU2es/yn9J/gIDwj8A
+   eJztmOtOwzAMhcM/fq7LCwS2wujK9v5vRy2dTzElndRbEBKWrEVZ5lNfjuMuhL8hh0HToKd/3E1sH/U51kaYJ52JE+e8jTm4L4O+FtT2k3TqjNe5uGb3bdB20HfnQ9R+N+hZPlkMPnTurHN25rQQ12zehYX9u2yyx+dBmODGFbhgfg7ay2bj/OO7TtiXkPPdrsDFvyg72G+07oR71HP5Olvjr8WTnJl96uiloK8h1wHPthT3GnL+3rUXna/4fxRG1Lk4A7fEUfPxJjs+brbuQ453DLkO+5GNMcfHUuIoePjl7fhaJz6d+w17Y46PpZSvi2wf5Du46JvzwzBa+Ym/pXp4JPh2c5gH7cEjcOFu0roN3+thjpCvRr+/hczHUk8ml8SGM3PvDs/fcT2XejL10OoZTc8rcMlvI5vk09afUnuuq9bkthP2Ulx/n+E73EG4G4gJnKceluJ+hMxZeqLp81M+2+g7O9sLn/toKS44Z9mlZiyO8LfT+hJyrKnDOWK2pvowdUXtPurZW85CcJtYpA1tPxK4bXmkh9UQcm/5xfeauFav9Km9xM9QYFkNX8PPO2pLGd8tKeT7LoXvvXNLIbbGX/omavG+hn1iPuazrVupj8OeuaaGuSvSjlhePH/3rmcvftZc0oPX4trnfWfcKf5yx9bmb2lW3VL8vMVsw/sf880eMZ/ibwz1+cs8k3bE8uJn6z7U55F/D6yJa/4umc3X4lLHtXH5X6EWLpwybDhUS3jXSxUxTX7rv9G/LF/vaz6k
   </data>
  </layer>
- <layer name="MapCollision" width="30" height="50">
+ <layer name="MapCollision" width="30" height="50" visible="0">
   <data encoding="base64" compression="zlib">
-   eJztl9sOgCAIhrPe/527cjUSOYgHkn9jcwv9RGDpcch0GZlUCYyDq+cmwrh+2SziPZExJiuuVFpuol2qc7zF24tbMs3ZeuPCnqv1CNbPlF9pD9IYONySVuFKz7k0pvbHybWVVq3n4D7zNKxWbqu8cDn3nPfa0nuO1DCuxdq7c6X57Rkjph7c2j8qf/tLvDPyO6ued+NG/34V/eu3noMb3BFc+B4YwYUxj2J6txtCTAnu
+   eJztl1EOgCAMQ9H7H9ovP1wEylYUXZuYEJh7IDawUr6hrdIW15e79aBxNh7h1rRX2p5ckdhZXM8cvO+vsF5xuVzruZZHUH9GvBzhsjVzDb3vfNfu5UT2mqVV/2dx/XPQuYDHjtxbWPec3pyQPrYycEf3l8mdEYvmap1R59hf1vvG/loG0ieujyX/XiX/cpXBR+Lm4tp64KnaO1rHZNQB7D8Aww==
   </data>
  </layer>
  <objectgroup name="Event" width="30" height="50">
@@ -114,11 +111,11 @@
  </objectgroup>
  <layer name="MapObject" width="30" height="50">
   <data encoding="base64" compression="zlib">
-   eJxjYBgaQJuRgUEKiKUZIWx62ouNPZTt1QCap4UDayLZpYZHHQyrU8lty9HYmwmop2dcUGLvJiidT4ZdyHrI9S+hcCQEhko4UwJAcbRhAOxFBoTsRc+jS6hgZxMDZh5HB5J0Cg90eyQosHcrCWrR7XFGwh4M+MNZhgg3bmGAhHM0EAcjYUJgIx65TXjk0EEQCWqpCYabvRsIyJNrL6X1Ar3CGT3NUcteUvIqqfbia79ga7eg51FkHE+iO3EBbOU8PeJwJNjry4C9HQsDUUAcCMSuQOxHRXuziFADKz/cqGhvEpRuw6MGJkfNMEf2L756itr2+jCg1s3oADn/Uiu/ogMHLGL0yEdpA2SvAx3tBeVfUN50BGJPLPIDmX9hYLjlX0KAlvl3C5r8cM6/o/YOb3tdGGjXRsYHQHkKuS4E5SFa5R104IDEpnd/DzYWPNQAAAiTOO4=
+   eJztmE1uwjAQhYdblLaHcX8FiCK13bWLSl100U3vwKInqcQWQrgftoql6TQZZ2zHISZPesKKB7544GEDQD+ktM9HABfa14m5VrlwH7TvajxFdTOmznoh4CpmbkXGW8drSXrCcaWScovD+MuDhZ/ju15XH13qS59DZN6jdQdcLBf3Ctlk9CcCcwn/M041HkUANRDlnAVwd4JayrlBngDf58sG91jCb59ftZ+ROSntDTNfMHNUT4JaJag9Ne7aMe/LDd0XUvWZfuZicSVZlXLn8DfPNNtUNKPYb8L7rJOquCZZ08CtlznX4j2S6kX7EeTnVpc+G9TY74/7iNz3w+M3U2PnYvYcr5fbp2JzcZ5d+Y2VVypVcS1Fjj464qqEXPu79Bjza5Vbfl1qM78lmc85vwM3b+4thJ2RfWUyhfdCk6G2skOl0DjFWrHsf8F90x7qCkGs
   </data>
  </layer>
  <objectgroup name="Enemy" width="30" height="50"/>
  <objectgroup name="Object" width="30" height="50">
-  <object name="hugo" type="Player" gid="256" x="32" y="32"/>
+  <object name="hugo" type="Player" gid="256" x="352" y="256"/>
  </objectgroup>
 </map>
