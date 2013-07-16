@@ -1,12 +1,19 @@
+
+modules = require "modules"
+
 -- import
-flower = require "hanappe/flower"
-themes = require "hanappe/extensions/themes"
-tiled = require "hanappe/extensions/tiled"
-widget = require "hanappe/extensions/widget"
+--flower = require "hanappe/flower"
+--themes = require "hanappe/extensions/themes"
+--tiled = require "hanappe/extensions/tiled"
+--widget = require "hanappe/extensions/widget"
+
+
 physics = require "hanappe/extensions/physics"
 rpgmap = require "hanappe/RPGMap"
 Resources = flower.Resources
 require "hanappe/extensions/savefile-manager"
+
+
 
 -- Resources setting
 Resources.addResourceDirectory("assets")
@@ -31,6 +38,7 @@ GAME_FILE = savefiles.get "user"
 GAME_FILE.data = USER_DATA
 GAME_FILE:saveGame()]]
 
+
 -- Screen setting
 local screenWidth = MOAIEnvironment.horizontalResolution or 800
 local screenHeight = MOAIEnvironment.verticalResolution or 600
@@ -48,4 +56,4 @@ MOAISim.setBoostThreshold(0)
 flower.openWindow("Flower extensions", screenWidth, screenHeight, 1.0)
 
 -- open scene
-flower.openScene("scenes/game_scene")
+flower.openScene(scenes.INITIAL)
