@@ -155,7 +155,7 @@ function TileMap:loadMapData(data)
     
     self:dispatchEvent(TileMap.EVENT_LOADED_DATA, data)
     
-    self:updateRenderOrder()
+    --self:updateRenderOrder()
 end
 
 --------------------------------------------------------------------------------

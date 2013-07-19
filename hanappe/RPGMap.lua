@@ -757,9 +757,9 @@ function MapObject:startWalk(direction, speed, count)
     self:startWalkAnim()    
     if not self.walking then
         self.walking = true        
-        self:dispatchEvent(MapObject.EVENT_WALK_START)
-        self:setPriority(self:vertexZ())
+        self:dispatchEvent(MapObject.EVENT_WALK_START)        
     end
+    self:setPriority(self:vertexZ())    
 end
 
 function MapObject:stopWalk()
