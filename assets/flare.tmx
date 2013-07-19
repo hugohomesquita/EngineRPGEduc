@@ -116,6 +116,6 @@
  </layer>
  <objectgroup name="Enemy" width="30" height="50"/>
  <objectgroup name="Object" width="30" height="50">
-  <object name="hugo" type="Player" gid="256" x="352" y="256"/>
+  <object name="hugo" type="player" gid="297" x="352" y="256"/>
  </objectgroup>
 </map>

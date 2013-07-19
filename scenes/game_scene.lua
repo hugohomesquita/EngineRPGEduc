@@ -250,10 +250,13 @@ function updateMap()
 end
 
 function updatePlayer()
-    local direction = mapControlView:getDirection()
-    --print(direction)
-
-    playerObject:walkMap(direction)
+    local direction = mapControlView:getDirection()    
+    
+    if direction then
+        playerObject:startWalk(direction)
+    else      
+        playerObject:stopWalk()
+    end
     --playerObject:setPriority(0)    
 end
 
