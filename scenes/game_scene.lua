@@ -6,8 +6,9 @@ module(..., package.seeall)
 local Avatar = require "hanappe/class/Avatar"
 local FpsMonitor = require "hanappe/extensions/FpsMonitor"
 
-local RPGMapControlView = rpgmap.RPGMapControlView
-local RPGMapPlayerInfo = rpgmap.RPGMapPlayerInfo
+local MapControlView = views.MapControlView
+local MapPlayerInfo = views.MapPlayerInfo
+
 local RPGMap = rpgmap.RPGMap
 
 local mapPlayerInfo = nil
@@ -24,18 +25,13 @@ function onCreate(e)
     
     rpgMap = RPGMap()
     rpgMap:setScene(scene)
+    rpgMap:addEventListener("talk",onTalk)
     loadRPGMap("assets/flare.lue")    
     
     playerObject = rpgMap.objectLayer:findObjectByName("hugo")
-    --PHYSICS = createWorldPhysics()
-    --MAPA = initMap()
-    --initAvatar()                  
-  
-    --scrollCameraToFocusObject()
-    
-    
+
     --INICIALIZANDO A GUI    
-    mapControlView = RPGMapControlView()
+    mapControlView = MapControlView()
     mapControlView:setScene(scene)
     mapControlView:addEventListener("enter", onEnter)
     --mapControlView:addEventListener("OnStickChanged", joystick_OnStickChanged)
@@ -45,7 +41,7 @@ function onCreate(e)
     
     flower.Runtime:addEventListener("resize", onResize)
     --INFO PLAYER
-    mapPlayerInfo = RPGMapPlayerInfo()
+    mapPlayerInfo = MapPlayerInfo()
     mapPlayerInfo:setScene(scene)
     
     createHUD()
@@ -235,6 +231,10 @@ end
 
 function buttonOption_Click(e)
   print('buttonOption_Click')
+end
+
+function onTalk(e)
+    flower.openScene(scenes.DIALOG, {animation = "overlay"})
 end
 
 function onUpdate(e)  

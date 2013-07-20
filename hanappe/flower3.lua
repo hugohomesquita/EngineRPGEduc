@@ -1001,11 +1001,6 @@ function EventDispatcher:dispatchEvent(event, data)
     if eventName then
         EventDispatcher.EVENT_CACHE[eventName] = event
     end
-
-    -- reset properties to free resources used in cached events
-    event.data = nil
-    event.target = nil
-    event:setListener(nil, nil)
 end
 
 --------------------------------------------------------------------------------
@@ -1915,22 +1910,19 @@ end
 -- Sets the object's parent, inheriting its color and transform.
 -- @param parent parent
 --------------------------------------------------------------------------------
-function DisplayObject:setParent(parent,teste)
+function DisplayObject:setParent(parent)
     self.parent = parent
-    self.teste = teste
+
     self:clearAttrLink(MOAIColor.INHERIT_COLOR)
     self:clearAttrLink(MOAITransform.INHERIT_TRANSFORM)
 
-    
     -- Conditions compatibility
     if MOAIProp.INHERIT_VISIBLE then
         self:clearAttrLink(MOAIProp.INHERIT_VISIBLE)
     end
 
     if parent then
-        if teste ~= "notAttr" then
-          self:setAttrLink(MOAIColor.INHERIT_COLOR, parent, MOAIColor.COLOR_TRAIT)          
-        end        
+        --self:setAttrLink(MOAIColor.INHERIT_COLOR, parent, MOAIColor.COLOR_TRAIT)
         self:setAttrLink(MOAITransform.INHERIT_TRANSFORM, parent, MOAITransform.TRANSFORM_TRAIT)
 
         -- Conditions compatibility
@@ -3252,12 +3244,6 @@ function TouchHandler:onTouch(e)
     if prop or prop2 then
         e:stop()
     end
-
-    -- reset properties to free resources used in cached event
-    e2.data = nil
-    e2.prop = nil
-    e2.target = nil
-    e2:setListener(nil, nil)
 end
 
 function TouchHandler:getTouchableProp(e)

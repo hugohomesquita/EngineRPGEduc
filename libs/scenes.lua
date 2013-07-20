@@ -10,7 +10,7 @@ local M = {
     MAP = "scenes/game_scene",
     --BATTLE = "scenes/battle_scene",
     --MENU = "scenes/menu_scene",
-    --DIALOG = "scenes/dialog_scene",
+    DIALOG = "scenes/dialog_scene",
 }
 
 return M

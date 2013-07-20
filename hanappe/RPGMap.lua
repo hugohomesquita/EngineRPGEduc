@@ -9,6 +9,10 @@ local M = {}
 -- import
 local flower = require "hanappe/flower"
 local tiled = require "hanappe/extensions/tiled"
+
+local entities = require "libs/entities"
+local repositry = entities.repositry
+
 local class = flower.class
 local table = flower.table
 local Layer = flower.Layer
@@ -24,33 +28,32 @@ local Avatar = require "hanappe/class/Avatar"
 local UIView = widget.UIView
 local Joystick = widget.Joystick
 local Button = widget.Button
-local ImageButton = widget.ImageButton
+local MsgBox = widget.MsgBox
 -- class
+local MapEvent
 local RPGMap
 local MapObject
 local PlayerController
 local RPGMapControlView
---local UpdatingSystem
+local UpdatingSystem
 local MovementSystem
 local CameraSystem
 local RenderSystem
 --local ActorController
 
+--------------------------------------------------------------------------------
+-- @type MapEvent
+-- 
+--------------------------------------------------------------------------------
+MapEvent = class(Event)
+M.MapEvent = MapEvent
 
--- KeyCode
-local KeyCode = {}
-KeyCode.LEFT = string.byte("a")
-KeyCode.RIGHT = string.byte("d")
-KeyCode.UP = string.byte("w")
-KeyCode.DOWN = string.byte("s")
+MapEvent.TALK = "talk"
 
--- stick to dir map
-local STICK_TO_DIR = {
-    top = "north",    
-    left = "west",
-    right = "east",
-    bottom = "south"    
-}
+MapEvent.CHANGE_MAP = "changeMap"
+
+MapEvent.OPEN_MINIGAME = "openMinigame"
+
 
 ----------------------------------------------------------------------------------------------------
 -- @type RPGMap
@@ -61,9 +64,7 @@ M.RPGMap = RPGMap
 function RPGMap:init()
     TileMap.init(self)
     self.objectFactory = ClassFactory(MapObject)
-    
-    
-    RPGMap.WORLD = nil
+              
     self.objectLayer = nil
     self.collisionLayer = nil
     self.avatar = nil
@@ -91,14 +92,14 @@ function RPGMap:initPhysics()
     world:setGravity ( 0, 0 )
     world:setUnitsToMeters ( 1/30)
     --world:setDebugDrawEnabled(false)
-    world:start()
-    RPGMap.WORLD = world
-    self.layer:setBox2DWorld(RPGMap.WORLD)
+    world:start()    
+    self:setWorldPhysics(world)
+    self.layer:setBox2DWorld(world)
 end
 
 function RPGMap:setScene(scene)
     self.scene = scene
-    self.layer:setScene(scene)
+    self.layer:setScene(scene)    
 end
 
 function RPGMap:setWorldPhysics(world)
@@ -107,7 +108,7 @@ end
 
 function RPGMap:initSystems()
     self.systems = {
-        --UpdatingSystem(self),
+        UpdatingSystem(self),
         MovementSystem(self),        
         CameraSystem(self),
         --RenderSystem(self),
@@ -187,13 +188,13 @@ end
 function RPGMap:createPhysicsEvent()
   for i, object in ipairs(self.eventLayer.children) do   
       object.physics = {} 
-      local body = RPGMap.WORLD:addBody(MOAIBox2DBody.KINEMATIC)        
+      local body = self.world:addBody(MOAIBox2DBody.KINEMATIC)        
       local posX,posY = object:getPos()
       local width, height = object:getSize()
       local xMin, yMin, xMax, yMax = -width / 2, -height / 2, width / 2, height / 2   
       
-      object:setPos(xMin, yMin)
-      object:setParent(body)   
+      object:setPos(xMin, yMin)      
+      object:setParent(body,"notAttr")   
       body:setTransform(posX,posY)  
       
       local size = {x=1,y=1}
@@ -242,7 +243,7 @@ function RPGMap:createPhysicsEvent()
       
       --CALLBACK PARA CHAMADA DO EVENTO
       --object.physics.fixture:setCollisionHandler(onCollide, MOAIBox2DArbiter.ALL)
-      
+      body.object = object
       object.physics.body = body
   end
 end
@@ -254,13 +255,13 @@ function RPGMap:createPhysicsCollision()
       for x = 0, self.mapWidth - 1 do
         objeto = object.renderers[y * self.mapWidth + x + 1]
         if objeto then
-          local body = RPGMap.WORLD:addBody(MOAIBox2DBody.STATIC)        
+          local body = self.world:addBody(MOAIBox2DBody.STATIC)        
           local posX,posY = objeto:getPos()
           local width, height = objeto:getSize()
           local xMin, yMin, xMax, yMax = -width / 2, -height / 2, width / 2, height / 2   
           
           objeto:setPos(xMin, yMin)
-          objeto:setParent(body)   
+          objeto:setParent(body,"notAttr")   
           body:setTransform(posX+32,posY+16)  
                  
           poly = {
@@ -282,12 +283,10 @@ function RPGMap:onSavedData(e)
     
 end
 
-function RPGMap:onUpdate(e)  
-    
+function RPGMap:onUpdate(e)      
     for i, system in ipairs(self.systems) do
         system:onUpdate()
-    end
-    
+    end    
 end
 
 function RPGMap:updateRenderOrdem()
@@ -296,26 +295,33 @@ function RPGMap:updateRenderOrdem()
     bg:setPriority(1)   
 end
 
-
-
 ----------------------------------------------------------------------------------------------------
 -- @type UpdatingSystem
 ----------------------------------------------------------------------------------------------------
 UpdatingSystem = class()
 
-function UpdatingSystem:init(tileMap)
+
+function UpdatingSystem:init(tileMap)    
     self.tileMap = tileMap
+    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_BEGIN, self.onCollisionBegin, self)
+    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_PRE_SOLVE, self.collisionPreSolve, self)
+    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_END, self.onCollisionEnd, self)
 end
 
 function UpdatingSystem:onUpdate() 
-    local objectLayer = self.tileMap:findMapLayerByName('Object')
-    for i, object in ipairs(objectLayer:getObjects()) do
-        if object.controller then
-            object:onUpdate()
-        end
-    end
+        
 end
 
+function UpdatingSystem:onCollisionBegin(e)     
+    local object = e.data.objectB    
+    if object.type == 'Actor' then
+        self.tileMap:dispatchEvent(MapEvent.TALK, object)
+    end       
+end
+function UpdatingSystem:collisionPreSolve(e)  
+end
+function UpdatingSystem:onCollisionEnd(e)      
+end
 
 ----------------------------------------------------------------------------------------------------
 -- @type MovementSystem
@@ -324,6 +330,10 @@ MovementSystem = class()
 
 function MovementSystem:init(tileMap)
     self.tileMap = tileMap    
+    
+    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_BEGIN, self.onCollisionBegin, self)
+    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_PRE_SOLVE, self.collisionPreSolve, self)
+    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_END, self.onCollisionEnd, self)
 end
 
 function MovementSystem:onUpdate()
@@ -332,190 +342,69 @@ function MovementSystem:onUpdate()
     end
 end
 
-function MovementSystem:moveObject(object)  
+function MovementSystem:moveObject(object)         
     
-    --VERIFICA SE TEM CONTROLLER E SE ESTÁ SE MOVIMENTANDO 
     if not object.controller then      
         return
     end
     
-    object.controller:moveObject()
-end
-
---------------------------------------------------------------------------------
--- @type RPGMapControlView
---------------------------------------------------------------------------------
-RPGMapControlView = class(UIView)
-M.RPGMapControlView = RPGMapControlView
-
-RPGMapControlView.JOYSTICK = nil
-RPGMapControlView.ENTER_BUTTON = nil
-RPGMapControlView.OPTION_BUTTON = nil
-RPGMapControlView.PROFILE_BUTTON = nil
-
-
-function RPGMapControlView:_createChildren()
-    RPGMapControlView.__super._createChildren(self)
-
-    --JOYSTICK
-    self.joystick = Joystick {
-        stickMode = "digital",
-        parent = self,        
-        color = {0.6, 0.6, 0.6, 0.6},
-        OnStickChanged = function(e)          
-          self:dispatchEvent('OnStickChanged', e)
-        end,
-    }
-   
-    --BUTTON ENTER
-    self.enterButton = Button {
-        size = {100, 50},
-        color = {0.6, 0.6, 0.6, 0.6},
-        text = "Enter",
-        parent = self,
-        onClick = function(e)
-            self:dispatchEvent("enter")
-        end,
-    }
+    --if object.lastDirection == object:getDirection() and object:isColliding() then        
+    ---    object.physics.body:setLinearVelocity(0, 0)
+    --    object:stopWalk()
+    --    return
+    --end    
     
-    --BUTTON OPTION
-    self.optionButton = ImageButton {
-        pos = {self:getWidth()-43, 5},
-        normalTexture = "skins/bt_option.png",
-        selectedTexture = "skins/bt_option_selected.png",
-        disabledTexture = "skins/bt_option.png",
-        parent = self,
-        onClick = function(e)
-          self:dispatchEvent("buttonOption_Click")
-        end,
-    }
-    --BUTTON PROFILE
-    self.profileButton = ImageButton {
-        pos = {self.optionButton:getLeft()-43, 5},
-        normalTexture = "skins/bt_profile.png",
-        selectedTexture = "skins/bt_profile_selected.png",
-        disabledTexture = "skins/bt_profile.png",
-        parent = self,
-        onClick = function(e)
-          self:dispatchEvent("buttonProfile_Click")
-        end,
-    }
-    
-    RPGMapControlView.JOYSTICK = self.joystick    
-    RPGMapControlView.ENTER_BUTTON = self.enterButton
-    RPGMapControlView.OPTION_BUTTON = self.optionButton
-    RPGMapControlView.PROFILE_BUTTON = self.profileButton
-end
-
-function RPGMapControlView:updateLayout()
-    local vw, vh = flower.getViewSize()
-    
-    local joystick = RPGMapControlView.JOYSTICK
-    local enterButton = RPGMapControlView.ENTER_BUTTON
-    local optionButton = RPGMapControlView.OPTION_BUTTON
-    local profileButton = RPGMapControlView.PROFILE_BUTTON         
-        
-    joystick:setPos(10, vh - joystick:getHeight() - 10)
-    enterButton:setPos(vw - enterButton:getWidth() - 10, vh - enterButton:getHeight() - 10)
-    
-    optionButton:setPos(vw-43, 5)
-    profileButton:setPos(optionButton:getLeft()-43, 5)
-end
-
-function RPGMapControlView:updateDisplay()
-    RPGMapControlView.__super.updateDisplay(self)
-    
-    local vw, vh = flower.getViewSize()
-    local joystick = self.joystick
-    local enterButton = self.enterButton
-    
-    joystick:setPos(10, vh - joystick:getHeight() - 10)
-    enterButton:setPos(vw - enterButton:getWidth() - 10, vh - enterButton:getHeight() - 10)
-end
-
-function RPGMapControlView:getDirection()
-    if InputMgr:keyIsDown(KeyCode.LEFT) then
-        return "left"
+    if object:isColliding() then
+        --print(object.collisionSide)
+       -- object.renderer:setIndex(MapObject.DIR_TO_INDEX[object.collisionSide])
     end
-    if InputMgr:keyIsDown(KeyCode.UP) then
-        return "up"
-    end
-    if InputMgr:keyIsDown(KeyCode.RIGHT) then
-        return "right"
-    end
-    if InputMgr:keyIsDown(KeyCode.DOWN) then
-        return "down"
-    end
-    return STICK_TO_DIR[self.joystick:getStickDirection()]
-end
-
---------------------------------------------------------------------------------
--- @type RPGMapPlayerInfo
---------------------------------------------------------------------------------
-RPGMapPlayerInfo = class(UIView)
-M.RPGMapPlayerInfo = RPGMapPlayerInfo
-
-RPGMapPlayerInfo.NAME = "null"
-RPGMapPlayerInfo.XP = 0 
-
-function RPGMapPlayerInfo:_createChildren()
-    RPGMapPlayerInfo.__super._createChildren(self)
     
-    self.playerPanel = widget.Panel {
-        size = {250, 90},
-        pos = {5, 5},
-        parent = self,
-        backgroundTexture = "skins/panel_playerinfo.png",
-        backgroundVisible = "skins/panel_playerinfo.png"
-    }
-    
-    -- AVATAR IMAGE
-    self.avatarImage = flower.NineImage("avatars/avatar5.png")
-    self.avatarImage:setPos(0,0)
-    self.avatarImage:setSize(80,85)
-    self.playerPanel:addChild(self.avatarImage)  
-    
-    self.lbNome = flower.Label(RPGMapPlayerInfo.NAME, 100, 30, "arial-rounded.ttf")    
-    self.lbNome:setPos(80,5)
-    self.playerPanel:addChild(self.lbNome)
-    
-    self.labelLVL = flower.Label("LVL", 100, 30, "arial-rounded.ttf",14)
-    self.labelLVL:setPos(80,35)
-    self.playerPanel:addChild(self.labelLVL)    
+    if object.controller.ia then
       
-    self.lbLVL = flower.Label(tostring(RPGMapPlayerInfo.XP), 100, 30, "arial-rounded.ttf",18)    
-    self.lbLVL:setPos(112,33)
-    self.playerPanel:addChild(self.lbLVL)    
-
-    self.barXP = flower.NineImage("skins/barXp.png")
-    self.barXP:setPos(80,55)
-    self.barXP:setSize(165,26)
-    self.playerPanel:addChild(self.barXP)  
-
-    self.barXPbar = flower.NineImage("skins/barXpbar.png")
-    self.barXPbar:setPos(124,57)
-    self.barXPbar:setSize(80,22)
-    self.playerPanel:addChild(self.barXPbar)
-end
-
-function RPGMapPlayerInfo:updateDisplay()
-    RPGMapPlayerInfo.__super.updateDisplay(self)
+      if object:isColliding() then
+        --object.physics.body:setLinearVelocity(-object.speedX, -object.speedY)
+        object.physics.body:setLinearVelocity(0, 0)
+        object:stopWalk()
+      end
+      
+      if not object:isWalking() then
+        if self.move then 
+            self.currentMove = "north"  
+        else
+            self.currentMove = "south"  
+        end
+        object:startWalk(self.currentMove,0,20)
+        return
+      end
+      
+      if object.walkingCount then
+          object.walkingCount = object.walkingCount - 1
+          if object.walkingCount <= 0 then
+              self.move = not self.move
+              object:stopWalk()            
+          end
+      end     
+           
+    end
     
-    local vw, vh = flower.getViewSize()    
+    object.physics.body:setLinearVelocity(object.speedX, object.speedY)    
+    object:setPos(object.physics.body:getPosition())
+    
 end
 
-function RPGMapPlayerInfo:setName(name)
-  RPGMapPlayerInfo.NAME = name
-  
+function MovementSystem:onCollisionBegin(e)      
+    --print(e.data.objectA.name) 
+    --print(e.data.objectB.name) 
+    --print(e.data.collisionSide)
 end
-function RPGMapPlayerInfo:setXP(xp)
-  RPGMapPlayerInfo.XP = xp  
-end  
+function MovementSystem:collisionPreSolve(e)  
+    --print(e.data.name)
+    --print(e.data.collisionSide)
+end
+function MovementSystem:onCollisionEnd(e)  
+    
+end
 
-function RPGMapPlayerInfo:onUpdate()
-    self.lbNome:setString(RPGMapPlayerInfo.NAME)
-    self.lbLVL:setString(tostring(RPGMapPlayerInfo.XP))
-end
 
 ----------------------------------------------------------------------------------------------------
 -- @type CameraSystem
@@ -550,13 +439,12 @@ function CameraSystem:scrollCameraToFocusObject()
 end
 
 ----------------------------------------------------------------------------------------------------
--- @type PlayerController
+-- @type ActorController
 -- 
 ----------------------------------------------------------------------------------------------------
-PlayerController = class()
+ActorController = class()
 
-
-PlayerController.ANIM_DATA_LIST = {
+ActorController.ANIM_DATA_LIST = {
     {name = "walkNorth", frames = {2, 3, 4, 5, 6, 7, 8, 9}, sec = 0.1},
     {name = "walkSouth", frames = {38, 39, 40, 41, 42, 43, 44, 45}, sec = 0.1},   
     {name = "walkEast",  frames = {20, 21, 22, 23, 24, 25, 26, 27}, sec = 0.1},
@@ -567,37 +455,32 @@ PlayerController.ANIM_DATA_LIST = {
     {name = "walkSouthwest", frames = {47, 48, 49, 50, 51, 52, 53, 54}, sec = 0.1},
 }
 
-function PlayerController:init(mapObject)    
+function ActorController:init(mapObject)    
     self.mapObject = mapObject
     self:initController()
     self:initEventListeners()    
     self:initPhysics()
-    self.mapObject:setIsoPos(320,224)
+    --self.mapObject:setIsoPos(320,224)
+    self.move = true
+    self.currentMove = "north"
+    self.nextMove = "south"    
+    --self.ia = true
 end
 
-function PlayerController:initEventListeners()
-    local obj = self.mapObject
-end
-
-function PlayerController:initController()
+function ActorController:initController()
     local object = self.mapObject
     if object.renderer then
         object.renderer:setPos(-48,-76)        
-        object.renderer:setAnimDatas(PlayerController.ANIM_DATA_LIST)
+        object.renderer:setAnimDatas(ActorController.ANIM_DATA_LIST)
         object:setDirection(object:getDirectionByIndex())
     end
 end
 
-function PlayerController:onUpdate()
-    
-end 
-function PlayerController:moveObject()    
-    local object = self.mapObject       
-    
-    object.physics.body:setLinearVelocity(object.speedX, object.speedY)
-    object:setPos(object.physics.body:getPosition())
+function ActorController:initEventListeners()
+    local obj = self.mapObject
 end
-function PlayerController:initPhysics()
+
+function ActorController:initPhysics()
     local object = self.mapObject
     local poly = {
         0, -16,
@@ -605,58 +488,34 @@ function PlayerController:initPhysics()
         0, 16,
         -32, 0,
     } 
-    object.physics.body = RPGMap.WORLD:addBody(MOAIBox2DBody.DYNAMIC)
-    object.renderer:setParent(object.physics.body)
+    object.physics.body = object.tileMap.world:addBody(MOAIBox2DBody.DYNAMIC)
+    object.physics.body.object = object
+    object.renderer:setParent(object.physics.body,"notAttr")
     
     local x,y = object:getPos()
     local width, height = object.renderer:getSize()   
     
     object.physics.body:setTransform(x, y)
     object.physics.fixture = object.physics.body:addPolygon(poly)
-    
-    object.physics.fixture:setCollisionHandler(function(phase, a, b, arbiter)
-                                 self:onCollide(phase, a, b, arbiter)
-                              end, MOAIBox2DArbiter.ALL)
-    
-    object.physics.body:resetMassData() 
+    object.physics.fixture:setDensity(0)                        
+    object.physics.fixture:setFriction(0)
+    object.physics.body:resetMassData()     
 end
 
-function PlayerController:getEventCollision(fixture)  
-  for i, object in ipairs(self.mapObject.tileMap:findMapLayerByName("Event").children) do     
-    if object.physics.fixture == fixture then
-      return object
-    end    
-  end
-  return nil
+----------------------------------------------------------------------------------------------------
+-- @type PlayerController
+-- 
+----------------------------------------------------------------------------------------------------
+PlayerController = class(ActorController)
+
+function PlayerController:initController()
+    PlayerController.__super.initController(self)    
+    self.entity = repositry:getPlayer()    
 end
 
-function PlayerController:onCollide(phase, fixtureA, fixtureB, arbiter)
-  local object = self:getEventCollision(fixtureB)
-  
-  if phase == MOAIBox2DArbiter.BEGIN then           
-    if object then
-      self.mapObject:dispatchEvent(MapObject.EVENT_COLLISION_BEGIN, object)
-    end  
-	end
-	
-	if phase == MOAIBox2DArbiter.END then
-    if object then
-      self.mapObject:dispatchEvent(MapObject.EVENT_COLLISION_END, object)
-    end
-	end
-	
-	if phase == MOAIBox2DArbiter.PRE_SOLVE then
-    if object then
-      self.mapObject:dispatchEvent(MapObject.EVENT_COLLISION_PRE_SOLVE, object)
-    end
-	end
-	
-	if phase == MOAIBox2DArbiter.POST_SOLVE then
-    if object then
-      self.mapObject:dispatchEvent(MapObject.EVENT_COLLISION_POST_SOLVE, object)
-    end
-	end
-end
+function PlayerController:onUpdate()
+    
+end 
 
 ----------------------------------------------------------------------------------------------------
 -- @type MapObject
@@ -681,7 +540,7 @@ MapObject.DIR_RIGHT = "east"
 MapObject.DIR_DONW = "south"
 
 -- Move speed
-MapObject.MOVE_SPEED = 50
+MapObject.MOVE_SPEED = 100
 
 -- Direction to AnimationName
 MapObject.DIR_TO_ANIM = {
@@ -708,7 +567,10 @@ MapObject.DIR_TO_VELOCITY = {
 function MapObject:init(tileMap)
     TileObject.init(self, tileMap)
     self.isMapObject = true
-    self.walking = false    
+    
+    self.colliding = false
+    self.collisionSide = nil
+    self.walking = false        
     self.mapX = 0
     self.mapY = 0
     self.controller = nil 
@@ -720,10 +582,13 @@ function MapObject:loadData(data)
     self.mapX = math.floor(data.x / self.tileMap.tileWidth)
     self.mapY = math.floor(data.y / self.tileMap.tileHeight) - 1
     
-    if self.type == "Actor" or self.type == "player" then      
-       -- self:createPhysics()
-       self.controller = PlayerController(self)
-      --  self:setPriority(999999)        
+    if self.type == "Player" then
+        self.controller = PlayerController(self)        
+        self.physics.fixture:setCollisionHandler(function(phase, a, b, arbiter)
+                                 self:onCollide(phase, a, b, arbiter)
+                              end, MOAIBox2DArbiter.ALL)
+    elseif self.type == "Actor" then            
+        self.controller = ActorController(self)
     end
 end
 
@@ -731,6 +596,47 @@ function MapObject:isWalking()
     return self.walking
 end
 
+function MapObject:isColliding()
+    return self.colliding
+end
+
+function MapObject:onCollide(phase, fixtureA, fixtureB, arbiter)  
+  --local objectA = fixtureA:getBody()   
+  local objectB = fixtureB:getBody() 
+  
+  if phase == MOAIBox2DArbiter.BEGIN then       
+    local objects = {}  
+    if objectB.object then      
+      objects.objectB = objectB.object
+      self.tileMap:dispatchEvent(MapObject.EVENT_COLLISION_BEGIN, objects)
+    end         
+	end
+	
+	if phase == MOAIBox2DArbiter.END then
+      --self.mapObject.tileMap:dispatchEvent(MapObject.EVENT_COLLISION_END, objects)      
+	end
+	
+	if phase == MOAIBox2DArbiter.PRE_SOLVE then        
+    local x,y = arbiter:getContactNormal()    
+    if (x > 0 and y < 0) then  
+      self.collisionSide = MapObject.DIR_UP
+    end
+    if (x < 0 and y > 0) then
+      self.collisionSide = MapObject.DIR_DOWN
+    end
+    if (x < 0 and y < 0) then
+      self.collisionSide = MapObject.DIR_LEFT
+    end
+    if (x > 0 and y > 0) then
+      self.collisionSide = MapObject.DIR_RIGHT
+    end
+    --self.mapObject.tileMap:dispatchEvent(MapObject.EVENT_COLLISION_PRE_SOLVE, event)      
+	end
+	
+	if phase == MOAIBox2DArbiter.POST_SOLVE then
+    --self.mapObject.tileMap:dispatchEvent(MapObject.EVENT_COLLISION_POST_SOLVE, event)     
+	end
+end
 --
 -- 
 --
@@ -752,9 +658,11 @@ function MapObject:stopWalkAnim()
 end
 
 function MapObject:startWalk(direction, speed, count)
+    self.lastDirection = self.direction
     self:setDirection(direction)
     self:setSpeed(direction)
-    self:startWalkAnim()    
+    self:startWalkAnim()
+    self.walkingCount = count
     if not self.walking then
         self.walking = true        
         self:dispatchEvent(MapObject.EVENT_WALK_START)        
@@ -765,6 +673,7 @@ end
 function MapObject:stopWalk()
     self:setSpeed(0)
     self:stopWalkAnim()    
+    self.walkingCount = nil
     if self.walking then
         self.walking = false
         self:dispatchEvent(MapObject.EVENT_WALK_STOP)
@@ -818,8 +727,12 @@ function MapObject:getDirectionByIndex()
 end
 
 
-function MapObject:setDirection(dir)   
-    self.direction = dir
+function MapObject:setDirection(dir)          
+    self.direction = dir    
+end
+
+function MapObject:getDirection()   
+    return self.direction
 end
 
 function MapObject:vertexZ()     

@@ -116,6 +116,11 @@
  </layer>
  <objectgroup name="Enemy" width="30" height="50"/>
  <objectgroup name="Object" width="30" height="50">
-  <object name="hugo" type="player" gid="297" x="352" y="256"/>
+  <object name="hugo" type="Player" gid="297" x="352" y="256"/>
+  <object name="Everton" type="Actor" gid="333" x="672" y="512">
+   <properties>
+    <property name="route" value="21,15-21,16-21,17"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
