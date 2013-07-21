@@ -22,24 +22,19 @@ local TileMap = tiled.TileMap
 local TileObject = tiled.TileObject
 local ClassFactory = flower.ClassFactory
 local Group = flower.Group
-local Avatar = require "hanappe/class/Avatar"
 
--- VARIABLES GUI
-local UIView = widget.UIView
-local Joystick = widget.Joystick
-local Button = widget.Button
-local MsgBox = widget.MsgBox
 -- class
 local MapEvent
-local RPGMap
 local MapObject
-local PlayerController
-local RPGMapControlView
+local RPGMap
+
 local UpdatingSystem
 local MovementSystem
 local CameraSystem
 local RenderSystem
---local ActorController
+
+local ActorController
+local PlayerController
 
 --------------------------------------------------------------------------------
 -- @type MapEvent
@@ -50,9 +45,9 @@ M.MapEvent = MapEvent
 
 MapEvent.TALK = "talk"
 
-MapEvent.CHANGE_MAP = "changeMap"
+MapEvent.TELEPORT = "teleport"
 
-MapEvent.OPEN_MINIGAME = "openMinigame"
+MapEvent.MINIGAME = "minigame"
 
 
 ----------------------------------------------------------------------------------------------------
@@ -66,8 +61,8 @@ function RPGMap:init()
     self.objectFactory = ClassFactory(MapObject)
               
     self.objectLayer = nil
-    self.collisionLayer = nil
-    self.avatar = nil
+    self.collisionLayer = nil    
+    self.worldFreeze = false
     
     self:initLayer()
     self:initPhysics()
@@ -83,14 +78,14 @@ function RPGMap:initLayer()
     --layer:setPriority(1)
     layer:setSortMode(MOAILayer.SORT_PRIORITY_ASCENDING)
     layer:setCamera(self.camera)
-    self.camera:addLoc(-400,-150,0)
+    self.camera:addLoc(-400, -150, 0)
     self:setLayer(layer)
 end
 
 function RPGMap:initPhysics()
     local world = MOAIBox2DWorld.new ()
-    world:setGravity ( 0, 0 )
-    world:setUnitsToMeters ( 1/30)
+    world:setGravity(0, 0)
+    world:setUnitsToMeters(1/30)
     --world:setDebugDrawEnabled(false)
     world:start()    
     self:setWorldPhysics(world)
@@ -133,10 +128,7 @@ function RPGMap:onLoadedData(e)
     if self.collisionLayer then
         self.collisionLayer:setVisible(false)
         self:createPhysicsCollision()
-    end
-    if self.objectLayer then
-       -- self:createAvatar()
-    end
+    end    
     
     if self.eventLayer then
       self:createPhysicsEvent()
@@ -283,10 +275,20 @@ function RPGMap:onSavedData(e)
     
 end
 
-function RPGMap:onUpdate(e)      
-    for i, system in ipairs(self.systems) do
+function RPGMap:onUpdate(e)          
+    for i, system in ipairs(self.systems) do      
         system:onUpdate()
-    end    
+    end        
+end
+
+function RPGMap:stopWorld()
+    self.world:stop()
+    self.worldFreeze = true
+end
+
+function RPGMap:startWorld()    
+    self.world:start()    
+    self.worldFreeze = false
 end
 
 function RPGMap:updateRenderOrdem()
@@ -300,12 +302,11 @@ end
 ----------------------------------------------------------------------------------------------------
 UpdatingSystem = class()
 
-
 function UpdatingSystem:init(tileMap)    
     self.tileMap = tileMap
     self.tileMap:addEventListener(MapObject.EVENT_COLLISION_BEGIN, self.onCollisionBegin, self)
-    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_PRE_SOLVE, self.collisionPreSolve, self)
-    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_END, self.onCollisionEnd, self)
+    --self.tileMap:addEventListener(MapObject.EVENT_COLLISION_PRE_SOLVE, self.collisionPreSolve, self)
+    --self.tileMap:addEventListener(MapObject.EVENT_COLLISION_END, self.onCollisionEnd, self)
 end
 
 function UpdatingSystem:onUpdate() 
@@ -316,7 +317,13 @@ function UpdatingSystem:onCollisionBegin(e)
     local object = e.data.objectB    
     if object.type == 'Actor' then
         self.tileMap:dispatchEvent(MapEvent.TALK, object)
-    end       
+    end
+    if object.type == 'MiniGame' then
+        self.tileMap:dispatchEvent(MapEvent.MINIGAME, object)
+    end
+    if object.type == 'Teleport' then
+        self.tileMap:dispatchEvent(MapEvent.TELEPORT, object)
+    end
 end
 function UpdatingSystem:collisionPreSolve(e)  
 end

@@ -9,7 +9,7 @@ local M = {
     LOADING = "scenes/loading_scene",
     MAP = "scenes/game_scene",
     --BATTLE = "scenes/battle_scene",
-    --MENU = "scenes/menu_scene",
+    MENU = "scenes/menu_scene",
     DIALOG = "scenes/dialog_scene",
 }
 

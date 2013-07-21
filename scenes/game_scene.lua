@@ -1,9 +1,5 @@
 module(..., package.seeall)
 
---------------------------------------------------------------------------------
--- Event Handler
---------------------------------------------------------------------------------
-local Avatar = require "hanappe/class/Avatar"
 local FpsMonitor = require "hanappe/extensions/FpsMonitor"
 
 local MapControlView = views.MapControlView
@@ -13,19 +9,16 @@ local RPGMap = rpgmap.RPGMap
 
 local mapPlayerInfo = nil
 local rpgMap = nil
-
-
-local AVATAR = nil
-local MAPA = nil
-local PHYSICS = nil
+local worldFreeze  = false
 
 local fpsMonitor = FpsMonitor(1)
-function onCreate(e)    
-   
-    
+
+function onCreate(e)         
     rpgMap = RPGMap()
     rpgMap:setScene(scene)
-    rpgMap:addEventListener("talk",onTalk)
+    rpgMap:addEventListener("talk",onTalk)    
+    rpgMap:addEventListener("minigame",onMinigame)
+    
     loadRPGMap("assets/flare.lue")    
     
     playerObject = rpgMap.objectLayer:findObjectByName("hugo")
@@ -33,7 +26,7 @@ function onCreate(e)
     --INICIALIZANDO A GUI    
     mapControlView = MapControlView()
     mapControlView:setScene(scene)
-    mapControlView:addEventListener("enter", onEnter)
+    --mapControlView:addEventListener("enter", onEnter)
     --mapControlView:addEventListener("OnStickChanged", joystick_OnStickChanged)
     
     mapControlView:addEventListener("buttonProfile_Click", buttonProfile_Click)
@@ -45,7 +38,7 @@ function onCreate(e)
     mapPlayerInfo:setScene(scene)
     
     createHUD()
-    
+        
 end
 
 function loadRPGMap(mapName)
@@ -68,44 +61,28 @@ function onResize(e)
    RPGMapControlView:updateLayout()
 end
 
-function onEnter(e)
-  print('ENTER')
-end
-
-function initAvatar()
-    AVATAR = Avatar({tileMap=MAPA,worldPhysics=PHYSICS})
-    AVATAR:addEventListener("collisionBegin",onCollisionBegin)    
-    AVATAR:addEventListener("collisionEnd",onCollisionEnd)
-    MAPA.objectLayer:addObject(AVATAR)    
-    MAPA.avatar = AVATAR
-end
-
-function initMap()    
-   -- TODO: Tile Map Editor 0.9 Bug
-    local mapData = dofile("assets/flare.lue")
-    mapData.tilesets[7].tileoffsetx = 0
-    mapData.tilesets[7].tileoffsety = 48
-    
-    mapData.tilesets[4].tileoffsetx = 0
-    mapData.tilesets[4].tileoffsety = 16
-    
-    local mapa = RPGMap()
-    mapa:setWorldPhysics(PHYSICS)
-    mapa:loadMapData(mapData)
-    mapa:setLayer(MapLayer)
-    
-    --PRIORIDADES DE RENDERIZAÇÃO
-    mapa:updateRenderOrdem()
-    MapLayer:setBox2DWorld (PHYSICS)
-
-    return mapa
-end
-
 colidindo = false
+--EVENTOS DO RPGMap
+
+
+function onTalk(e)
+    flower.openScene(scenes.DIALOG, {animation = "overlay"})
+end
+
+function onMinigame(e)
+  --print(e.data.name)
+  clase = require "minigames/quiz"
+  MINIGAME = flower.openScene("minigames/quiz", {sceneFactory = flower.ClassFactory(clase)}) 
+  MINIGAME:addEventListener("onClose",onCloseMiniGame)
+  stopWorld()
+end
+function onCloseMiniGame(e)    
+    USER_DATA.xp = USER_DATA.xp + e.data.XP
+    startWorld()         
+end
 
 function onCollisionBegin(e)  
-  
-  
+   
   if e.data.type == 'teleport' and not colidindo then
       local toMap = e.data:getProperty('ToMap')
       local ToMapHotSpot = e.data:getProperty('ToMapHotSpot')
@@ -118,79 +95,17 @@ function onCollisionBegin(e)
       USER_DATA.xp = USER_DATA.xp + 20
   end
   
-  if e.data.type == 'minigame' then
-    clase = require "minigames/quiz"
-    MINIGAME = flower.openScene("minigames/quiz", {sceneFactory = flower.ClassFactory(clase)}) 
-    MINIGAME:addEventListener("onClose",onCloseMiniGame)
-    stopWorld()
-  end
-end
-function onCloseMiniGame(e)    
-    USER_DATA.xp = USER_DATA.xp + e.data.XP
-    PHYSICS:start()
-end
-function onCollisionEnd(e)
-  colidindo = false
-end
-function changeMap(toMap,ToMapHotSpot)   
-   local mapName = assert(toMap)
-   local hotspot = assert(ToMapHotSpot)
-   
-   local mapFile = dofile("assets/"..mapName..".lue")
-   --REINICIANDO FÍSICA
-   PHYSICS = createWorldPhysics()
-   
-   
-   local mapData = rpgmap.RPGMap()
-   mapData:setWorldPhysics(PHYSICS) --MUDAR E COLOCAR NO CONSTRUTOR
-   mapData:loadMapData(mapFile)
-   
-   local px,py = mapData:getPositionHotSpot(hotspot)
-   
-   --LIMPANDO A LAYER
-
-   MapLayer:clear()
-   
-   
-   
-   
-   AVATAR:setWorldPhysics(PHYSICS)
-      
-   AVATAR:toPos(px,py)
-   mapData:setLayer(MapLayer)
-  
-   --PRIORIDADES DE RENDERIZAÇÃO
-   --mapData:updateRenderOrdem()
-
-   
-   AVATAR:setTileMap(mapData)
-   mapData.objectLayer:addObject(AVATAR)    
-   mapData.avatar = AVATAR
-    
-   MapLayer:setBox2DWorld (PHYSICS)
-   MAPA = mapData
-   --layer:removeProp(image1)
 end
 
-function createWorldPhysics()
-    local world = MOAIBox2DWorld.new ()
-    world:setGravity ( 0, 0 )
-    world:setUnitsToMeters ( 1/30)
-    --world:setDebugDrawEnabled(false)
-    world:start()
-    return world
-end
 
 function createHUD()
     --LOAD PLAYER INFO
     
     GAME_FILE = savefiles.get "user"
     USER_DATA = GAME_FILE.data
-    
-    
+       
     mapPlayerInfo:setName(USER_DATA.nome)
-    mapPlayerInfo:setXP(USER_DATA.xp)
-  
+    mapPlayerInfo:setXP(USER_DATA.xp)  
 end
 
 function updateHUD()
@@ -198,51 +113,43 @@ function updateHUD()
     mapPlayerInfo:onUpdate()
 end
 
-function scrollCameraToCenter(x, y)
-    local cx, cy = flower.getViewSize()
-    scrollCamera(x - (cx/2), y - (cy/2))    
-end
-function scrollCamera(x, y)
-  nx,ny = math.floor(x), math.floor(y)
-  camera:setLoc(nx,ny)
-end
-function scrollCameraToFocusObject()
-    local x,y = MAPA.avatar:getLoc()
-    scrollCameraToCenter(x, y)
-end
-
-function onStart(e)
-  
+---
+---   FUNCTIONS
+---
+function startWorld()
+  worldFreeze = false  
+  rpgMap:startWorld()
 end
 
 function stopWorld()
-  joystick:setCenterKnob()
-  e = {}
-  
-  e.direction = "center"
-  MAPA.avatar.controller:walkByStick(e)
-  PHYSICS:stop()
+  worldFreeze = true
+  mapControlView:reset()
+  rpgMap:stopWorld()
 end
+
+
 
 --CONTROLLER LISTENER
 function buttonProfile_Click(e)
-  print('buttonProfile_Click')
+    flower.openScene(menus.PROFILE.name, {animation = menus.PROFILE.animation})
 end
 
-function buttonOption_Click(e)
-  print('buttonOption_Click')
+function buttonOption_Click(e)  
+    flower.openScene(scenes.MENU, {animation = "overlay"})
 end
 
-function onTalk(e)
-    flower.openScene(scenes.DIALOG, {animation = "overlay"})
-end
 
-function onUpdate(e)  
-  --MAPA:onUpdate(e) 
-  updateHUD()
-  updateMap()
-  updatePlayer()
-  --scrollCameraToFocusObject()
+
+--
+--    UPDATES THE GAME  
+--
+
+function onUpdate(e)       
+  if not worldFreeze then
+    updateMap()
+    updatePlayer()  
+    updateHUD()
+  end
 end
 
 function updateMap()
@@ -251,13 +158,24 @@ end
 
 function updatePlayer()
     local direction = mapControlView:getDirection()    
-    
     if direction then
         playerObject:startWalk(direction)
     else      
         playerObject:stopWalk()
-    end
-    --playerObject:setPriority(0)    
+    end    
 end
 
+--
+--
+--
+
+function onStop(e)
+    mapControlView:setVisible(false)
+    mapPlayerInfo:setVisible(false)
+end
+
+function onStart(e)
+    mapControlView:setVisible(true)
+    mapPlayerInfo:setVisible(true)
+end
 
