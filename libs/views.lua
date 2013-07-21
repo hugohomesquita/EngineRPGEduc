@@ -208,65 +208,22 @@ end
 MapPlayerInfo = class(UIView)
 M.MapPlayerInfo = MapPlayerInfo
 
-MapPlayerInfo.NAME = "null"
-MapPlayerInfo.XP = 0 
 
 function MapPlayerInfo:_createChildren()
     MapPlayerInfo.__super._createChildren(self)
-    
-    self.playerPanel = widget.Panel {
-        size = {250, 90},
-        pos = {5, 5},
+    self.statusBox = ActorStatusBox {
         parent = self,
-        backgroundTexture = "skins/panel_playerinfo.png",
-        backgroundVisible = "skins/panel_playerinfo.png"
+        actor = repositry:getActorById(1),
+        pos = {5,5}
     }
-    
-    -- AVATAR IMAGE
-    self.avatarImage = flower.NineImage("avatars/avatar5.png")
-    self.avatarImage:setPos(0,0)
-    self.avatarImage:setSize(80,85)
-    self.playerPanel:addChild(self.avatarImage)  
-    
-    self.lbNome = flower.Label(MapPlayerInfo.NAME, 100, 30, "arial-rounded.ttf")    
-    self.lbNome:setPos(80,5)
-    self.playerPanel:addChild(self.lbNome)
-    
-    self.labelLVL = flower.Label("LVL", 100, 30, "arial-rounded.ttf",14)
-    self.labelLVL:setPos(80,35)
-    self.playerPanel:addChild(self.labelLVL)    
-      
-    self.lbLVL = flower.Label(tostring(MapPlayerInfo.XP), 100, 30, "arial-rounded.ttf",18)    
-    self.lbLVL:setPos(112,33)
-    self.playerPanel:addChild(self.lbLVL)    
-
-    self.barXP = flower.NineImage("skins/barXp.png")
-    self.barXP:setPos(80,55)
-    self.barXP:setSize(165,26)
-    self.playerPanel:addChild(self.barXP)  
-
-    self.barXPbar = flower.NineImage("skins/barXpbar.png")
-    self.barXPbar:setPos(124,57)
-    self.barXPbar:setSize(80,22)
-    self.playerPanel:addChild(self.barXPbar)
 end
 
 function MapPlayerInfo:updateDisplay()
     MapPlayerInfo.__super.updateDisplay(self)    
-    local vw, vh = flower.getViewSize()    
 end
-
-function MapPlayerInfo:setName(name)
-    MapPlayerInfo.NAME = name
-  
-end
-function MapPlayerInfo:setXP(xp)
-    MapPlayerInfo.XP = xp  
-end  
 
 function MapPlayerInfo:onUpdate()
-    self.lbNome:setString(MapPlayerInfo.NAME)
-    self.lbLVL:setString(tostring(MapPlayerInfo.XP))
+   
 end
 
 

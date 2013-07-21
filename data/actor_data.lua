@@ -2,8 +2,8 @@ return {
     {
         id = 1,
         name = "HugoMesq",
-        level = 1,
-        exp = 0,        
+        level = 12,
+        exp = 90,        
         str = 20,
         vit = 24,
         int = 20,        

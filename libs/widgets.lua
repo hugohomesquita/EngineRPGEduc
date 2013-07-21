@@ -201,7 +201,7 @@ M.ActorStatusBox = ActorStatusBox
 -- @param params パラメータ
 function ActorStatusBox:init(params)
     self._actor = params.actor
-    params.size = {120, 140}
+    params.size = {250, 105}
 
     ActorStatusBox.__super.init(self, params)
 end
@@ -214,37 +214,30 @@ function ActorStatusBox:_createChildren()
     self._faceImage = FaceImage(1)
     self._faceImage:setPos(5, 5)
     self:addChild(self._faceImage)
+    
+    self._nameValueLabel = Label(self._actor.name, 130, 24, nil, 18)       
+    self._nameValueLabel:setPos(self._faceImage:getRight()+5,5)
+    self:addChild(self._nameValueLabel)
 
-    self._hpNameLabel = Label("HP:", 40, 20, nil, 16)
-    self._hpNameLabel:setPos(5, self._faceImage:getBottom())
-    self._hpValueLabel = Label(self._actor.hp .. "/" .. self._actor.mhp, 100, 20, nil, 16)
-    self._hpValueLabel:setPos(self._hpNameLabel:getRight(), self._hpNameLabel:getTop())
-
-    self._mpNameLabel = Label("MP:", 40, 20, nil, 16)
-    self._mpNameLabel:setPos(5, self._hpNameLabel:getBottom() - 2)
-    self._mpValueLabel = Label(self._actor.hp .. "/" .. self._actor.mhp, 100, 20, nil, 16)
-    self._mpValueLabel:setPos(self._hpNameLabel:getRight(), self._mpNameLabel:getTop())
-
-    self:addChild(self._hpNameLabel)
-    self:addChild(self._hpValueLabel)
-    self:addChild(self._mpNameLabel)
-    self:addChild(self._mpValueLabel)
+    self._lvlNameLabel = Label("LVL", 30, 20, nil, 16)       
+    self._lvlNameLabel:setPos(self._faceImage:getRight()+5,self._nameValueLabel:getBottom()+5)    
+    self._lvlValueLabel = Label(tostring(self._actor.level), 100, 20, nil, 16)       
+    self._lvlValueLabel:setPos(self._lvlNameLabel:getRight()+5,self._nameValueLabel:getBottom()+5)
+    self:addChild(self._lvlNameLabel)
+    self:addChild(self._lvlValueLabel)
+    
+    self._expNameLabel = Label("EXP", 30, 20, nil, 16)       
+    self._expNameLabel:setPos(self._faceImage:getRight()+5,self._lvlNameLabel:getBottom()+5)    
+    self._expValueLabel = Label(tostring(self._actor.exp), 100, 20, nil, 16)       
+    self._expValueLabel:setPos(self._expNameLabel:getRight()+5,self._lvlNameLabel:getBottom()+5)
+    self:addChild(self._expNameLabel)
+    self:addChild(self._expValueLabel)
+    
 end
-
----
--- 表示を更新します.
-function ActorStatusBox:updateDisplay()
-    ActorStatusBox.__super.updateDisplay(self)
-
-    self._hpValueLabel:setString(self._actor.hp .. "/" .. self._actor.mhp)
-    self._mpValueLabel:setString(self._actor.mp .. "/" .. self._actor.mmp)
-end
-
 ---
 -- 表示対象のアクターを設定します.
 function ActorStatusBox:setActor(actor)
-    self._actor = actor
-    self:updateDisplay()
+    self._actor = actor   
 end
 
 --------------------------------------------------------------------------------

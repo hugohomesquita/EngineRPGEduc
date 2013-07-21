@@ -36,9 +36,7 @@ function onCreate(e)
     --INFO PLAYER
     mapPlayerInfo = MapPlayerInfo()
     mapPlayerInfo:setScene(scene)
-    
-    createHUD()
-        
+               
 end
 
 function loadRPGMap(mapName)
@@ -97,19 +95,7 @@ function onCollisionBegin(e)
   
 end
 
-
-function createHUD()
-    --LOAD PLAYER INFO
-    
-    GAME_FILE = savefiles.get "user"
-    USER_DATA = GAME_FILE.data
-       
-    mapPlayerInfo:setName(USER_DATA.nome)
-    mapPlayerInfo:setXP(USER_DATA.xp)  
-end
-
 function updateHUD()
-    --lbXP:setString("XP:"..tostring(USER_DATA.xp))
     mapPlayerInfo:onUpdate()
 end
 

@@ -18,6 +18,7 @@ local EntityPool
 local EntityRepositry
 local EntityWorld
 local EntitySystem
+
 local Skill
 local Item
 local ItemType
@@ -495,17 +496,12 @@ Actor.EVENT_UPDATE = "update"
 function Actor:init()
     Actor.__super.init(self)
     self.id = 0
-    self.level = 0
-    self.exp = 0
     self.name = nil
-    self.hp = 0
-    self.mhp = 0
-    self.mp = 0
-    self.mmp = 0
+    self.level = 0
+    self.exp = 0        
     self.str = 0
     self.vit = 0
-    self.int = 0
-    self.men = 0
+    self.int = 0    
     self.spd = 0
     self.equipItems = {}
     self.equipSkills = {}
@@ -519,15 +515,10 @@ function Actor:loadData(data)
     self.name = data.name
     self.texture = data.texture
     self.level = data.level
-    self.exp = data.exp
-    self.hp = data.hp
-    self.mhp = data.mhp
-    self.mp = data.mp
-    self.mmp = data.mmp
+    self.exp = data.exp    
     self.str = data.str
     self.vit = data.vit
-    self.int = data.int
-    self.men = data.men
+    self.int = data.int    
     self.spd = data.spd
 
     for i, itemId in ipairs(data.equipItems) do
