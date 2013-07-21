@@ -2,8 +2,12 @@ module(..., package.seeall)
 
 local FpsMonitor = require "hanappe/extensions/FpsMonitor"
 
+local entities = require "libs/entities"
+local repositry = entities.repositry
+
 local MapControlView = views.MapControlView
 local MapPlayerInfo = views.MapPlayerInfo
+local BalloonEffect = effects.BalloonEffect
 
 local RPGMap = rpgmap.RPGMap
 
@@ -26,7 +30,7 @@ function onCreate(e)
     --INICIALIZANDO A GUI    
     mapControlView = MapControlView()
     mapControlView:setScene(scene)
-    --mapControlView:addEventListener("enter", onEnter)
+    mapControlView:addEventListener("enter", onEnter)
     --mapControlView:addEventListener("OnStickChanged", joystick_OnStickChanged)
     
     mapControlView:addEventListener("buttonProfile_Click", buttonProfile_Click)
@@ -61,6 +65,11 @@ end
 
 colidindo = false
 --EVENTOS DO RPGMap
+
+function onEnter(e)
+    effect = BalloonEffect(repositry:getEffectById(2))
+    effect:play(playerObject)    
+end
 
 
 function onTalk(e)
