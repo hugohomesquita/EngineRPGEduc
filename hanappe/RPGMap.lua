@@ -43,6 +43,11 @@ local PlayerController
 MapEvent = class(Event)
 M.MapEvent = MapEvent
 
+MapEvent.EVENT_COLLISION_BEGIN = "collisionBegin"
+MapEvent.EVENT_COLLISION_END = "collisionEnd"
+MapEvent.EVENT_COLLISION_PRE_SOLVE = "collisionPreSolve"
+MapEvent.EVENT_COLLISION_POST_SOLVE = "collisionPostSolve"
+
 MapEvent.TALK = "talk"
 
 MapEvent.TELEPORT = "teleport"
@@ -277,13 +282,13 @@ end
 
 function RPGMap:onUpdate(e)          
     for i, system in ipairs(self.systems) do      
-        system:onUpdate()
+        system:onUpdate()        
     end        
 end
 
 function RPGMap:stopWorld()
     self.world:stop()
-    self.worldFreeze = true
+    self.worldFreeze = true    
 end
 
 function RPGMap:startWorld()    
@@ -304,7 +309,7 @@ UpdatingSystem = class()
 
 function UpdatingSystem:init(tileMap)    
     self.tileMap = tileMap
-    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_BEGIN, self.onCollisionBegin, self)
+    self.tileMap:addEventListener(MapEvent.EVENT_COLLISION_BEGIN, self.onCollisionBegin, self)
     --self.tileMap:addEventListener(MapObject.EVENT_COLLISION_PRE_SOLVE, self.collisionPreSolve, self)
     --self.tileMap:addEventListener(MapObject.EVENT_COLLISION_END, self.onCollisionEnd, self)
 end
@@ -316,7 +321,9 @@ end
 function UpdatingSystem:onCollisionBegin(e)     
     local object = e.data.objectB    
     if object.type == 'Actor' then
-        self.tileMap:dispatchEvent(MapEvent.TALK, object)
+        e.data.objectA:stopWalk()        
+        e.data.objectB:stopWalk()        
+        self.tileMap:dispatchEvent(MapEvent.TALK, object)        
     end
     if object.type == 'MiniGame' then
         self.tileMap:dispatchEvent(MapEvent.MINIGAME, object)
@@ -338,9 +345,9 @@ MovementSystem = class()
 function MovementSystem:init(tileMap)
     self.tileMap = tileMap    
     
-    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_BEGIN, self.onCollisionBegin, self)
-    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_PRE_SOLVE, self.collisionPreSolve, self)
-    self.tileMap:addEventListener(MapObject.EVENT_COLLISION_END, self.onCollisionEnd, self)
+    self.tileMap:addEventListener(MapEvent.EVENT_COLLISION_BEGIN, self.onCollisionBegin, self)
+    self.tileMap:addEventListener(MapEvent.EVENT_COLLISION_PRE_SOLVE, self.collisionPreSolve, self)
+    self.tileMap:addEventListener(MapEvent.EVENT_COLLISION_END, self.onCollisionEnd, self)
 end
 
 function MovementSystem:onUpdate()
@@ -355,54 +362,19 @@ function MovementSystem:moveObject(object)
         return
     end
     
-    --if object.lastDirection == object:getDirection() and object:isColliding() then        
-    ---    object.physics.body:setLinearVelocity(0, 0)
-    --    object:stopWalk()
-    --    return
-    --end    
-    
-    if object:isColliding() then
-        --print(object.collisionSide)
-       -- object.renderer:setIndex(MapObject.DIR_TO_INDEX[object.collisionSide])
-    end
-    
-    if object.controller.ia then
-      
-      if object:isColliding() then
-        --object.physics.body:setLinearVelocity(-object.speedX, -object.speedY)
-        object.physics.body:setLinearVelocity(0, 0)
-        object:stopWalk()
-      end
-      
-      if not object:isWalking() then
-        if self.move then 
-            self.currentMove = "north"  
-        else
-            self.currentMove = "south"  
-        end
-        object:startWalk(self.currentMove,0,20)
+    if object:isColliding() then                      
         return
-      end
-      
-      if object.walkingCount then
-          object.walkingCount = object.walkingCount - 1
-          if object.walkingCount <= 0 then
-              self.move = not self.move
-              object:stopWalk()            
-          end
-      end     
-           
-    end
-    
+    end       
+  
     object.physics.body:setLinearVelocity(object.speedX, object.speedY)    
     object:setPos(object.physics.body:getPosition())
-    
 end
 
 function MovementSystem:onCollisionBegin(e)      
-    --print(e.data.objectA.name) 
-    --print(e.data.objectB.name) 
-    --print(e.data.collisionSide)
+    local object = e.data.objectB    
+    if object.type == 'Actor' then      
+        
+    end    
 end
 function MovementSystem:collisionPreSolve(e)  
     --print(e.data.name)
@@ -504,8 +476,10 @@ function ActorController:initPhysics()
     
     object.physics.body:setTransform(x, y)
     object.physics.fixture = object.physics.body:addPolygon(poly)
-    object.physics.fixture:setDensity(0)                        
+    object.physics.fixture:setDensity(0)
     object.physics.fixture:setFriction(0)
+    object.physics.fixture:setRestitution(0)
+    object.physics.fixture:setSensor(false)    
     object.physics.body:resetMassData()     
 end
 
@@ -534,11 +508,6 @@ M.MapObject = MapObject
 -- Events
 MapObject.EVENT_WALK_START = "walkStart"
 MapObject.EVENT_WALK_STOP = "walkStop"
-
-MapObject.EVENT_COLLISION_BEGIN = "collisionBegin"
-MapObject.EVENT_COLLISION_END = "collisionEnd"
-MapObject.EVENT_COLLISION_PRE_SOLVE = "collisionPreSolve"
-MapObject.EVENT_COLLISION_POST_SOLVE = "collisionPostSolve"
 
 -- Direction
 MapObject.DIR_UP = "north"
@@ -607,40 +576,39 @@ function MapObject:isColliding()
     return self.colliding
 end
 
-function MapObject:onCollide(phase, fixtureA, fixtureB, arbiter)  
-  --local objectA = fixtureA:getBody()   
+function MapObject:onCollide(phase, fixtureA, fixtureB, arbiter)   
+  local objectA = fixtureA:getBody()   
   local objectB = fixtureB:getBody() 
-  
+  local objects = {}
   if phase == MOAIBox2DArbiter.BEGIN then       
-    local objects = {}  
+      
     if objectB.object then      
       objects.objectB = objectB.object
-      self.tileMap:dispatchEvent(MapObject.EVENT_COLLISION_BEGIN, objects)
+      objects.objectA = objectA.object
+      
+      objectB.object.physics.body:setLinearVelocity(0, 0)
+      objectB.object.physics.fixture:setFriction(0)
+      objectB.object.physics.fixture:setRestitution(0)
+      objectB.object.physics.fixture:setDensity(100000)
+      objectB.object.physics.body:setFixedRotation(false)
+      objectB.object.physics.body:resetMassData()
+      
+      objectA.object.physics.fixture:setDensity(0)      
+      objectA.object.physics.body:resetMassData()
+      
+      self.tileMap:dispatchEvent(MapEvent.EVENT_COLLISION_BEGIN, objects)
     end         
 	end
 	
 	if phase == MOAIBox2DArbiter.END then
-      --self.mapObject.tileMap:dispatchEvent(MapObject.EVENT_COLLISION_END, objects)      
+      self.tileMap:dispatchEvent(MapEvent.EVENT_COLLISION_END)      
 	end
 	
-	if phase == MOAIBox2DArbiter.PRE_SOLVE then        
-    local x,y = arbiter:getContactNormal()    
-    if (x > 0 and y < 0) then  
-      self.collisionSide = MapObject.DIR_UP
-    end
-    if (x < 0 and y > 0) then
-      self.collisionSide = MapObject.DIR_DOWN
-    end
-    if (x < 0 and y < 0) then
-      self.collisionSide = MapObject.DIR_LEFT
-    end
-    if (x > 0 and y > 0) then
-      self.collisionSide = MapObject.DIR_RIGHT
-    end
+	if phase == MOAIBox2DArbiter.PRE_SOLVE then            
     --self.mapObject.tileMap:dispatchEvent(MapObject.EVENT_COLLISION_PRE_SOLVE, event)      
 	end
 	
-	if phase == MOAIBox2DArbiter.POST_SOLVE then
+	if phase == MOAIBox2DArbiter.POST_SOLVE then    
     --self.mapObject.tileMap:dispatchEvent(MapObject.EVENT_COLLISION_POST_SOLVE, event)     
 	end
 end
@@ -702,8 +670,7 @@ function MapObject:setSpeed(direction)
     self.speedX = moveSpeed * velocity.x    
 
     self.speedY = 0
-    self.speedY = moveSpeed * velocity.y
-        
+    self.speedY = moveSpeed * velocity.y        
 end
 
 --

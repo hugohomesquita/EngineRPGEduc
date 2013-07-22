@@ -73,7 +73,8 @@ end
 
 
 function onTalk(e)
-    flower.openScene(scenes.DIALOG, {animation = "overlay"})
+    stopWorld()
+    flower.openScene(scenes.DIALOG, {animation = "overlay",actorA = repositry:getActorById(1),actorB= repositry:getActorById(2)})
 end
 
 function onMinigame(e)
@@ -84,7 +85,7 @@ function onMinigame(e)
   stopWorld()
 end
 function onCloseMiniGame(e)    
-    USER_DATA.xp = USER_DATA.xp + e.data.XP
+    --USER_DATA.xp = USER_DATA.xp + e.data.XP
     startWorld()         
 end
 
@@ -139,7 +140,12 @@ end
 --    UPDATES THE GAME  
 --
 
-function onUpdate(e)       
+function onUpdate(e)
+       
+  if worldFreeze then
+      playerObject:stopWalk()
+  end
+       
   if not worldFreeze then
     updateMap()
     updatePlayer()  
@@ -170,6 +176,7 @@ function onStop(e)
 end
 
 function onStart(e)
+    startWorld()
     mapControlView:setVisible(true)
     mapPlayerInfo:setVisible(true)
 end

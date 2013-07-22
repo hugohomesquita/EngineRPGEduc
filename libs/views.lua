@@ -271,36 +271,56 @@ function ProfileView:_createChildren()
         size = {self:getWidth()/2,260},
         pos = {self:getWidth()/2-200, self:getHeight()/2-130},        
     }
-    self.detailBox:addEventListener(Event.TOUCH_DOWN, self.onTouchDown, self)   
-    --[[self.menuList = ListBox {
-        width = self:getWidth(),
-        pos = {0, 0},
-        rowCount = 2,
-        columnCount = 3,
-        parent = self,
-        labelField = "title",
-        listData = {repositry:getMenus()},
-        onItemChanged = function(e)
-            local data = e.data
-            local text = data and data.description or ""
-            self.menuMsgBox:setText(text)
-        end,
-        onItemEnter = function(e)
-            self:dispatchEvent("enter", e.data)
-        end,
-    }
-
-    self.menuMsgBox = widget.TextBox {
-        size = {self:getWidth(), 40},
-        pos = {0, self.menuList:getBottom()},
-        parent = self,
-    }]]--
-
+    self.detailBox:addEventListener(Event.TOUCH_DOWN, self.onTouchDown, self)     
 end
 
 function ProfileView:onTouchDown(e)
     self:dispatchEvent("back", e.data)
 end
+
+-----
+--
+--  TALK VIEW
+--
+-----
+TalkView = class(UIView)
+M.TalkView = TalkView
+
+function TalkView:init(params)
+    self._actorA = params.actorA    
+    self._actorB = params.actorB
+    
+    TalkView.__super.init(self, params)
+end
+
+---
+-- I will create a child object.
+function TalkView:_createChildren()
+    TalkView.__super._createChildren(self)
+       
+    self.talkBox = TalkBox {
+        actorA = self._actorA,
+        actorB = self._actorB,
+        parent = self,        
+        size = {self:getWidth()/2,180},
+        pos = {self:getWidth()/2-200, self:getHeight()/2-130},        
+    }    
+    self.talkBox:addEventListener(Event.TOUCH_DOWN, self.onTouchDown, self)     
+end
+
+function TalkView:onTouchDown(e)
+    self:dispatchEvent("back", e.data)
+end
+
+function TalkView:setActorA(actorA)
+    self._actorA = actorA
+end
+
+function TalkView:setActorB(actorB)
+    self._actorB = actorB
+end
+
+
 --------------------------------------------------------------------------------
 -- @type MenuItemView
 -- アイテムメニューのビュークラスです.

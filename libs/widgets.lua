@@ -240,6 +240,78 @@ function ActorStatusBox:setActor(actor)
     self._actor = actor   
 end
 
+
+--------------------------------------------------------------------------------
+-- @type TalkBox
+-- アクターの簡易的なステータスを表示するボックスです.
+--------------------------------------------------------------------------------
+TalkBox = class(Panel)
+M.TalkBox = TalkBox
+
+---
+-- コンストラクタ
+-- @param params パラメータ
+function TalkBox:init(params)
+    self._actorA = params.actorA
+    self._actorB = params.actorB        
+    TalkBox.__super.init(self, params)
+end
+
+---
+-- 子オブジェクトを生成します.
+function TalkBox:_createChildren()
+    TalkBox.__super._createChildren(self)
+
+    self._faceImage = FaceImage(1)
+    self._faceImage:setPos(5, 5)
+    self:addChild(self._faceImage)
+        
+    self._msgBox = widget.TextBox {
+        size = {self._faceImage:getWidth(), 100},
+        pos = {self._faceImage:getRight()+5, 5},
+        text = "fdsafdsafdsafdsaf",
+        parent = self,
+    }
+    --self._msgBox:showPopup()          
+    
+    
+    
+end
+
+function TalkBox:updateDisplay()
+    TalkBox.__super.updateDisplay(self)       
+    local width,height = self:getSize()
+    
+    self._msgBox:setSize(width-self._faceImage:getWidth()-15,100)
+    
+end
+
+---
+-- 表示対象のアクターを設定します.
+function TalkBox:setActorA(actorA)
+    self._actorA = actorA   
+end
+
+function TalkBox:setActorB(actorB)
+    self._actorB = actorB   
+end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 --------------------------------------------------------------------------------
 -- @type ItemListBox
 -- アイテムを表示するリストボックスです.
