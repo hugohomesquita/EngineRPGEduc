@@ -2,7 +2,6 @@ module(..., package.seeall)
 
 
 local TalkView = views.TalkView
-local message1 = "Hello MessageBox"
 
 --------------------------------------------------------------------------------
 -- Event Handler
