@@ -262,19 +262,33 @@ end
 function TalkBox:_createChildren()
     TalkBox.__super._createChildren(self)
 
-    self._faceImage = FaceImage(1)
+    self._faceImage = FaceImage(2)
     self._faceImage:setPos(5, 5)
     self:addChild(self._faceImage)
-        
+    
+    
+    
+    self._talk = self._actorB:getTalkById(1)    
+    self._answer = self._talk.answer
+    
     self._msgBox = widget.TextBox {
         size = {self._faceImage:getWidth(), 100},
         pos = {self._faceImage:getRight()+5, 5},
-        text = "fdsafdsafdsafdsaf",
+        text = self._answer,
         parent = self,
+    }        
+    
+    self._responseListBox = ListBox {        
+        rowCount = 1,
+        columnCount = 2,
+        pos = {5, self._faceImage:getBottom()+5},
+        parent = self,
+        labelField = "label",
+        listData = {self._talk.answers},        
+        onItemChanged = function(e)            
+            self:dispatchEvent("resposta",e)
+        end
     }
-    --self._msgBox:showPopup()          
-    
-    
     
 end
 
@@ -283,7 +297,12 @@ function TalkBox:updateDisplay()
     local width,height = self:getSize()
     
     self._msgBox:setSize(width-self._faceImage:getWidth()-15,100)
-    
+    self._responseListBox:setSize(width-10,height-110)
+end
+
+function TalkBox:newTalk()
+    local talk
+    return talk
 end
 
 ---

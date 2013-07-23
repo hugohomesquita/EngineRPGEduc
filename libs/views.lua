@@ -305,7 +305,13 @@ function TalkView:_createChildren()
         size = {self:getWidth()/2,180},
         pos = {self:getWidth()/2-200, self:getHeight()/2-130},        
     }    
+    
+    self.talkBox:addEventListener("resposta", self.onResposta, self)
     self.talkBox:addEventListener(Event.TOUCH_DOWN, self.onTouchDown, self)     
+end
+
+function TalkView:onResposta(e)
+    print('respondeu')
 end
 
 function TalkView:onTouchDown(e)

@@ -31,6 +31,7 @@ local Enemy
 local Team
 local Bag
 local BagItem
+local Talk
 
 -- variables
 local entityPool
@@ -107,6 +108,7 @@ function EntityPool:initEntities()
     self.enemies = self:createEntities(Enemy, dofile("data/enemy_data.lua"))
     self.teams = self:createEntities(Team, dofile("data/team_data.lua"))
     self.bagItems = self:createEntities(BagItem, dofile("data/bag_data.lua"))
+    --self.talk = self:createEntities(Talk, dofile("data/talk_data.lua"))
     self.bag = Bag(self.bagItems)
 end
 
@@ -470,6 +472,23 @@ function Team:loadData(data)
     end
 end
 
+--------------------------------------------------------------------------------
+-- @type Talk
+-- 
+-- 
+--------------------------------------------------------------------------------
+Talk = class(Entity)
+M.Talk = Talk
+
+function Talk:init()    
+    self.id = 0
+    self.actor = 0 
+    self.answer = nil    
+    self.answers = {}     
+end
+
+
+
 
 --------------------------------------------------------------------------------
 -- @type Actor
@@ -505,6 +524,7 @@ function Actor:init()
     self.spd = 0
     self.equipItems = {}
     self.equipSkills = {}
+    self.talks = {}
     self.statusStates = {}
 end
 
@@ -529,7 +549,24 @@ function Actor:loadData(data)
         local skill = assert(repositry:getSkillById(skillId), "Not Found Skill", skillId)
         self.equipSkills[i] = skill
     end
+    
+    if data.talks then
+      for i, talk in ipairs(data.talks) do                      
+          table.insertElement(self.talks, talk)
+      end
+    end
 end
+
+---
+-- 
+function Actor:getTalkById(id)    
+    for i, talk in ipairs(self.talks) do
+        if talk.id == id then
+            return talk
+        end
+    end    
+end
+
 
 ---
 -- 武器を装備します.
