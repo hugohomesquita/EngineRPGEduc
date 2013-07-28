@@ -91,7 +91,7 @@ function RPGMap:initPhysics()
     local world = MOAIBox2DWorld.new ()
     world:setGravity(0, 0)
     world:setUnitsToMeters(1/30)
-    --world:setDebugDrawEnabled(false)
+    world:setDebugDrawEnabled(false)
     world:start()    
     self:setWorldPhysics(world)
     self.layer:setBox2DWorld(world)
@@ -130,6 +130,8 @@ function RPGMap:onLoadedData(e)
     self.playerObject = assert(self.objectLayer:findObjectByName("hugo"))
     self.collisionLayer = assert(self:findMapLayerByName("MapCollision"))
     self.eventLayer = assert(self:findMapLayerByName("Event"))
+    self.mapBackgroundLayer = assert(self:findMapLayerByName("MapBackground"))
+    
     if self.collisionLayer then
         self.collisionLayer:setVisible(false)
         self:createPhysicsCollision()
@@ -139,7 +141,9 @@ function RPGMap:onLoadedData(e)
       self:createPhysicsEvent()
     end  
     
-    self:setInvisibleLayerByName("MapBackground")
+    self.mapBackgroundLayer:setPriority(1)  
+   
+    --self:setInvisibleLayerByName("MapBackground")
     --self:setInvisibleLayerByName("MapObject")
 end
 
@@ -315,7 +319,9 @@ function UpdatingSystem:init(tileMap)
 end
 
 function UpdatingSystem:onUpdate() 
-        
+    for i, object in ipairs(self.tileMap.objectLayer:getObjects()) do
+        object:onUpdate()
+    end    
 end
 
 function UpdatingSystem:onCollisionBegin(e)     
@@ -483,6 +489,10 @@ function ActorController:initPhysics()
     object.physics.body:resetMassData()     
 end
 
+function ActorController:onUpdate()
+    --self.mapObject:setPriority(self:vertexZ())
+end  
+
 ----------------------------------------------------------------------------------------------------
 -- @type PlayerController
 -- 
@@ -551,7 +561,7 @@ function MapObject:init(tileMap)
     self.mapX = 0
     self.mapY = 0
     self.controller = nil 
-    self.physics = {}    
+    self.physics = {}        
 end
 
 function MapObject:loadData(data)
@@ -642,8 +652,7 @@ function MapObject:startWalk(direction, speed, count)
     if not self.walking then
         self.walking = true        
         self:dispatchEvent(MapObject.EVENT_WALK_START)        
-    end
-    self:setPriority(self:vertexZ())    
+    end       
 end
 
 function MapObject:stopWalk()
@@ -674,6 +683,9 @@ function MapObject:setSpeed(direction)
     self.speedY = moveSpeed * velocity.y        
 end
 
+function MapObject:onUpdate()
+    self:setPriority(self:vertexZ())
+end
 --
 --
 --
