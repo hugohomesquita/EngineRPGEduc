@@ -38,6 +38,7 @@ local MemberListBox = widgets.MemberListBox
 
 -- classes
 local TitleMenuView
+local AvatarView
 
 -- consts
 local STICK_TO_DIR = {
@@ -211,11 +212,7 @@ M.MapPlayerInfo = MapPlayerInfo
 
 function MapPlayerInfo:_createChildren()
     MapPlayerInfo.__super._createChildren(self)
-    self.statusBox = ActorStatusBox {
-        parent = self,
-        actor = repositry:getActorById(1),
-        pos = {5,5}
-    }
+    
 end
 
 function MapPlayerInfo:updateDisplay()
@@ -359,170 +356,5 @@ function MenuItemView:_createChildren()
     }
 end
 
---[[--------------------------------------------------------------------------------
--- @type MenuMainView
--- It is the view class in the main menu.
---------------------------------------------------------------------------------
-MenuMainView = class(UIView)
-M.MenuMainView = MenuMainView
-
----
--- I will create a child object.
-function MenuMainView:_createChildren()
-    MenuMainView.__super._createChildren(self)
-
-    self.menuList = ListBox {
-        width = self:getWidth(),
-        pos = {0, 0},
-        rowCount = 2,
-        columnCount = 3,
-        parent = self,
-        labelField = "title",
-        listData = {repositry:getMenus()},
-        onItemChanged = function(e)
-            local data = e.data
-            local text = data and data.description or ""
-            self.menuMsgBox:setText(text)
-        end,
-        onItemEnter = function(e)
-            self:dispatchEvent("enter", e.data)
-        end,
-    }
-
-    self.menuMsgBox = widget.TextBox {
-        size = {self:getWidth(), 40},
-        pos = {0, self.menuList:getBottom()},
-        parent = self,
-    }
-
-end
-
---------------------------------------------------------------------------------
--- @type MenuItemView
--- アイテムメニューのビュークラスです.
---------------------------------------------------------------------------------
-MenuItemView = class(UIView)
-M.MenuItemView = MenuItemView
-
----
--- 子オブジェクトを生成します.
-function MenuItemView:_createChildren()
-    MenuItemView.__super._createChildren(self)
-
-    self.itemList = ItemListBox {
-        pos = {0, 0},
-        parent = self,
-        onItemChanged = function(e)
-            local data = e.data
-            local text = data and data.item.description or ""
-            self.itemMsgBox:setText(text)
-        end,
-        onItemEnter = function(e)
-            self:dispatchEvent("enter", e.data)
-        end,
-    }
-
-    self.itemMsgBox = widget.TextBox {
-        size = {WIDGET_WIDTH, 80},
-        pos = {0, self.itemList:getBottom()},
-        parent = self,
-    }
-end
-
---------------------------------------------------------------------------------
--- @type MenuStatusView
--- ステータスメニューのビュークラスです.
---------------------------------------------------------------------------------
-MenuStatusView = class(UIView)
-M.MenuStatusView = MenuStatusView
-
----
--- 内部変数の初期化処理です.
-function MenuStatusView:_initInternal()
-    MenuStatusView.__super._initInternal(self)
-    self._statusBoxList = {}
-end
-
----
--- 子オブジェクトの生成処理です.
-function MenuStatusView:_createChildren()
-    MenuStatusView.__super._createChildren(self)
-
-    self.memberList = MemberListBox {
-        pos = {0, 0},
-        parent = self,
-        selectedIndex = 0,
-        onItemChanged = function(e)
-            local data = e.data
-            self.detailBox:setActor(data)
-        end,
-    }
-
-    self.detailBox = ActorDetailBox {
-        actor = {repositry:getActorById(1)},
-        parent = self,
-        pos = {0, self.memberList:getBottom() + 5}
-    }
-end
-
---------------------------------------------------------------------------------
--- @type MenuSettingView
--- 設定メニューのビュークラスです.
--- システムの設定を変更します.
---------------------------------------------------------------------------------
-MenuSettingView = class(UIView)
-M.MenuSettingView = MenuSettingView
-
-function MenuSettingView:_initInternal()
-    MenuSettingView.__super._initInternal(self)
-end
-
-function MenuSettingView:_createChildren()
-    MenuStatusView.__super._createChildren(self)
-end
-
---------------------------------------------------------------------------------
--- @type MenuSkillView
--- スキルメニューのビュークラスです.
---------------------------------------------------------------------------------
-MenuSkillView = class(UIView)
-M.MenuSkillView = MenuSkillView
-
----
--- 子オブジェクトを生成します.
-function MenuSkillView:_createChildren()
-    MenuSkillView.__super._createChildren(self)
-    
-    self.memberList = MemberListBox {
-        pos = {0, 0},
-        parent = self,
-        selectedIndex = 0,
-        onItemChanged = function(e)
-            local data = e.data
-            self.skillList:setActor(data)
-        end,
-    }
-
-    self.skillList = SkillListBox {
-        pos = {0, self.memberList:getBottom() + 5},
-        actor = repositry:getActorById(1),
-        parent = self,
-        onItemChanged = function(e)
-            local data = e.data
-            local text = data and data.descripsion or ""
-            self.msgBox:setText(text)
-        end,
-        onItemEnter = function(e)
-            self:dispatchEvent("enter", e.data)
-        end,
-    }
-
-    self.msgBox = widget.TextBox {
-        size = {WIDGET_WIDTH, 80},
-        pos = {0, self.skillList:getBottom()},
-        parent = self,
-    }
-end
-]]
 
 return M

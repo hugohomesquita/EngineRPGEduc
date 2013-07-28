@@ -491,7 +491,8 @@ PlayerController = class(ActorController)
 
 function PlayerController:initController()
     PlayerController.__super.initController(self)    
-    self.entity = repositry:getPlayer()    
+    self.player = repositry:getPlayerById(1)
+    self.entity = self.player.actor
 end
 
 function PlayerController:onUpdate()

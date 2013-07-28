@@ -6,7 +6,7 @@ local entities = require "libs/entities"
 local repositry = entities.repositry
 
 local MapControlView = views.MapControlView
-local MapPlayerInfo = views.MapPlayerInfo
+local AvatarInfoBox = widgets.AvatarInfoBox
 local BalloonEffect = effects.BalloonEffect
 
 local RPGMap = rpgmap.RPGMap
@@ -17,7 +17,9 @@ local worldFreeze  = false
 
 local fpsMonitor = FpsMonitor(1)
 
-function onCreate(e)         
+function onCreate(e)           
+    flower.Runtime:addEventListener("resize", onResize)
+    
     rpgMap = RPGMap()
     rpgMap:setScene(scene)
     rpgMap:addEventListener("talk",onTalk)    
@@ -36,10 +38,13 @@ function onCreate(e)
     mapControlView:addEventListener("buttonProfile_Click", buttonProfile_Click)
     mapControlView:addEventListener("buttonOption_Click", buttonOption_Click)
     
-    flower.Runtime:addEventListener("resize", onResize)
+    
     --INFO PLAYER
-    mapPlayerInfo = MapPlayerInfo()
-    mapPlayerInfo:setScene(scene)
+    player = repositry:getPlayerById(1)
+    avatarInfoBox = AvatarInfoBox{
+        scene = scene,
+        player = player
+    }    
                
 end
 
@@ -79,10 +84,10 @@ end
 
 function onMinigame(e)
   --print(e.data.name)
-  clase = require "minigames/quiz"
-  MINIGAME = flower.openScene("minigames/quiz", {sceneFactory = flower.ClassFactory(clase)}) 
-  MINIGAME:addEventListener("onClose",onCloseMiniGame)
   stopWorld()
+  clase = require "minigames/quiz"
+  MINIGAME = flower.openScene("minigames/quiz", {animation = "overlay"})   
+  MINIGAME:addEventListener("onClose",onCloseMiniGame)   
 end
 function onCloseMiniGame(e)    
     --USER_DATA.xp = USER_DATA.xp + e.data.XP
@@ -106,7 +111,7 @@ function onCollisionBegin(e)
 end
 
 function updateHUD()
-    mapPlayerInfo:onUpdate()
+    avatarInfoBox:updateDisplay()
 end
 
 ---
@@ -172,12 +177,12 @@ end
 
 function onStop(e)
     mapControlView:setVisible(false)
-    mapPlayerInfo:setVisible(false)
+    avatarInfoBox:setVisible(false)
 end
 
 function onStart(e)
     startWorld()
     mapControlView:setVisible(true)
-    mapPlayerInfo:setVisible(true)
+    avatarInfoBox:setVisible(true)
 end
 

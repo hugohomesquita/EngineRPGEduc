@@ -33,6 +33,7 @@ local ActorImage = display.ActorImage
 -- classes
 local ActorStatusBox
 local ActorDetailBox
+local AvatarInfoBox
 --local ItemListBox
 --local ItemListItem
 --local SkillListBox
@@ -264,9 +265,7 @@ function TalkBox:_createChildren()
 
     self._faceImage = FaceImage(2)
     self._faceImage:setPos(5, 5)
-    self:addChild(self._faceImage)
-    
-    
+    self:addChild(self._faceImage)       
     
     self._talk = self._actorB:getTalkById(1)    
     self._answer = self._talk.answer
@@ -522,5 +521,85 @@ end
 function MemberListItem:onResize(e)
     self:updateDisplay()
 end
+
+--------------------------------------------------------------------------------
+-- @type AvatarView
+-- 
+--------------------------------------------------------------------------------
+AvatarInfoBox = class(UIView)
+M.AvatarInfoBox = AvatarInfoBox
+
+function AvatarInfoBox:init(params)            
+    AvatarInfoBox.__super.init(self, params)    
+end
+
+function AvatarInfoBox:_createChildren()    
+    AvatarInfoBox.__super._createChildren(self)   
+    
+    local font = flower.getFont("minigames/assets/fonts/SHOWG.TTF", nil, 18)        
+    
+    self._mainPanel = Panel {      
+      backgroundTexture = "minigames/assets/panel.png",
+      size = {200, 100},
+      pos = {5, 5},      
+      parent = self,            
+    }       
+    self:addChild(self._mainPanel)
+       
+    self._avatarImage = flower.Image("avatars/avatar1.png", 80, 80)
+    self._avatarImage:setPos(self._mainPanel:getLeft() + 2, self._mainPanel:getTop() + 5)
+    self:addChild(self._avatarImage)   
+       
+    self._avatarName = Label("Hugo Mesquita", nil, nil, font, 14)
+    self._avatarName:setPos(self._avatarImage:getRight(), self._mainPanel:getTop() + 10)    
+    self:addChild(self._avatarName)
+    
+    self._avatarLVL = Label("LEVEL 10", nil, nil, font, 13)
+    self._avatarLVL:setPos(self._avatarImage:getRight(), self._avatarName:getBottom())    
+    
+    self._avatarXP = Label("XP 80/100", nil, nil, font, 13)
+    self._avatarXP:setPos(self._avatarImage:getRight(), self._avatarLVL:getBottom())
+    
+    self:addChild(self._avatarLVL)
+    self:addChild(self._avatarXP)       
+    
+    self._goldImage = flower.Image("minigames/assets/coins.png", 20, 20)
+    self._goldImage:setPos(self._avatarImage:getRight(), self._avatarXP:getBottom())
+    self:addChild(self._goldImage)
+    
+    self._avatarGOLD = Label("999999", nil, nil, font, 13)
+    self._avatarGOLD:setPos(self._goldImage:getRight() + 5, self._avatarXP:getBottom() + 3)    
+    self:addChild(self._avatarGOLD)
+       
+end
+
+function AvatarInfoBox:updateDisplay()
+    AvatarInfoBox.__super.updateDisplay(self)   
+    
+    local texture = self._player.actor.texture
+    self._avatarImage:setTexture(texture)
+    self._avatarImage:setSize(80,80)
+    
+    local gold = tostring(self._player.gold)    
+    self._avatarGOLD:setString(gold)
+    self._avatarGOLD:fitSize(#gold)
+    
+    local name = self._player.actor.name
+    self._avatarName:setString(name)
+    self._avatarName:fitSize(#name)    
+    
+    local level = string.format("LEVEL  %d", self._player.actor.level)
+    self._avatarLVL:setString(level)
+    self._avatarLVL:fitSize(#level)
+    
+    local xp = string.format("XP  %d/%d", self._player.actor.exp,(self._player.actor.level+1)*100)
+    self._avatarXP:setString(xp)
+    self._avatarXP:fitSize(#xp)
+end
+
+function AvatarInfoBox:setPlayer(player)
+    self._player = player
+end
+
 
 return M

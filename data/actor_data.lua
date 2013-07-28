@@ -2,8 +2,9 @@ return {
     {
         id = 1,
         name = "HugoMesq",
-        level = 12,
-        exp = 90,        
+		texture = "avatars/avatar5.png",
+        level = 5,
+        exp = 550,		
         str = 20,
         vit = 24,
         int = 20,        
@@ -21,8 +22,9 @@ return {
     {
         id = 2,
         name = "Everton",
+		texture = "avatars/avatar5.png",
         level = 1,
-        exp = 0,                
+        exp = 0,                		
         str = 18,
         vit = 24,
         int = 21,        

@@ -108,6 +108,7 @@ function EntityPool:initEntities()
     self.enemies = self:createEntities(Enemy, dofile("data/enemy_data.lua"))
     self.teams = self:createEntities(Team, dofile("data/team_data.lua"))
     self.bagItems = self:createEntities(BagItem, dofile("data/bag_data.lua"))
+    self.players = self:createEntities(Player, dofile("data/player_data.lua"))
     --self.talk = self:createEntities(Talk, dofile("data/talk_data.lua"))
     self.bag = Bag(self.bagItems)
 end
@@ -124,7 +125,7 @@ end
 ---
 -- メモリ上のエンティティを保存します.
 function EntityPool:saveEntities(saveId)
--- TODO:実装
+    
 end
 
 ---
@@ -191,8 +192,143 @@ end
 ---
 -- プレイヤーを返します.
 -- TODO:適当なので修正が必要
-function EntityRepositry:getPlayer()
-    return self:getActorById(1)
+function EntityRepositry:getPlayers()
+    return entityPool.players
+end
+
+function EntityRepositry:getPlayerById(id)
+    return self:getEntityById(entityPool.players, id)
+end
+
+function EntityRepositry:savePlayer(player)
+    local actors = {}
+    for i, actor in ipairs(entityPool.actors) do
+        table.insertElement(actors, actor:saveData())
+    end
+    
+   
+    file = io.open ( "teste.lua", 'wb' )
+    --player = self:getPlayerById(1)
+    --self:savee("return",actors)
+    self:save(entityPool.players,"teste.lua")
+end
+
+function EntityRepositry:savee(name,object)
+  local type=type
+	local tostring=tostring
+	
+	file:write(name.."\t{" .. "\n")
+
+  local function thatkey(k)
+		if type(k)=="number" then		
+			return ''
+		end
+		return k
+	end
+	local function key_number(k,v)
+		if type(k)=="number" then
+			return "\t"
+		end
+		return "\t[\"" .. k .. "\"] = "
+	end 
+
+	for k,v in pairs(object) do  
+      
+      local the_type = type(v)      
+      local old_k = k
+      local k = thatkey(k)
+      local k_string = key_number(old_k,v)
+      
+      if the_type == "string" then
+          file:write(v)
+      elseif the_type == "table" then
+          self:savee(k, v, "\t")    
+      elseif the_type == "number" then
+          file:write('\t' .. k ..' = ' .. tostring(v))
+      end
+      
+      
+      if next(object,old_k) then file:write(",\n") else file:write("") end
+      
+	end
+	
+	file:write("\t\n".."}")
+end
+
+function exportstring( s )
+      return string.format("%q", s)
+end
+function EntityRepositry:save(tbl,filename)
+   local charS,charE = "   ","\n"
+      local file,err = io.open( filename, "wb" )
+      if err then return err end
+
+      -- initiate variables for save procedure
+      local tables,lookup = { tbl },{ [tbl] = 1 }
+      file:write( "return {"..charE )
+
+      for idx,t in ipairs( tables ) do
+         file:write( "-- Table: {"..idx.."}"..charE )
+         file:write( "{"..charE )
+         local thandled = {}
+
+         for i,v in ipairs( t ) do
+            thandled[i] = true
+            local stype = type( v )
+            -- only handle value
+            if stype == "table" then
+               if not lookup[v] then
+                  table.insert( tables, v )
+                  lookup[v] = #tables
+               end
+               file:write( charS.."{"..lookup[v].."},"..charE )
+            elseif stype == "string" then
+               file:write(  charS..exportstring( v )..","..charE )
+            elseif stype == "number" then
+               file:write(  charS..tostring( v )..","..charE )
+            end
+         end
+
+         for i,v in pairs( t ) do
+            -- escape handled values
+            if (not thandled[i]) then
+            
+               local str = ""
+               local stype = type( i )
+               -- handle index
+               if stype == "table" then
+                  if not lookup[i] then
+                     table.insert( tables,i )
+                     lookup[i] = #tables
+                  end
+                  str = charS.."[{"..lookup[i].."}]="
+               elseif stype == "string" then
+                  str = charS.."["..exportstring( i ).."]="
+               elseif stype == "number" then
+                  str = charS.."["..tostring( i ).."]="
+               end
+            
+               if str ~= "" then
+                  stype = type( v )
+                  -- handle value
+                  if stype == "table" then
+                     if not lookup[v] then
+                        table.insert( tables,v )
+                        lookup[v] = #tables
+                     end
+                     file:write( str.."{"..lookup[v].."},"..charE )
+                  elseif stype == "string" then
+                     file:write( str..exportstring( v )..","..charE )
+                  elseif stype == "number" then
+                     file:write( str..tostring( v )..","..charE )
+                  end
+               end
+            end
+         end
+         file:write( "},"..charE )
+      end
+      file:write( "}" )
+      file:close()
 end
 
 ---
@@ -516,8 +652,9 @@ function Actor:init()
     Actor.__super.init(self)
     self.id = 0
     self.name = nil
-    self.level = 0
-    self.exp = 0        
+    self.texture = nil
+    self.level = 0    
+    self.exp = 0      
     self.str = 0
     self.vit = 0
     self.int = 0    
@@ -534,8 +671,8 @@ function Actor:loadData(data)
     self.id = data.id
     self.name = data.name
     self.texture = data.texture
-    self.level = data.level
-    self.exp = data.exp    
+    self.level = data.level    
+    self.exp = data.exp        
     self.str = data.str
     self.vit = data.vit
     self.int = data.int    
@@ -555,6 +692,18 @@ function Actor:loadData(data)
           table.insertElement(self.talks, talk)
       end
     end
+end
+
+function Actor:saveData()
+    local data = table.copy(self)
+    data.__index = nil
+    data.__class = nil
+    
+    data.equipItems = {}
+    data.equipSkills = {}
+    data.talks = {}
+    data.statusStates = {}
+    return data
 end
 
 ---
@@ -657,6 +806,23 @@ M.Player = Player
 
 function Player:init()
     Player.__super.init(self)
+    self.id = 0
+    self.gold = 0
+    self.actor = nil    
+end
+
+function Player:loadData(data)
+    self.id = data.id
+    self.gold = data.gold
+    self.actor = repositry:getActorById(data.actor_id)
+end
+
+function Player:saveData()    
+    local player = {}
+    player.id = self.id
+    player.gold = self.gold
+    player.actor_id = self.actor.id
+    return player
 end
 
 --------------------------------------------------------------------------------

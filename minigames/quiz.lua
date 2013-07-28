@@ -10,10 +10,11 @@ local views = require('minigames/libs/views')
 local QuizQuestionView = views.QuizQuestionView
 local MenuPrincipalView = views.MenuPrincipalView
 local LojaView = views.LojaView
-
+local AvatarInfoBox = widgets.AvatarInfoBox
 
 local entities = require "libs/entities"
 local repositry = entities.repositry
+local entityPool = entities.entityPool
 
 Resources.addResourceDirectory("assets/fonts")
 --------------------------------------------------------------------------------
@@ -22,24 +23,29 @@ Resources.addResourceDirectory("assets/fonts")
 
 function onCreate(e)
     flower.Runtime:addEventListener("resize", onResize)
-    local actor = repositry:getPlayer()
     
+    player = repositry:getPlayerById(1)
+        
+    local w,h = flower.getViewSize()    
+
     view = widget.UIView {
         scene = scene
-    } 
-    
-    -- BACKGROUND
-    mainBackground = Panel {
-        size = {scene:getWidth(),scene:getHeight()},
-        pos = {0, 0},
-        backgroundTexture = "minigames/assets/bg_main.png",        
-        parent = view,        
-    }
+    }     
     
     menuPrincipal = MenuPrincipalView {
+        size = {w-100,h-100},
         scene = scene
     }
+    menuPrincipal:addEventListener("comecar", menuPrincipal_onComecar) 
     menuPrincipal:addEventListener("loja", onLoja)
+    menuPrincipal:addEventListener("close", menuPrincipal_onClose)
+    
+    
+    playerInfo = AvatarInfoBox {        
+        scene = scene,
+        player = player
+    }
+   
     
     --loja = LojaView {
      --   scene = scene
@@ -62,8 +68,22 @@ function onResize(e)
   -- menuPrincipal:setSize(w,h)
 end
 
+function menuPrincipal_onComecar(e)
+    local quiz = flower.openScene("minigames/scenes/question_scene",{player = player})    
+end
+
+function menuPrincipal_onClose(e)
+    flower.closeScene()
+end
+
 function onLoja(e)
-    flower.openScene("minigames/scenes/loja_scene")
+    local loja = flower.openScene("minigames/scenes/loja_scene",{player = player})
+    loja:addEventListener("onClose",onCloseLoja)
+end
+
+function onCloseLoja()
+    playerInfo:updateDisplay()
+    repositry:savePlayer(1)
 end
 
 
@@ -71,13 +91,6 @@ function onCloseResult(e)
     quiz:nextQuestion()
 end
 
-function onSelectAnswer(e)
-    if e.data.target.correct then
-        flower.openScene("minigames/scenes/result_question_scene")       
-    else
-        
-    end
-end
 
 function onStopQuiz(e)
 end
