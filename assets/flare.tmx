@@ -108,9 +108,8 @@
     <property name="soundfx" value="soundfx/environment/open_fire_loop.ogg"/>
    </properties>
   </object>
-  <object name="quiz" type="MiniGame" x="416" y="224" width="64" height="32">
+  <object name="quiz" type="MiniGame" x="576" y="160" width="64" height="32">
    <properties>
-    <property name="intermap" value="brothers_lair_sacrifice_room.txt,9,41"/>
     <property name="size" value="2,1"/>
    </properties>
   </object>
@@ -123,8 +122,10 @@
  <objectgroup name="Enemy" width="30" height="50"/>
  <objectgroup name="Object" width="30" height="50">
   <object name="hugo" type="Player" gid="297" x="352" y="256"/>
-  <object name="Everton" type="Actor" gid="333" x="672" y="512">
+  <object name="Everton" type="Actor" gid="333" x="480" y="192">
    <properties>
+    <property name="actor_id" value="2"/>
+    <property name="minigame" value="quiz"/>
     <property name="route" value="21,15-21,16-21,17"/>
    </properties>
   </object>

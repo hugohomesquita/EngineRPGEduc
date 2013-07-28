@@ -253,8 +253,8 @@ M.TalkBox = TalkBox
 -- コンストラクタ
 -- @param params パラメータ
 function TalkBox:init(params)
-    self._actorA = params.actorA
-    self._actorB = params.actorB        
+    self._actor = params.actor
+    self._talk = params.talk        
     TalkBox.__super.init(self, params)
 end
 
@@ -266,9 +266,8 @@ function TalkBox:_createChildren()
     self._faceImage = FaceImage(2)
     self._faceImage:setPos(5, 5)
     self:addChild(self._faceImage)       
-    
-    self._talk = self._actorB:getTalkById(1)    
-    self._answer = self._talk.answer
+           
+    self._answer = self._talk.text
     
     self._msgBox = widget.TextBox {
         size = {self._faceImage:getWidth(), 100},
@@ -284,8 +283,8 @@ function TalkBox:_createChildren()
         parent = self,
         labelField = "label",
         listData = {self._talk.answers},        
-        onItemChanged = function(e)            
-            self:dispatchEvent("resposta",e)
+        onItemEnter = function(e)            
+            self:dispatchEvent("resposta",e.data)
         end
     }
     
@@ -299,19 +298,14 @@ function TalkBox:updateDisplay()
     self._responseListBox:setSize(width-10,height-110)
 end
 
-function TalkBox:newTalk()
-    local talk
-    return talk
-end
-
 ---
 -- 表示対象のアクターを設定します.
-function TalkBox:setActorA(actorA)
-    self._actorA = actorA   
+function TalkBox:setActor(actor)
+    self._actor = actor
 end
 
-function TalkBox:setActorB(actorB)
-    self._actorB = actorB   
+function TalkBox:setTalk(talk)
+    self._talk = talk   
 end
 
 

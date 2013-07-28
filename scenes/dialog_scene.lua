@@ -10,17 +10,13 @@ local TalkView = views.TalkView
 function onCreate(e)    
     
     talkView = TalkView {
-        actorA = e.data.actorA,
-        actorB = e.data.actorB,
+        actor = e.data.actor,
+        talk = e.data.talk,
         scene = scene,        
-    }
-    
-   -- menuControlView = MenuControlView {
-    --    scene = scene,
-    --}
-    --menuControlView:addEventListener("back", menuControlView_OnBack)
+    }  
+    talkView:addEventListener("back", talkView_OnBack)
 end
 
-function menuControlView_OnBack(e)    
-    flower.closeScene()
+function talkView_OnBack(e)       
+    flower.closeScene(e.data)
 end

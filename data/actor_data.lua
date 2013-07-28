@@ -16,8 +16,7 @@ return {
         equipSkills = {
             1,
             2,
-        },	
-		talks = {}	
+        },
     },
     {
         id = 2,
@@ -36,26 +35,6 @@ return {
         equipSkills = {
             3,
             4,
-        },
-		talks = {
-			{
-				id = 1,				
-				answer = "Como você está?",        
-				answers = {
-					{
-						id = 1,
-						label = "¦ Bem!",						
-					},
-					{
-						id = 2,				
-						label = "¦ Estou mal!",						
-					},
-					{
-						id = 2,				
-						label = "¦ Estou indo!",						
-					},
-				}				
-			}
-		}
+        }		
     }    
 }

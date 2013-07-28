@@ -10,15 +10,25 @@ local table = flower.table
 local Label = flower.Label
 local Panel = widget.Panel
 local Event = flower.Event
+
+
+local InputMgr = flower.InputMgr
+
+
+local Image = flower.Image
 local ImageButton = widget.ImageButton
+local NineImage = flower.NineImage
 local UIView = widget.UIView
+local Joystick = widget.Joystick
 local Button = widget.Button
+
+local ListBox = widget.ListBox
+local ListItem = widget.ListItem
+local TextBox = widget.TextBox
 
 -- classes
 local QuizQuestionView
 local MessageView
-
-
 --------------------------------------------------------------------------------
 -- @type QuizQuestionView
 -- 
@@ -31,162 +41,186 @@ M.QuizQuestionView = QuizQuestionView
 function QuizQuestionView:_createChildren()
     QuizQuestionView.__super._createChildren(self)       
     
-    local font = flower.getFont("minigames/assets/fonts/SHOWG.TTF", nil, 18)  
-    -- BACKGROUND
-    self._mainBackground = Panel {
-        size = {self:getWidth(),self:getHeight()},
-        pos = {0, 0},
-        backgroundTexture = "minigames/assets/bg_main2.png",        
-        parent = self,        
-    }    
-        
-    self._mainQuestionPanel = Panel {               
-        backgroundTexture = "minigames/assets/bg_msg.png",
+    self.mainPanel = Panel {
+        size = {flower.viewWidth - 100, flower.viewHeight - 100},
+        pos = {50,50},
         parent = self
-    }       
+    }
     
-    self.mainQuestion = Label("",nil,nil, font, 18)    
+    self.mainQuestionPanel = Panel {
+        size = {self.mainPanel:getWidth() - 20, 120},
+        pos = {self.mainPanel:getLeft() + 10, self.mainPanel:getTop() + 10},
+        parent = self
+    }
+                  
+    self.mainQuestion = Label("", self.mainPanel:getWidth() - 20, 120, nil, 18)
+    self.mainQuestion:setPos(self.mainQuestionPanel:getLeft() + 10, self.mainQuestionPanel:getTop() + 10)    
     self:addChild(self.mainQuestion)
     
     self.answerA = Button {
-        text = "",        
-        textColor = {1,1,1,1},
-        fontName = font,     
-        normalTexture = "minigames/assets/button-normal.png",
-        selectedTexture = "minigames/assets/button-selected.png",
+        text = "ALTERNATIVA A",
+        size = {self.mainQuestion:getWidth() / 2, 50},
+        pos = {self.mainPanel:getLeft() + 10, self.mainQuestionPanel:getBottom() + 5},
         onClick = function(e)
             self:dispatchEvent("selectAnswer", e)
         end,
-        parent = self
     }
+    self:addChild(self.answerA)
+    
     self.answerB = Button {
-        text = "",        
-        textColor = {1,1,1,1},
-        fontName = font,     
-        normalTexture = "minigames/assets/button-normal.png",
-        selectedTexture = "minigames/assets/button-selected.png",
+        text = "ALTERNATIVA B",
+        size = {self.mainQuestion:getWidth() / 2, 50},
+        pos = {self.mainPanel:getLeft() + 10, self.answerA:getBottom() + 5},
         onClick = function(e)
             self:dispatchEvent("selectAnswer", e)
         end,
-        parent = self
     }
+    self:addChild(self.answerB)    
+    
     self.answerC = Button {
-        text = "",        
-        textColor = {1,1,1,1},
-        fontName = font,     
-        normalTexture = "minigames/assets/button-normal.png",
-        selectedTexture = "minigames/assets/button-selected.png",
+        text = "ALTERNATIVA C",
+        size = {self.mainQuestion:getWidth() / 2, 50},
+        pos = {self.mainPanel:getLeft() + 10, self.answerB:getBottom() + 5},
         onClick = function(e)
             self:dispatchEvent("selectAnswer", e)
         end,
-        parent = self
     }
+    self:addChild(self.answerC)
+    
     self.answerD = Button {
-        text = "",
-        textColor = {1,1,1,1},
-        fontName = font,     
-        normalTexture = "minigames/assets/button-normal.png",
-        selectedTexture = "minigames/assets/button-selected.png",
+        text = "ALTERNATIVA D",
+        size = {self.mainQuestion:getWidth() / 2, 50},
+        pos = {self.mainPanel:getLeft() + 10, self.answerC:getBottom() + 5},
         onClick = function(e)
             self:dispatchEvent("selectAnswer", e)
         end,
+    }
+    self:addChild(self.answerD)
+    
+    --INFO THE PLAYER    
+    self.mainPlayerPanel = Panel {
+        size = {100, self.mainPanel:getHeight() - 140},
+        pos = {self.mainPanel:getRight() - 110, self.mainQuestion:getBottom() - 5},
         parent = self
     }
     
-    self._helpPanel = Panel {               
-        backgroundTexture = "minigames/assets/bg_msg.png",
-        parent = self
-    }  
+    avatar = flower.Image("avatars/avatar1.png", 100, 100)
+    avatar:setPos(self.mainPlayerPanel:getRight() - avatar:getWidth() - 5, self.mainPlayerPanel:getTop() + 5)
+    self:addChild(avatar)
     
-    self.ajuda = Label("AJUDA", nil, nil, font, 30)            
-    self:addChild(self.ajuda)
+    avatarNameLabel = Label("", avatar:getWidth(), 20, nil, 14)
+    avatarNameLabel:setPos(avatar:getLeft(), avatar:getBottom() + 5)
+    self:addChild(avatarNameLabel)
     
-    self.pular = Button {      
-      text = "0x PULAR",            
-      textColor = {1,1,1,1},
-      fontName = font,      
-      normalTexture = "minigames/assets/button-normal.png",
-      selectedTexture = "minigames/assets/button-selected.png",
-      onClick = function(e)
-          self:dispatchEvent("pular", e)
-      end,              
-      parent = self
-    }  
+    avatarLVLNameLabel = Label("LVL", 30, 17, nil, 13)
+    avatarLVLNameLabel:setPos(avatar:getLeft(), avatarNameLabel:getBottom())    
+    avatarLVLValueLabel = Label("0", 30, 17, nil, 13)
+    avatarLVLValueLabel:setPos(avatarLVLNameLabel:getRight(), avatarNameLabel:getBottom())
     
-   
-    self.verResposta = Button {      
-      text = "0x VER RESPOSTA",            
-      textColor = {1,1,1,1},
-      fontName = font,      
-      normalTexture = "minigames/assets/button-normal.png",
-      selectedTexture = "minigames/assets/button-selected.png",
-      onClick = function(e)
-          self:dispatchEvent("verResposta", e)
-      end,              
-      parent = self
-    } 
-       
+    self:addChild(avatarLVLNameLabel)
+    self:addChild(avatarLVLValueLabel)
+    
+    avatarEXPNameLabel = Label("EXP", 30, 17, nil, 13)
+    avatarEXPNameLabel:setPos(avatar:getLeft(), avatarLVLNameLabel:getBottom())    
+    avatarEXPValueLabel = Label("0", 30, 17, nil, 13)
+    avatarEXPValueLabel:setPos(avatarEXPNameLabel:getRight(), avatarLVLNameLabel:getBottom())
+    
+    self:addChild(avatarEXPNameLabel)
+    self:addChild(avatarEXPValueLabel)
+    
+    avatarCoinsNameLabel = Label("MOEDAS", 55, 17, nil, 13)
+    avatarCoinsNameLabel:setPos(avatar:getLeft(), avatarEXPNameLabel:getBottom())    
+    avatarCoinsValueLabel = Label("0", 50, 17, nil, 13)
+    avatarCoinsValueLabel:setPos(avatarCoinsNameLabel:getRight(), avatarEXPNameLabel:getBottom())
+    
+    self:addChild(avatarCoinsNameLabel)
+    self:addChild(avatarCoinsValueLabel)
+    
+    self.pular = Button {
+        text = "3x Pular",
+        size = {140, 50},
+        pos = {self.mainPanel:getLeft() + 10, self.answerD:getBottom() + 40},
+        onClick = function(e)
+            self:dispatchEvent("jump", e)
+        end,
+
+    }
+    self:addChild(self.pular)
+    
+    self.parar = Button {
+        text = "Parar",
+        size = {140, 50},
+        pos = {self.pular:getRight()+10, self.pular:getTop()},
+        onClick = function(e)
+            self:dispatchEvent("stop", e)
+        end,
+    }
+    self:addChild(self.parar)
+        
+        
+    pontosLabelParar = Label("Parar", 40, 17, nil, 13)
+    pontosLabelParar:setPos(self.mainPanel:getWidth() / 3 - 20, self.mainPanel:getBottom()-40)
+    self:addChild(pontosLabelParar)    
+    pontosValueParar = Label("1000", 40, 17, nil, 13)
+    pontosValueParar:setPos(pontosLabelParar:getLeft(), pontosLabelParar:getBottom()+2)
+    self:addChild(pontosValueParar)
+    
+    
+    -- PONTOS
+    pontosLabelErrar = Label("Errar", 40, 17, nil, 13)
+    pontosLabelErrar:setPos(pontosLabelParar:getLeft() - 80, pontosLabelParar:getTop())
+    self:addChild(pontosLabelErrar)    
+    pontosValueErrar = Label("500", 40, 17, nil, 13)
+    pontosValueErrar:setPos(pontosLabelErrar:getLeft(), pontosLabelErrar:getBottom()+2)
+    self:addChild(pontosValueErrar)
+    
+    
+    pontosLabelAcertar = Label("Acertar", 50, 17, nil, 13)
+    pontosLabelAcertar:setPos(pontosLabelParar:getRight() + 40, pontosLabelErrar:getTop())
+    self:addChild(pontosLabelAcertar)    
+    pontosValueAcertar = Label("2000", 50, 17, nil, 13)
+    pontosValueAcertar:setPos(pontosLabelAcertar:getLeft(), pontosLabelAcertar:getBottom()+2)
+    self:addChild(pontosValueAcertar)
     
     self.listQuestionsDisplayed = {}  
     self.totalQuestions = 0
     
-    self.questions = {}    
+    self.questions = {}
+    self:initQuestions()
 end
 
 function QuizQuestionView:updateDisplay()
-    QuizQuestionView.__super.updateDisplay(self)       
-    local xOffset,yOffset = 50,50
+    QuizQuestionView.__super.updateDisplay(self)
     
+    --UPDATE THE PLAYER INFO
     
-    self._mainBackground:setSize(self:getWidth(),self:getHeight())
-    self._mainBackground:setPos(xOffset,yOffset)                 
+    avatar:setTexture(self._player.texture)
+    avatar:setSize(100, 100)
+    avatarNameLabel:setString(self._player.name)
     
-    --D
-    self.answerD:setSize(self._mainBackground:getWidth() / 2, 40)
-    self.answerD:setPos(self._mainBackground:getLeft(),self._mainBackground:getBottom() - 45)
-    --C
-    self.answerC:setSize(self.answerD:getWidth(), 40)
-    self.answerC:setPos(self.answerD:getLeft(), self.answerD:getTop() - self.answerC:getHeight() - 5)
-    --B
-    self.answerB:setSize(self.answerD:getWidth(), 40)
-    self.answerB:setPos(self.answerD:getLeft(), self.answerC:getTop() - self.answerB:getHeight() - 5)
-    --A
-    self.answerA:setSize(self.answerD:getWidth(), 40)
-    self.answerA:setPos(self.answerD:getLeft(), self.answerB:getTop() - self.answerA:getHeight() - 5)
+    avatarLVLValueLabel:setString(tostring(self._player.level))
+    avatarEXPValueLabel:setString(tostring(self._player.exp))
+    avatarCoinsValueLabel:setString(tostring(self._player.coins))
     
-    self._mainQuestionPanel:setSize(self._mainBackground:getWidth()/2 + 50, self:getHeight() / 4)
-    self._mainQuestionPanel:setPos(self.answerD:getLeft(),self.answerA:getTop() - self._mainQuestionPanel:getHeight() - 10)
-    
-    --QUESTION VIEW
-    self.mainQuestion:setSize(self._mainBackground:getWidth()/2 + 40, self:getHeight() / 4)    
-    self.mainQuestion:setPos(self._mainQuestionPanel:getLeft() + 10, self._mainQuestionPanel:getTop() + 10)   
-    
-    -- HELP BOX
-    self._helpPanel:setSize(200,95)
-    self._helpPanel:setPos(self._mainBackground:getRight() - self._helpPanel:getWidth(), self.answerA:getTop())
-    
-    self.ajuda:setPos(self._helpPanel:getLeft() + (self.ajuda:getWidth()/2), self._helpPanel:getTop() - self.ajuda:getHeight())
-    --PULO        
-    self.pular:setSize(self._helpPanel:getWidth()-10, 40)
-    self.pular:setPos(self._helpPanel:getLeft() + 5, self._helpPanel:getTop() + 5)
-    local pular = string.format("%dX PULAR", self._playerData.pular)
-    self.pular:setText(pular)
-    --RESPOSTA    
-    self.verResposta:setSize(self._helpPanel:getWidth()-10, 40)
-    self.verResposta:setPos(self._helpPanel:getLeft() + 5, self.pular:getBottom() + 5)
-    local verResposta = string.format("%dX VER RESPOSTA", self._playerData.verResposta)
-    self.verResposta:setText(verResposta)   
-    
+    self:nextQuestion()
 end
+
+function QuizQuestionView:initQuestions()
+    self.questions = dofile('minigames/data/questoes.lua')    
+    self.totalQuestions = #self.questions    
+end
+
 
 function QuizQuestionView:nextQuestion()
     local idQuestion = 0
             
     if #self.listQuestionsDisplayed == self.totalQuestions then
         self:dispatchEvent("finnishQuestions")
-        return false
+        return
     end
-        
+
+    
+    
     local ok = true
     while ok do
         idQuestion = math.random(self.totalQuestions) 
@@ -211,16 +245,11 @@ function QuizQuestionView:nextQuestion()
     
     self.answerD:setText(self.questions[idQuestion].a4.value)
     self.answerD.correct = self.questions[idQuestion].a4.correct
-    return true       
+           
 end
 
-function QuizQuestionView:setPlayerData(playerData)
-    self._playerData = playerData
-end
-
-function QuizQuestionView:setQuestionsData(questionsData)
-    self.questions = questionsData    
-    self.totalQuestions = #self.questions     
+function QuizQuestionView:setPlayer(player)
+    self._player = player
 end
 
 --------------------------------------------------------------------------------
@@ -306,9 +335,8 @@ function MessageView:updateDisplay()
     self.mainPanel:setSize(self:getWidth() / 2, self:getHeight() / 2)
     self.mainPanel:setPos(self:getWidth() / 2 - self.mainPanel:getWidth()/2, self:getHeight() / 2 - self.mainPanel:getHeight()/2)
     
-    --self.msg:setSize(self.mainPanel:getWidth(),40)
-    
-    self.msg:setPos(self.mainPanel:getWidth()/2 , self.mainPanel:getHeight() - self.msg:getHeight()/2)
+    self.msg:setSize(self.mainPanel:getWidth(),40)
+    self.msg:setPos(self.mainPanel:getWidth()/2 , self.mainPanel:getHeight())
     self.msg:setAlignment(MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY)
             
     if self._type == "yesno" then                  
@@ -460,14 +488,18 @@ function LojaView:_createChildren()
         backgroundTexture = "minigames/assets/bg_main.png",        
         parent = self,        
     }    
-       
+    
+    self._lojaLabel = Label("LOJA", nil, nil, font, 20)        
+    self:addChild(self._lojaLabel)
+    
     self._meusItensLabel = Label("MEUS ITENS", nil, nil, font, 20)        
     self:addChild(self._meusItensLabel)
     
     self._pularContemPanel = Panel {      
       backgroundTexture = "minigames/assets/panel.png",                
       parent = self,            
-    }       
+    }   
+    self:addChild(self._pularContemPanel)
     
     self._pularContemLabel = Label("0X PULAR", nil, nil, font, 30)        
     self._pularContemLabel:setAlignment(MOAITextBox.CENTER_JUSTIFY, MOAITextBox.CENTER_JUSTIFY)
@@ -477,7 +509,8 @@ function LojaView:_createChildren()
     self._verRespostaContemPanel = Panel {      
       backgroundTexture = "minigames/assets/panel.png",                
       parent = self,            
-    }       
+    }   
+    self:addChild(self._verRespostaContemPanel)
     
     self._verRespostaContemLabel = Label("0X VER RESPOSTA", nil,nil, font, 30)        
     self._verRespostaContemLabel:setAlignment(MOAITextBox.CENTER_JUSTIFY, MOAITextBox.CENTER_JUSTIFY)
@@ -489,22 +522,24 @@ function LojaView:_createChildren()
     self._comprarPularButton = Button {                        
       normalTexture = "minigames/assets/compraPular-button-normal.png",
       selectedTexture = "minigames/assets/compraPular-button-selected.png",
-      textColor = {1,1,1,1},
       onClick = function(e)
           self:dispatchEvent("compraPular", e)
       end,      
       parent = self
-    }                
+    }        
+    self._comprarPularButton:setTextColor(1,1,1,1)    
+    self:addChild(self._comprarPularButton)
     
-    self._comprarVerRespostaButton = Button {                        
+    self._comprarVerRespostaButton = ImageButton {                        
       normalTexture = "minigames/assets/compraVerResposta-button-normal.png",
       selectedTexture = "minigames/assets/compraVerResposta-button-selected.png",
-      textColor = {1,1,1,1},
       onClick = function(e)
           self:dispatchEvent("compraVerResposta", e)
       end,      
       parent = self
-    }                 
+    }        
+    self._comprarVerRespostaButton:setTextColor(1,1,1,1)    
+    self:addChild(self._comprarVerRespostaButton)
     
     self._backButton = ImageButton {                        
       normalTexture = "minigames/assets/back.png",
@@ -513,7 +548,8 @@ function LojaView:_createChildren()
           self:dispatchEvent("back", e)
       end,      
       parent = self
-    }                  
+    }              
+    self:addChild(self._backButton)    
 end
 
 
@@ -523,42 +559,39 @@ function LojaView:updateDisplay()
     local xOffset,yOffset = 50, 50
     self._mainBackground:setSize(self:getWidth(),self:getHeight())
     self._mainBackground:setPos(xOffset,yOffset)
-            
-    -- BOTÃO COMPRA PULAR
-    self._comprarPularButton:setSize(200, self:getHeight() / 8)
-    self._comprarPularButton:setPos(self:getWidth() / 2 - 200 + xOffset, self._mainBackground:getBottom() - self._comprarPularButton:getHeight() - self:getHeight() / 8)
-        
-    -- BOTÃO COMPRA VER RESPOSTA    
-    self._comprarVerRespostaButton:setSize(self._comprarPularButton:getWidth(), self._comprarPularButton:getHeight())    
-    self._comprarVerRespostaButton:setPos(self._comprarPularButton:getRight() + 10, self._mainBackground:getBottom() - self._comprarVerRespostaButton:getHeight() - self:getHeight() / 8)
     
-    -- LABEL ITENS COMPRA
-    self._comprarItensLabel:setPos(self._comprarPularButton:getLeft(), self._comprarVerRespostaButton:getTop() - self._comprarItensLabel:getHeight())
-                      
+    self._lojaLabel:setPos(self:getWidth() / 2 - self._lojaLabel:getWidth() / 2 + xOffset, self:getHeight() / 2 - self._lojaLabel:getHeight() / 2 + yOffset)    
     
-    -- PANEL DE EXIBIÇÃO DOS PULOS
-    self._pularContemPanel:setSize(200, self:getHeight() / 8)
-    self._pularContemPanel:setPos(self:getWidth() / 2 - 200 + xOffset, self._comprarItensLabel:getTop() - self._pularContemPanel:getHeight() - 10)    
+    self._meusItensLabel:setPos(self:getWidth() / 2 - self._lojaLabel:getWidth() / 2 - 175 + xOffset, self:getHeight() / 2 - self._lojaLabel:getHeight() / 2 + 15 + yOffset)
     
-    local pular = string.format("%dX PULOS", self._playerData.pular)
+    self._pularContemPanel:setPos(self:getWidth() / 2 - 200 + xOffset, self._meusItensLabel:getBottom())
+    self._pularContemPanel:setSize(200, 60)
+                
+    local pular = string.format("%dX PULAR", self._playerData.pular)
     self._pularContemLabel:setString(pular)
     self._pularContemLabel:setPos(self._pularContemPanel:getLeft(), self._pularContemPanel:getTop())            
     self._pularContemLabel:setSize(self._pularContemPanel:getWidth(), self._pularContemPanel:getHeight())
-    self._pularContemLabel:setTextSize(self._pularContemPanel:getHeight() / 4)
+    self._pularContemLabel:setTextSize(self._pularContemPanel:getHeight()/4)
     
-    --  PANEL DE EXIBIÇÃO VER RESPOSTA
-    self._verRespostaContemPanel:setPos(self._pularContemPanel:getRight() + 10, self._pularContemPanel:getTop())
-    self._verRespostaContemPanel:setSize(200, self:getHeight() / 8)
+    
+    self._verRespostaContemPanel:setPos(self._pularContemPanel:getRight() + 10, self._meusItensLabel:getBottom())
+    self._verRespostaContemPanel:setSize(200, 60)
     
     local verResposta = string.format("%dX VER RESPOSTA", self._playerData.verResposta)
     self._verRespostaContemLabel:setString(verResposta)
 
     self._verRespostaContemLabel:setPos(self._verRespostaContemPanel:getLeft(), self._verRespostaContemPanel:getTop()) 
     self._verRespostaContemLabel:setSize(self._verRespostaContemPanel:getWidth(),self._verRespostaContemPanel:getHeight())
-    self._verRespostaContemLabel:setTextSize(self._verRespostaContemPanel:getHeight() / 4)
+    self._verRespostaContemLabel:setTextSize(self._verRespostaContemPanel:getHeight()/4)
     
-    -- LABEL MEUS ITENS
-    self._meusItensLabel:setPos(self._comprarPularButton:getLeft(), self._pularContemPanel:getTop() - self._meusItensLabel:getHeight())
+    
+    self._comprarItensLabel:setPos(self._meusItensLabel:getLeft(), self._pularContemPanel:getBottom() + 10)
+    
+    self._comprarPularButton:setSize(200, 60)
+    self._comprarPularButton:setPos(self._pularContemPanel:getLeft(),self._comprarItensLabel:getBottom())
+        
+    self._comprarVerRespostaButton:setPos(self._verRespostaContemPanel:getLeft(),self._comprarItensLabel:getBottom())
+    
     
     self._backButton:setPos(self._mainBackground:getLeft(),self._mainBackground:getBottom() - self._backButton:getHeight())
 end
@@ -568,6 +601,88 @@ function LojaView:setPlayerData(data)
     self._playerData = data
 end
 
+--------------------------------------------------------------------------------
+-- @type AvatarView
+-- 
+--------------------------------------------------------------------------------
+AvatarView = class(UIView)
+M.AvatarView = AvatarView
+
+function AvatarView:init(params)            
+    AvatarView.__super.init(self, params)    
+end
+
+function AvatarView:_createChildren()    
+    AvatarView.__super._createChildren(self)   
+    
+    local font = flower.getFont("minigames/assets/fonts/SHOWG.TTF", nil, 18)        
+    
+    self._mainPanel = Panel {      
+      backgroundTexture = "minigames/assets/panel.png",
+      size = {200, 100},
+      pos = {5, 5},      
+      parent = self,            
+    }       
+    self:addChild(self._mainPanel)
+       
+    self._avatarImage = flower.Image("avatars/avatar1.png", 80, 80)
+    self._avatarImage:setPos(self._mainPanel:getLeft() + 2, self._mainPanel:getTop() + 5)
+    self:addChild(self._avatarImage)   
+       
+    self._avatarName = Label("Hugo Mesquita", nil, nil, font, 14)
+    self._avatarName:setPos(self._avatarImage:getRight(), self._mainPanel:getTop() + 10)    
+    self:addChild(self._avatarName)
+    
+    self._avatarLVL = Label("LEVEL 10", nil, nil, font, 13)
+    self._avatarLVL:setPos(self._avatarImage:getRight(), self._avatarName:getBottom())    
+    
+    self._avatarXP = Label("XP 80/100", nil, nil, font, 13)
+    self._avatarXP:setPos(self._avatarImage:getRight(), self._avatarLVL:getBottom())
+    
+    self:addChild(self._avatarLVL)
+    self:addChild(self._avatarXP)       
+    
+    self._goldImage = flower.Image("minigames/assets/coins.png", 20, 20)
+    self._goldImage:setPos(self._avatarImage:getRight(), self._avatarXP:getBottom())
+    self:addChild(self._goldImage)
+    
+    self._avatarGOLD = Label("999999", nil, nil, font, 13)
+    self._avatarGOLD:setPos(self._goldImage:getRight() + 5, self._avatarXP:getBottom() + 3)    
+    self:addChild(self._avatarGOLD)
+       
+end
+
+function AvatarView:updateDisplay()
+    AvatarView.__super.updateDisplay(self)   
+    
+    local texture = self._player.actor.texture
+    self._avatarImage:setTexture(texture)
+    self._avatarImage:setSize(80,80)
+    
+    local gold = tostring(self._player.gold)    
+    self._avatarGOLD:setString(gold)
+    self._avatarGOLD:fitSize(#gold)
+    
+    local name = self._player.actor.name
+    self._avatarName:setString(name)
+    self._avatarName:fitSize(#name)    
+    
+    local level = string.format("LEVEL  %d", self._player.actor.level)
+    self._avatarLVL:setString(level)
+    self._avatarLVL:fitSize(#level)
+    
+    local xp = string.format("XP  %d/%d", self._player.actor.exp,(self._player.actor.level+1)*100)
+    self._avatarXP:setString(xp)
+    self._avatarXP:fitSize(#xp)
+end
+
+function AvatarView:setPlayer(player)
+    self._player = player
+end
+
+--------------------------------------------------------------------------------
+-- @type ActorDetailBox
+--------------------------------------------------------------------------------
 
 
 

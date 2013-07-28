@@ -11,10 +11,10 @@ local QuizQuestionView = views.QuizQuestionView
 
 
 local closeScene = false
-
+local result = nil
 
 --------------------------------------------------------------------------------
--- Event Handler
+-- Event Handler Scene
 --------------------------------------------------------------------------------
 
 function onCreate(e)  
@@ -40,27 +40,11 @@ function onCreate(e)
     }     
     
     quizQuestionView:addEventListener('selectAnswer', quizQuestionView_onSelectAnswer)        
+    quizQuestionView:addEventListener('finnishQuestions', quizQuestionView_onFinish)
     quizQuestionView:addEventListener('pular', quizQuestionView_onPular)
     quizQuestionView:addEventListener('verResposta', quizQuestionView_onVerResposta)
     quizQuestionView:nextQuestion()
     
-end
-
-function onStart(e)
-    
-end
- 
-
-function quizQuestionView_onSelectAnswer(e)
-    if e.data.target.correct then
-        questionNumber = questionNumber + 1
-        sceneResult = flower.openScene("minigames/scenes/message_view_scene",
-          {animation="overlay", message="PERGUNTA Nº ".. tostring(questionNumber) .." de ".. tostring(totalQuestions) ..""})
-        sceneResult:addEventListener('close', messageView_onClose)
-    else
-        sceneResult = flower.openScene("minigames/scenes/message_view_scene",{animation="overlay", message="VOCÊ ERROU!"})
-        closeScene = true     
-    end
 end
 
 function onUpdate(e)    
@@ -68,6 +52,33 @@ function onUpdate(e)
         flower.closeScene()
     end
     quizQuestionView:updateDisplay()
+end
+
+function onClose(e)
+    scene:dispatchEvent("closeQuiz", result)
+end 
+ 
+--------------------------------------------------------------------------------
+-- Event Handler Views
+--------------------------------------------------------------------------------
+ 
+function quizQuestionView_onSelectAnswer(e)
+    if e.data.target.correct then
+        if quizQuestionView:nextQuestion() then
+          questionNumber = questionNumber + 1
+          sceneResult = flower.openScene("minigames/scenes/message_view_scene",
+            {animation="overlay", message="PERGUNTA Nº ".. tostring(questionNumber) .." de ".. tostring(totalQuestions) ..""})          
+        end
+    else
+        sceneResult = flower.openScene("minigames/scenes/message_view_scene",{animation="overlay", message="VOCÊ ERROU!"})
+        closeScene = true     
+    end
+end
+
+function quizQuestionView_onFinish(e)
+    flower.openScene("minigames/scenes/message_view_scene",{animation="overlay", message="PARABÉNS VOCÊ CONSEGUIU!"})
+    closeScene = true
+    result = true
 end
 
 function quizQuestionView_onPular(e)
@@ -81,17 +92,5 @@ end
 
 function quizQuestionView_onVerResposta(e)
     
-end
-
-function messageView_onSim(e)
-    
-end
-
-function messageView_onNao(e)
-    closeScene = true
-end
-
-function messageView_onClose(e)  
-    quizQuestionView:nextQuestion()
 end
 

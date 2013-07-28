@@ -17,8 +17,11 @@ local repositry = entities.repositry
 local entityPool = entities.entityPool
 
 Resources.addResourceDirectory("assets/fonts")
+
+local closeScene = false
+local result = nil
 --------------------------------------------------------------------------------
--- Event Handler
+-- Event Handler Scene
 --------------------------------------------------------------------------------
 
 function onCreate(e)
@@ -27,10 +30,6 @@ function onCreate(e)
     player = repositry:getPlayerById(1)
         
     local w,h = flower.getViewSize()    
-
-    view = widget.UIView {
-        scene = scene
-    }     
     
     menuPrincipal = MenuPrincipalView {
         size = {w-100,h-100},
@@ -46,39 +45,54 @@ function onCreate(e)
         player = player
     }
    
-    
-    --loja = LojaView {
-     --   scene = scene
-    --}    
-   --[[ quiz = QuizQuestionView {
-        player = actor,
-        scene = scene,        
-    }               
-    quiz:addEventListener("stop",onStopQuiz)
-    quiz:addEventListener("jump",onJumpQuestion)
-    quiz:addEventListener("finnishQuestions",onFinnishQuestions)
-    quiz:addEventListener("closeResult",onCloseResult)]]
 end
 
 function onResize(e)
    local w,h = flower.getViewSize()
    scene:setSize(w,h)
    
-   mainBackground:setSize(w,h)
-  -- menuPrincipal:setSize(w,h)
+   mainBackground:setSize(w,h)  
 end
 
+function onUpdate()
+    if closeScene then
+        local var = true
+        flower.closeScene()
+    end
+end
+
+function onClose(e)
+    scene:dispatchEvent("closeMinigame", result)
+end
+
+
+--------------------------------------------------------------------------------
+-- Event Handler Views
+--------------------------------------------------------------------------------
+
+--
+--  MENU DO QUIZ
+--
 function menuPrincipal_onComecar(e)
     local quiz = flower.openScene("minigames/scenes/question_scene",{player = player})    
+    quiz:addEventListener("closeQuiz", quiz_onClose)
 end
 
 function menuPrincipal_onClose(e)
-    flower.closeScene()
+    closeScene = true
 end
 
+function quiz_onClose(e)  
+    result = e.data          
+    closeScene = true
+end
+
+--
+--  MENU DA LOJA
+--
 function onLoja(e)
     local loja = flower.openScene("minigames/scenes/loja_scene",{player = player})
-    loja:addEventListener("onClose",onCloseLoja)
+    loja:addEventListener("close", onCloseLoja)
 end
 
 function onCloseLoja()
@@ -87,22 +101,3 @@ function onCloseLoja()
 end
 
 
-function onCloseResult(e)
-    quiz:nextQuestion()
-end
-
-
-function onStopQuiz(e)
-end
-
-function onJumpQuestion(e)
-end
-
-function onFinnishQuestions(e)
-    
-end  
-
-
-function onClose(e)
-      
-end

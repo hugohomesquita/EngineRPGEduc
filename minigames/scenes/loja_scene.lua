@@ -10,7 +10,7 @@ local LojaView = views.LojaView
 local AvatarInfoBox = widgets.AvatarInfoBox
 
 --------------------------------------------------------------------------------
--- Event Handler
+-- Event Handler Scene
 --------------------------------------------------------------------------------
 
 function onCreate(e)
@@ -19,10 +19,7 @@ function onCreate(e)
     local dataMiniGame = QuizData()    
     playerData = dataMiniGame:getDataByPlayerId(player.id)
     
-    local w,h = flower.getViewSize()    
-    view = widget.UIView {
-        scene = scene
-    }     
+    local w,h = flower.getViewSize() 
                   
     lojaView = LojaView{
          size = {w-100,h-100},
@@ -40,9 +37,13 @@ function onCreate(e)
                   
 end
 
-function onStart(e)
-  
+function onClose(e)
+      
 end
+
+--------------------------------------------------------------------------------
+-- Event Handler Views
+--------------------------------------------------------------------------------
 
 function lojaView_onCompraPular(e)
     if player.gold >= 1000 then
@@ -66,11 +67,8 @@ function lojaView_onCompraVerResposta(e)
     playerInfo:updateDisplay()
 end
 
-function lojaView_onBack(e)
-    scene:dispatchEvent("onClose")
+function lojaView_onBack(e)    
     flower.closeScene()
 end
 
-function onClose(e)
-      
-end
+

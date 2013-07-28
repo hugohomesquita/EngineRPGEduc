@@ -1,18 +1,28 @@
 return {
-    {
-        id = 1,
-		actor = 2,
-        answer = "Como você está?",        
+	{
+		id = 1,				
+		text = "Para passar aqui você precisa me responder algumas perguntas! Deseja responder?",
+		type = "minigame",
 		answers = {
 			{
 				id = 1,
-				text = "Bem!"
+				label = "¦ Sim!",						
 			},
 			{
 				id = 2,				
-				text = "Estou mal!"
-			},
+				label = "¦ Não!",						
+			},					
 		},
-		answered = 0
-    },
+		actions = {
+			{
+				answer_id = 1,
+				action = "minigame"
+			},
+			{
+				answer_id = 2,
+				action = ""
+			}
+		}
+			
+	}
 }

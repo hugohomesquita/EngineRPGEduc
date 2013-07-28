@@ -109,7 +109,7 @@ function EntityPool:initEntities()
     self.teams = self:createEntities(Team, dofile("data/team_data.lua"))
     self.bagItems = self:createEntities(BagItem, dofile("data/bag_data.lua"))
     self.players = self:createEntities(Player, dofile("data/player_data.lua"))
-    --self.talk = self:createEntities(Talk, dofile("data/talk_data.lua"))
+    self.talks = self:createEntities(Talk, dofile("data/talk_data.lua"))
     self.bag = Bag(self.bagItems)
 end
 
@@ -179,6 +179,10 @@ end
 -- @return アクター
 function EntityRepositry:getActorById(id)
     return self:getEntityById(entityPool.actors, id)
+end
+
+function EntityRepositry:getTalkById(id)
+    return self:getEntityById(entityPool.talks, id)
 end
 
 ---
@@ -619,13 +623,20 @@ M.Talk = Talk
 function Talk:init()    
     self.id = 0
     self.actor = 0 
-    self.answer = nil    
-    self.answers = {}     
+    self.type = nil
+    self.text = nil    
+    self.answers = {}
+    self.actions = {}
 end
 
-
-
-
+function Talk:getActionByIdAnswer(id)
+    for i, action in ipairs(self.actions) do
+        if action.answer_id == id then
+            return action 
+        end
+    end
+end  
+  
 --------------------------------------------------------------------------------
 -- @type Actor
 -- アクターを表すエンティティです.
@@ -660,8 +671,7 @@ function Actor:init()
     self.int = 0    
     self.spd = 0
     self.equipItems = {}
-    self.equipSkills = {}
-    self.talks = {}
+    self.equipSkills = {}    
     self.statusStates = {}
 end
 
@@ -686,12 +696,7 @@ function Actor:loadData(data)
         local skill = assert(repositry:getSkillById(skillId), "Not Found Skill", skillId)
         self.equipSkills[i] = skill
     end
-    
-    if data.talks then
-      for i, talk in ipairs(data.talks) do                      
-          table.insertElement(self.talks, talk)
-      end
-    end
+        
 end
 
 function Actor:saveData()
@@ -705,17 +710,6 @@ function Actor:saveData()
     data.statusStates = {}
     return data
 end
-
----
--- 
-function Actor:getTalkById(id)    
-    for i, talk in ipairs(self.talks) do
-        if talk.id == id then
-            return talk
-        end
-    end    
-end
-
 
 ---
 -- 武器を装備します.

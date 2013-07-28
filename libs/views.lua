@@ -284,8 +284,8 @@ TalkView = class(UIView)
 M.TalkView = TalkView
 
 function TalkView:init(params)
-    self._actorA = params.actorA    
-    self._actorB = params.actorB
+    self._actor = assert(params.actor)    
+    self._talk = assert(params.talk)
     
     TalkView.__super.init(self, params)
 end
@@ -296,31 +296,29 @@ function TalkView:_createChildren()
     TalkView.__super._createChildren(self)
        
     self.talkBox = TalkBox {
-        actorA = self._actorA,
-        actorB = self._actorB,
+        actor = self._actor,
+        talk = self._talk,
         parent = self,        
         size = {self:getWidth()/2,180},
         pos = {self:getWidth()/2-200, self:getHeight()/2-130},        
     }    
     
-    self.talkBox:addEventListener("resposta", self.onResposta, self)
-    self.talkBox:addEventListener(Event.TOUCH_DOWN, self.onTouchDown, self)     
+    self.talkBox:addEventListener("resposta", self.onResposta, self)       
 end
 
-function TalkView:onResposta(e)
-    print('respondeu')
+function TalkView:onResposta(e)    
+    e.data.talk = self._talk
+    e.data.actor = self._actor
+    self.talkBox:setVisible(false)
+    self:dispatchEvent("close", e.data)    
 end
 
-function TalkView:onTouchDown(e)
-    self:dispatchEvent("back", e.data)
+function TalkView:setActor(actor)
+    self._actor = actor
 end
 
-function TalkView:setActorA(actorA)
-    self._actorA = actorA
-end
-
-function TalkView:setActorB(actorB)
-    self._actorB = actorB
+function TalkView:setTalk(talk)
+    self._talk = talk
 end
 
 

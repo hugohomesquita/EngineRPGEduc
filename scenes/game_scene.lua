@@ -6,6 +6,9 @@ local entities = require "libs/entities"
 local repositry = entities.repositry
 
 local MapControlView = views.MapControlView
+
+local TalkView = views.TalkView
+
 local AvatarInfoBox = widgets.AvatarInfoBox
 local BalloonEffect = effects.BalloonEffect
 
@@ -14,7 +17,7 @@ local RPGMap = rpgmap.RPGMap
 local mapPlayerInfo = nil
 local rpgMap = nil
 local worldFreeze  = false
-
+colidindo = false
 local fpsMonitor = FpsMonitor(1)
 
 function onCreate(e)           
@@ -23,7 +26,7 @@ function onCreate(e)
     rpgMap = RPGMap()
     rpgMap:setScene(scene)
     rpgMap:addEventListener("talk",onTalk)    
-    rpgMap:addEventListener("minigame",onMinigame)
+    --rpgMap:addEventListener("minigame",onMinigame)
     
     loadRPGMap("assets/flare.lue")    
     
@@ -68,7 +71,7 @@ function onResize(e)
    RPGMapControlView:updateLayout()
 end
 
-colidindo = false
+
 --EVENTOS DO RPGMap
 
 function onEnter(e)
@@ -76,38 +79,34 @@ function onEnter(e)
     effect:play(playerObject)    
 end
 
+function onTalk(e)    
+    local actor = e.data
+    local id = tonumber(actor:getProperty('actor_id')) 
+    
+    talkView = TalkView {
+        actor = repositry:getActorById(id),
+        talk = repositry:getTalkById(1),
+        scene = scene,        
+    }           
+    talkView:addEventListener("close", talkView_onClose)
+end
 
-function onTalk(e)
+function talkView_onClose(e)
+    talkView:setVisible(false)
+    local actions = e.data.talk:getActionByIdAnswer(e.data.id)        
+    if actions.action == "minigame" then
+        openMinigame('quiz')
+    end      
+end
+
+function openMinigame(nameMinigame)
     stopWorld()
-    flower.openScene(scenes.DIALOG, {animation = "overlay",actorA = repositry:getActorById(1),actorB= repositry:getActorById(2)})
+    MINIGAME = flower.openScene("minigames/"..nameMinigame , {animation = "overlay"})   
+    MINIGAME:addEventListener("closeMinigame", onCloseMiniGame)
 end
 
-function onMinigame(e)
-  --print(e.data.name)
-  stopWorld()
-  clase = require "minigames/quiz"
-  MINIGAME = flower.openScene("minigames/quiz", {animation = "overlay"})   
-  MINIGAME:addEventListener("onClose",onCloseMiniGame)   
-end
 function onCloseMiniGame(e)    
-    --USER_DATA.xp = USER_DATA.xp + e.data.XP
     startWorld()         
-end
-
-function onCollisionBegin(e)  
-   
-  if e.data.type == 'teleport' and not colidindo then
-      local toMap = e.data:getProperty('ToMap')
-      local ToMapHotSpot = e.data:getProperty('ToMapHotSpot')
-      if toMap and toMpa ~= MAPA:getProperty('name')  and ToMapHotSpot then
-        colidindo = true
-        changeMap(toMap,ToMapHotSpot)
-      end
-  end
-  if e.data.type == 'on_load' then
-      USER_DATA.xp = USER_DATA.xp + 20
-  end
-  
 end
 
 function updateHUD()
@@ -152,9 +151,9 @@ function onUpdate(e)
   end
        
   if not worldFreeze then
-    updateMap()
-    updatePlayer()  
-    updateHUD()
+      updateMap()
+      updatePlayer()  
+      updateHUD()
   end
 end
 

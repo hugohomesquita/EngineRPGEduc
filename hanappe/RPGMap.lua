@@ -130,7 +130,7 @@ function RPGMap:onLoadedData(e)
     self.playerObject = assert(self.objectLayer:findObjectByName("hugo"))
     self.collisionLayer = assert(self:findMapLayerByName("MapCollision"))
     self.eventLayer = assert(self:findMapLayerByName("Event"))
-    self.mapBackgroundLayer = assert(self:findMapLayerByName("MapBackground"))
+    self.backgroundLayer = assert(self:findMapLayerByName("MapBackground"))
     
     if self.collisionLayer then
         self.collisionLayer:setVisible(false)
@@ -141,7 +141,7 @@ function RPGMap:onLoadedData(e)
       self:createPhysicsEvent()
     end  
     
-    self.mapBackgroundLayer:setPriority(1)  
+    self.backgroundLayer:setPriority(1)  
    
     --self:setInvisibleLayerByName("MapBackground")
     --self:setInvisibleLayerByName("MapObject")
@@ -448,14 +448,13 @@ function ActorController:init(mapObject)
     --self.mapObject:setIsoPos(320,224)
     self.move = true
     self.currentMove = "north"
-    self.nextMove = "south"    
-    --self.ia = true
+    self.nextMove = "south"        
 end
 
 function ActorController:initController()
     local object = self.mapObject
     if object.renderer then
-        object.renderer:setPos(-48,-76)        
+        object.renderer:setPos(-48,-108)        
         object.renderer:setAnimDatas(ActorController.ANIM_DATA_LIST)
         object:setDirection(object:getDirectionByIndex())
     end
@@ -489,10 +488,6 @@ function ActorController:initPhysics()
     object.physics.body:resetMassData()     
 end
 
-function ActorController:onUpdate()
-    --self.mapObject:setPriority(self:vertexZ())
-end  
-
 ----------------------------------------------------------------------------------------------------
 -- @type PlayerController
 -- 
@@ -504,10 +499,6 @@ function PlayerController:initController()
     self.player = repositry:getPlayerById(1)
     self.entity = self.player.actor
 end
-
-function PlayerController:onUpdate()
-    
-end 
 
 ----------------------------------------------------------------------------------------------------
 -- @type MapObject
