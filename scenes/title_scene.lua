@@ -18,9 +18,9 @@ local titleMenuView
 -- Event Handler
 --------------------------------------------------------------------------------
 
-function onCreate(e)
+function onCreate(e)    
     titleMenuView = TitleMenuView {
-        scene = scene,
+        scene = scene,        
     }
     
     titleMenuView:addEventListener("newGame", onNewGame)
@@ -31,7 +31,7 @@ end
 function onNewGame(e)
     flower.gotoScene(scenes.LOADING, {
         animation = "fade",
-        nextSceneName = scenes.MAP,
+        nextSceneName = scenes.NEW_GAME,
         nextSceneParams = {animation = "fade"},
     })
 end

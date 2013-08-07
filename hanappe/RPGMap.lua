@@ -454,7 +454,7 @@ end
 function ActorController:initController()
     local object = self.mapObject
     if object.renderer then
-        object.renderer:setPos(-48,-108)        
+        object.renderer:setPos(-48,-76)        
         object.renderer:setAnimDatas(ActorController.ANIM_DATA_LIST)
         object:setDirection(object:getDirectionByIndex())
     end
@@ -467,19 +467,20 @@ end
 function ActorController:initPhysics()
     local object = self.mapObject
     local poly = {
-        0, -16,
-        32, 0,
-        0, 16,
-        -32, 0,
+        0, -10,
+        20, 0,
+        0, 10,
+        -20, 0,
     } 
+    
     object.physics.body = object.tileMap.world:addBody(MOAIBox2DBody.DYNAMIC)
     object.physics.body.object = object
     object.renderer:setParent(object.physics.body,"notAttr")
     
-    local x,y = object:getPos()
+    local x,y = object:getPos()    
     local width, height = object.renderer:getSize()   
     
-    object.physics.body:setTransform(x, y)
+    object.physics.body:setTransform(x, y - 32)
     object.physics.fixture = object.physics.body:addPolygon(poly)
     object.physics.fixture:setDensity(0)
     object.physics.fixture:setFriction(0)

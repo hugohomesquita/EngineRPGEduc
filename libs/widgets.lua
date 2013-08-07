@@ -578,15 +578,15 @@ function AvatarInfoBox:updateDisplay()
     self._avatarGOLD:setString(gold)
     self._avatarGOLD:fitSize(#gold)
     
-    local name = self._player.actor.name
+    local name = self._player.name
     self._avatarName:setString(name)
     self._avatarName:fitSize(#name)    
     
-    local level = string.format("LEVEL  %d", self._player.actor.level)
+    local level = string.format("LEVEL  %d", self._player.level)
     self._avatarLVL:setString(level)
     self._avatarLVL:fitSize(#level)
     
-    local xp = string.format("XP  %d/%d", self._player.actor.exp,(self._player.actor.level+1)*100)
+    local xp = string.format("XP  %d/%d", self._player.exp,(self._player.level+1)*100)
     self._avatarXP:setString(xp)
     self._avatarXP:fitSize(#xp)
 end

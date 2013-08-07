@@ -15,7 +15,7 @@ end
 function onStart(e)
     --preloadFontTextures()
     
-    flower.gotoScene(scenes.MAP)
+    flower.gotoScene(scenes.NEW_GAME)
 end
 
 

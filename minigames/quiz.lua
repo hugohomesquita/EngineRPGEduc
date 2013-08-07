@@ -96,8 +96,7 @@ function onLoja(e)
 end
 
 function onCloseLoja()
-    playerInfo:updateDisplay()
-    repositry:savePlayer(1)
+    playerInfo:updateDisplay()    
 end
 
 

@@ -1,5 +1,7 @@
 ----------------------------------------------------------------------------------------------------
--- ゲームのエンティティを定義するモジュールです.
+-- Módulo que define as entidades da plataforma.
+--
+--
 ----------------------------------------------------------------------------------------------------
 
 -- module
@@ -7,7 +9,6 @@ local M = {}
 
 -- import
 local flower = require "hanappe/flower"
---local logger = require "libs/logger"
 local class = flower.class
 local table = flower.table
 local EventDispatcher = flower.EventDispatcher
@@ -19,18 +20,10 @@ local EntityRepositry
 local EntityWorld
 local EntitySystem
 
-local Skill
-local Item
-local ItemType
-local Effect
-local Menu
-local Message
 local Actor
 local Player
-local Enemy
-local Team
-local Bag
-local BagItem
+local Skill
+local Effect
 local Talk
 
 -- variables
@@ -39,18 +32,20 @@ local repositry
 local world
 
 ---
--- モジュールの初期化処理を行います.
+-- 
 function M.initialize()
     repositry = EntityRepositry()
     entityPool = EntityPool()
     entityPool:initEntities()
 
-    M.repositry = repositry
+    M.repositry = repositry    
+    --VERIFICAR
+    M.entityPool = entityPool
 end
 
 --------------------------------------------------------------------------------
 -- @type Entity
--- エンティティの共通的な振る舞いを定義するクラスです.
+-- Classe que define uma entidade.
 --------------------------------------------------------------------------------
 Entity = class(EventDispatcher)
 M.Entity = Entity
@@ -69,7 +64,7 @@ end
 ---
 -- エンティティからデータにプロパティを保存します.
 -- デフォルト実装は単なるコピーです.
-function Entity:saveData()
+function Entity:saveData()    
     local data = table.copy(self)
     data.__index = nil
     data.__class = nil
@@ -87,51 +82,46 @@ end
 
 --------------------------------------------------------------------------------
 -- @type EntityPool
--- エンティティをメモリ上にプールする為のクラスです.
+-- 
 --------------------------------------------------------------------------------
 EntityPool = class()
 M.EntityPool = EntityPool
 
 ---
--- コンストラクタ
+-- 
 function EntityPool:init()
 end
 
 ---
--- エンティティを初期化します.
+-- Inicializa as Entidades
 function EntityPool:initEntities()
-    self.skills = self:createEntities(Skill, dofile("data/skill_data.lua"))
-    self.items = self:createEntities(Item, dofile("data/item_data.lua"))
-    self.effects = self:createEntities(Effect, dofile("data/effect_data.lua"))
-    self.menus = self:createEntities(Menu, dofile("data/menu_data.lua"))
-    self.actors = self:createEntities(Actor, dofile("data/actor_data.lua"))
-    self.enemies = self:createEntities(Enemy, dofile("data/enemy_data.lua"))
-    self.teams = self:createEntities(Team, dofile("data/team_data.lua"))
-    self.bagItems = self:createEntities(BagItem, dofile("data/bag_data.lua"))
+    self.skills = self:createEntities(Skill, dofile("data/skill_data.lua"))    
+    self.effects = self:createEntities(Effect, dofile("data/effect_data.lua"))    
+    self.actors = self:createEntities(Actor, dofile("data/actor_data.lua"))        
     self.players = self:createEntities(Player, dofile("data/player_data.lua"))
-    self.talks = self:createEntities(Talk, dofile("data/talk_data.lua"))
-    self.bag = Bag(self.bagItems)
+    self.talks = self:createEntities(Talk, dofile("data/talk_data.lua"))    
 end
 
 ---
--- セーブしていたエンティティを読み込みます.
+-- Carrega as entidades salvas para a memória
 function EntityPool:loadEntities(saveId)
-    self.actors = self:createEntities(Actor, dofile("save" .. saveId .. "/actor_data.lua"))
-    self.teams = self:createEntities(Actor, dofile("save" .. saveId .. "/team_data.lua"))
-    self.bagItems = self:createEntities(Actor, dofile("save" .. saveId .. "/bag_data.lua"))
-    self.bag = Bag(self.bagItems)
+    self.actors = self:createEntities(Actor, dofile("save" .. saveId .. "/actor_data.lua"))    
 end
 
 ---
--- メモリ上のエンティティを保存します.
+-- Salva as entidades da memória.
 function EntityPool:saveEntities(saveId)
-    
+    local actors = {}
+    for i, actor in pairs(entityPool.actors) do        
+        table.insertElement(actors, actor:saveData())                
+    end
+    self:saveEntity(actors, "saves/profile_".. tostring(saveId) .."_actor_data.lua")               
 end
 
 ---
--- 指定したエンティティクラスを作成してデータをロードして返します.
--- @param clazz エンティティのクラス
--- @param entityDataList エンティティデータリスト
+-- Criação de classes de entidade que você especificar.
+-- @param clazz Classe da entidade
+-- @param entityDataList Lista de dados da entidade
 function EntityPool:createEntities(clazz, entityDataList)
     local entities = {}
     for i, data in ipairs(entityDataList) do
@@ -142,21 +132,90 @@ function EntityPool:createEntities(clazz, entityDataList)
     return entities
 end
 
+function EntityPool:saveEntity(entityList, path)    
+    local file = io.open(path, 'wb')
+    file:write("return {\n")
+    for i, entity in pairs(entityList) do
+        self:save(entity, file)
+    end
+    file:write("\n}")
+    file:close()
+end
+
+function EntityPool:save(table, file)
+    local type = type
+    local tostring = tostring
+    
+    local function thatkey(k)
+      if type(k)=="number" then
+        return ""
+      end
+      return k 
+    end
+    
+    local function key_number(k,v)
+      if type(k)=="number" then
+        return "\t"
+      end
+      return "\t[\"" .. k .. "\"] = "
+    end 
+    
+    local function saveTable(name,_table)      
+        file:write("\t" .. name .. " = ")
+        
+        file:write("{")
+        for i, v in pairs(_table) do        
+          local the_type = type(v) 
+          local old_i = i       
+          local i = thatkey(i)
+          local i_string = key_number(old_i, v)
+          
+          if the_type == "string" then
+              file:write(" " .. i  .. string.format("%q",v))
+          elseif the_type == "number" then 
+              file:write(" " .. i  .. tostring(v))
+          elseif the_type == "table" then
+              saveTable(i, v)
+          end
+          if next(_table, old_i) then file:write(",") else file:write("") end
+        end      
+        file:write(" }")
+    end
+        
+    file:write("{\n")
+    for i, v in pairs(table) do
+        local the_type = type(v)
+        local old_i = i        
+        local i_string = key_number(old_i,v)
+        
+        if the_type == "string" then
+            file:write("\t" .. i .. " = " .. string.format("%q",v))
+        elseif the_type == "number" then 
+            file:write("\t" .. i .. " = " .. tostring(v))
+        elseif the_type == "table" then
+            saveTable(i, v)
+        end
+        if next(table, old_i) then file:write(",\n") else file:write("") end
+    end
+    file:write("\t\n},\n")
+    
+end
+
 --------------------------------------------------------------------------------
 -- @type EntityRepositry
--- エンティティにアクセスするリポジトリクラスです.
+-- A classe responsável por acessar as entidades.
 --------------------------------------------------------------------------------
 EntityRepositry = class()
 M.EntityRepositry = EntityRepositry
 
 ---
--- コンストラクタです.
+-- Construtor.
 function EntityRepositry:init()
 end
 
 ---
--- 指定したエンティティリストについて、IDが一致するエンティティを返します.
--- @return IDが一致するエンティティ
+-- Retorna a entidade na lista pelo ID.
+-- @return Entidade pelo id
 function EntityRepositry:getEntityById(entities, id)
     assert(entities)
     assert(id)
@@ -168,15 +227,15 @@ function EntityRepositry:getEntityById(entities, id)
 end
 
 ---
--- 全てのアクターリストを返します.
--- @return アクターリスト
+-- Retorna uma lista de todos os atores.
+-- @return Lista de Atores
 function EntityRepositry:getActors()
     return entityPool.actors
 end
 
 ---
--- 指定したIDに一致するアクターを返します.
--- @return アクター
+-- Retorna um actor pelo ID.
+-- @return Ator
 function EntityRepositry:getActorById(id)
     return self:getEntityById(entityPool.actors, id)
 end
@@ -186,16 +245,8 @@ function EntityRepositry:getTalkById(id)
 end
 
 ---
--- プレイヤーのチームに登録されたメンバーリストを返します.
--- @param メンバーリスト
-function EntityRepositry:getMembers()
-    local team = self:getEntityById(entityPool.teams, 1)
-    return team.members
-end
-
----
--- プレイヤーを返します.
--- TODO:適当なので修正が必要
+-- 
+-- 
 function EntityRepositry:getPlayers()
     return entityPool.players
 end
@@ -204,266 +255,51 @@ function EntityRepositry:getPlayerById(id)
     return self:getEntityById(entityPool.players, id)
 end
 
-function EntityRepositry:savePlayer(player)
-    local actors = {}
-    for i, actor in ipairs(entityPool.actors) do
-        table.insertElement(actors, actor:saveData())
-    end
-    
-   
-    file = io.open ( "teste.lua", 'wb' )
-    --player = self:getPlayerById(1)
-    --self:savee("return",actors)
-    self:save(entityPool.players,"teste.lua")
-end
-
-function EntityRepositry:savee(name,object)
-  local type=type
-	local tostring=tostring
-	
-	file:write(name.."\t{" .. "\n")
-
-  local function thatkey(k)
-		if type(k)=="number" then		
-			return ''
-		end
-		return k
-	end
-	local function key_number(k,v)
-		if type(k)=="number" then
-			return "\t"
-		end
-		return "\t[\"" .. k .. "\"] = "
-	end 
-
-	for k,v in pairs(object) do  
-      
-      local the_type = type(v)      
-      local old_k = k
-      local k = thatkey(k)
-      local k_string = key_number(old_k,v)
-      
-      if the_type == "string" then
-          file:write(v)
-      elseif the_type == "table" then
-          self:savee(k, v, "\t")    
-      elseif the_type == "number" then
-          file:write('\t' .. k ..' = ' .. tostring(v))
-      end
-      
-      
-      if next(object,old_k) then file:write(",\n") else file:write("") end
-      
-	end
-	
-	file:write("\t\n".."}")
-end
-
-function exportstring( s )
-      return string.format("%q", s)
-end
-function EntityRepositry:save(tbl,filename)
-   local charS,charE = "   ","\n"
-      local file,err = io.open( filename, "wb" )
-      if err then return err end
-
-      -- initiate variables for save procedure
-      local tables,lookup = { tbl },{ [tbl] = 1 }
-      file:write( "return {"..charE )
-
-      for idx,t in ipairs( tables ) do
-         file:write( "-- Table: {"..idx.."}"..charE )
-         file:write( "{"..charE )
-         local thandled = {}
-
-         for i,v in ipairs( t ) do
-            thandled[i] = true
-            local stype = type( v )
-            -- only handle value
-            if stype == "table" then
-               if not lookup[v] then
-                  table.insert( tables, v )
-                  lookup[v] = #tables
-               end
-               file:write( charS.."{"..lookup[v].."},"..charE )
-            elseif stype == "string" then
-               file:write(  charS..exportstring( v )..","..charE )
-            elseif stype == "number" then
-               file:write(  charS..tostring( v )..","..charE )
-            end
-         end
-
-         for i,v in pairs( t ) do
-            -- escape handled values
-            if (not thandled[i]) then
-            
-               local str = ""
-               local stype = type( i )
-               -- handle index
-               if stype == "table" then
-                  if not lookup[i] then
-                     table.insert( tables,i )
-                     lookup[i] = #tables
-                  end
-                  str = charS.."[{"..lookup[i].."}]="
-               elseif stype == "string" then
-                  str = charS.."["..exportstring( i ).."]="
-               elseif stype == "number" then
-                  str = charS.."["..tostring( i ).."]="
-               end
-            
-               if str ~= "" then
-                  stype = type( v )
-                  -- handle value
-                  if stype == "table" then
-                     if not lookup[v] then
-                        table.insert( tables,v )
-                        lookup[v] = #tables
-                     end
-                     file:write( str.."{"..lookup[v].."},"..charE )
-                  elseif stype == "string" then
-                     file:write( str..exportstring( v )..","..charE )
-                  elseif stype == "number" then
-                     file:write( str..tostring( v )..","..charE )
-                  end
-               end
-            end
-         end
-         file:write( "},"..charE )
-      end
-      file:write( "}" )
-      file:close()
+function EntityRepositry:savePlayerById(id, saveId)
+    local player = self:getEntityById(entityPool.players, id)
+    local entities = {}        
+    table.insertElement(entities,player:saveData())
+    entityPool:saveEntity(entities, "saves/profile_".. tostring(saveId) .."_player_data.lua")
 end
 
 ---
--- 全てのアイテムリストを返します.
--- @return アイテムリスト
-function EntityRepositry:getItems()
-    return entityPool.items
-end
-
----
--- 指定したIDに一致するアイテムを返します.
--- @return アイテム
-function EntityRepositry:getItemById(id)
-    return self:getEntityById(entityPool.items, id)
-end
-
----
--- 全てのスキルリストを返します.
--- @return スキルリスト
+-- 
+-- @return 
 function EntityRepositry:getSkills()
     return entityPool.skills
 end
 
 ---
--- 指定したIDに一致するスキルを返します.
--- @return スキル
+-- 
+-- @return 
 function EntityRepositry:getSkillById(id)
     return self:getEntityById(entityPool.skills, id)
 end
 
 ---
--- 全てのエフェクトリストを返します.
--- @return エフェクトリスト
+-- 
+-- @return 
 function EntityRepositry:getEffects()
     return entityPool.effects
 end
 
 ---
--- 指定したIDに一致するエフェクトを返します.
--- @return エフェクト
+-- 
+-- @return 
 function EntityRepositry:getEffectById(id)
     return self:getEntityById(entityPool.effects, id)
 end
 
----
--- プレイヤーが保持するバッグを返します.
--- @return バッグ
-function EntityRepositry:getBag()
-    return entityPool.bag
-end
-
----
--- バッグアイテムリストを返します.
--- @return バッグアイテムリスト
-function EntityRepositry:getBagItems()
-    return entityPool.bagItems
-end
-
----
--- メニューリストを返します.
--- @return メニューリスト
-function EntityRepositry:getMenus()
-    return entityPool.menus
-end
-
----
--- 指定したIDと同一のエネミーを作成して返します.
--- @param id エネミーID
--- @return エネミー
-function EntityRepositry:createEnemy(id)
-    local enemy = self:getEntityById(entityPool.enemies, id)
-    return enemy:clone()
-end
-
---------------------------------------------------------------------------------
--- @type Item
--- アイテムを定義するエンティティです.
---------------------------------------------------------------------------------
-Item = class(Entity)
-M.Item = Item
-
----
--- コンストラクタ
-function Item:init()
-    self.id = 0
-    self.name = nil
-    self.type = nil
-    self.description = nil
-    self.equipType = 0
-    self.atk = 0
-    self.def = 0
-end
-
----
--- アイテムの効果を発揮します.
-function Item:doEffectItem(actor)
-
-end
-
-function Item:doRecoveryItem(actor)
-
-end
-
---------------------------------------------------------------------------------
--- @type ItemType
--- アイテム区分を定義するエンティティです.
---------------------------------------------------------------------------------
-ItemType = class(Entity)
-M.ItemType = ItemType
-
---- 回復アイテム
-ItemType.RECOVERY = 1
-
---- 装備アイテム
-ItemType.EQUIP = 2
-
----
--- コンストラクタ
-function ItemType:init()
-    self.id = 0
-    self.name = nil
-    self.description = nil
-end
 
 --------------------------------------------------------------------------------
 -- @type Skill
--- スキルを定義するエンティティです.
+-- 
 --------------------------------------------------------------------------------
 Skill = class(Entity)
 M.Skill = Skill
 
+---
+-- Construtor
 function Skill:init()
     self.id = 0
     self.name = nil
@@ -475,11 +311,13 @@ end
 
 --------------------------------------------------------------------------------
 -- @type Effect
--- スキルを定義するエンティティです.
+-- 
 --------------------------------------------------------------------------------
 Effect = class(Entity)
 M.Effect = Effect
 
+---
+-- Construtor
 function Effect:init()
     self.id = 0
     self.name = nil
@@ -489,137 +327,14 @@ function Effect:init()
 end
 
 --------------------------------------------------------------------------------
--- @type Menu
--- メインメニューから起動するメニューを表すエンティティクラスです.
---------------------------------------------------------------------------------
-Menu = class(Entity)
-M.Menu = Menu
-
-function Menu:init()
-    self.id = 0
-    self.title = nil
-    self.description = nil
-    self.sceneName = nil
-    self.sceneAnimation = "change"
-end
-
---------------------------------------------------------------------------------
--- @type Bag
--- バッグを表すエンティティです.
--- アイテムを追加、削除する機能を有します.
---------------------------------------------------------------------------------
-Bag = class(Entity)
-M.Bag = Bag
-
----
--- コンストラクタ
--- @param bagItems バッグアイテムリスト
-function Bag:init(bagItems)
-    self.bagItems = assert(bagItems, "bagItems is required.")
-end
-
----
--- バッグにアイテムを追加します.
--- @param item アイテム
-function Bag:addItem(item)
-    local bagItem = self:getBagItemById(item.id)
-    if bagItem then
-        bagItem.itemCount = bagItem.itemCount + 1
-    else
-        table.insertElement(self.bagItems, bagItem)
-    end
-end
-
----
--- バッグからアイテムを削除します.
--- @param item アイテム
-function Bag:removeItem(item)
-    local bagItem = self:getBagItemById(item.id)
-    if bagItem then
-        bagItem.itemCount = bagItem.itemCount - 1
-        if bagItem.itemCount <= 0 then
-            table.removeElement(self.bagItems, bagItem)
-        end
-    end
-end
-
----
--- バッグにあるアイテムを検索して返します.
--- @param itemId アイテムID
--- @return バッグアイテム
-function Bag:getBagItemById(itemId)
-    for i, bagItem in ipairs() do
-        if bagItem.item.id == itemId then
-            return bagItem
-        end
-    end
-end
-
----
--- バッグアイテムリストを返します.
--- @return バッグアイテムリスト
-function Bag:getBagItems()
-    return self.bagItems
-end
-
---------------------------------------------------------------------------------
--- @type BagItem
--- バッグの中にあるアイテムを表現するエンティティです.
---------------------------------------------------------------------------------
-BagItem = class(Entity)
-M.BagItem = BagItem
-
----
--- コンストラクタ
--- @param item (option)アイテム
-function BagItem:init(item)
-    self.item = item
-    self.itemName = item and item.name
-    self.itemCount = item and 1 or 0
-    self.itemEquipCount = 0
-end
-
----
--- データを読み込みます.
--- @param data バッグデータ
-function BagItem:loadData(data)
-    self.item = assert(repositry:getItemById(data.itemId), "Not found item!")
-    self.itemName = self.item.name
-    self.itemCount = data.itemCount
-    self.itemEquipCount = data.itemEquipCount
-end
-
---------------------------------------------------------------------------------
--- @type Team
--- プレイヤーやエネミーの集合体を表すチームエンティティです.
---------------------------------------------------------------------------------
-Team = class(Entity)
-M.Team = Team
-
-function Team:init()
-    self.id = nil
-    self.members = {}
-end
-
----
--- データを読み込みます.
--- @param data バッグデータ
-function Team:loadData(data)
-    self.id = data.id
-    self.members = {}
-    for i, memberId in ipairs(data.members) do
-        table.insert(self.members, repositry:getActorById(memberId))
-    end
-end
-
---------------------------------------------------------------------------------
 -- @type Talk
--- 
 -- 
 --------------------------------------------------------------------------------
 Talk = class(Entity)
 M.Talk = Talk
 
+---
+-- Construtor
 function Talk:init()    
     self.id = 0
     self.actor = 0 
@@ -629,6 +344,8 @@ function Talk:init()
     self.actions = {}
 end
 
+---
+-- 
 function Talk:getActionByIdAnswer(id)
     for i, action in ipairs(self.actions) do
         if action.answer_id == id then
@@ -639,198 +356,127 @@ end
   
 --------------------------------------------------------------------------------
 -- @type Actor
--- アクターを表すエンティティです.
--- アクターとしての能力があります.
+-- Classe que representa os atores
+-- Herda Entity
 --------------------------------------------------------------------------------
 Actor = class(Entity)
 M.Actor = Actor
 
---- ダメージを受けた時のイベントです.
-Actor.EVENT_DAMEGE = "damege"
-
---- 死亡した時のイベントです.
-Actor.EVENT_DEAD = "dead"
-
---- 回復した時のイベントです.
-Actor.EVENT_RECOVERY = "recovery"
-
---- 何らかのステータスを更新したときのイベントです.
-Actor.EVENT_UPDATE = "update"
-
 ---
--- コンストラクタ
+-- Construtor
 function Actor:init()
     Actor.__super.init(self)
     self.id = 0
     self.name = nil
-    self.texture = nil
+    self.texture = nil    
+end
+
+---
+-- 
+function Actor:loadData(data)
+    self.id = data.id
+    self.name = data.name
+    self.texture = data.texture            
+end
+
+---
+-- 
+function Actor:saveData()    
+    local data = {}
+    data.id = self.id
+    data.name = self.name
+    data.texture = self.texture         
+    return data
+end
+
+
+--------------------------------------------------------------------------------
+-- @type Player
+-- Classe que representa os jogadores.
+-- Herda Actor.
+--------------------------------------------------------------------------------
+Player = class(Entity)
+M.Player = Player
+
+---
+-- Construtor
+function Player:init()
+    Player.__super.init(self)
+    self.id = 0
+    self.gold = 0
+    self.name = nil
+    self.current_map = nil
+    self.actor = nil    
     self.level = 0    
     self.exp = 0      
     self.str = 0
     self.vit = 0
     self.int = 0    
-    self.spd = 0
-    self.equipItems = {}
-    self.equipSkills = {}    
-    self.statusStates = {}
+    self.spd = 0    
+    self.equipSkills = {}        
 end
 
 ---
--- データを読み込みます.
-function Actor:loadData(data)
+-- 
+function Player:loadData(data)
     self.id = data.id
+    self.gold = data.gold
     self.name = data.name
-    self.texture = data.texture
+    self.current_map = data.current_map
+    self.actor = repositry:getActorById(data.actor_id)
     self.level = data.level    
     self.exp = data.exp        
     self.str = data.str
     self.vit = data.vit
     self.int = data.int    
-    self.spd = data.spd
-
-    for i, itemId in ipairs(data.equipItems) do
-        local item = assert(repositry:getItemById(itemId), "Not Found Item!", itemId)
-        self.equipItems[i] = item
-    end
+    self.spd = data.spd   
+    
     for i, skillId in ipairs(data.equipSkills) do
         local skill = assert(repositry:getSkillById(skillId), "Not Found Skill", skillId)
         self.equipSkills[i] = skill
     end
-        
+    
 end
 
-function Actor:saveData()
-    local data = table.copy(self)
-    data.__index = nil
-    data.__class = nil
-    
-    data.equipItems = {}
+---
+-- 
+function Player:saveData()
+    local data = {}
+    data.id = self.id
+    data.gold = self.gold
+    data.name = self.name
+    data.actor_id = self.actor.id                
+    data.level = self.level    
+    data.exp = self.exp        
+    data.str = self.str
+    data.vit = self.vit
+    data.int = self.int    
+    data.spd = self.spd       
     data.equipSkills = {}
-    data.talks = {}
-    data.statusStates = {}
+    
+    for i, skill in ipairs(self.equipSkills) do
+      data.equipSkills[i] = skill.id
+    end    
+    
     return data
 end
 
 ---
--- 武器を装備します.
-function Actor:equipWeaponItem(item)
-    self.equipItems[1] = item
-end
-
----
--- 防具を装備します.
-function Actor:equipArmorItem(item)
-    self.equipItems[2] = item
-end
-
----
--- 装備しているスキルリストを返します.
-function Actor:getSkills()
+-- 
+function Player:getSkills()
     return self.equipSkills
 end
 
 ---
--- スキルを追加します.
-function Actor:addSkill(skill)
+-- 
+function Player:addSkill(skill)
     table.insertElement(self.equipSkills, skill)
 end
 
 ---
--- スキルを削除します.
-function Actor:removeSkill(skill)
+-- 
+function Player:removeSkill(skill)
     table.removeElement(self.equipSkills, skill)
-end
-
----
--- アイテムを使用します.
-function Actor:useItem(item)
-
-end
-
----
--- ターゲットを攻撃します.
--- TODO:スキルはどうやって攻撃するのか
--- @param ターゲット
-function Actor:doAttack(target)
-    local atkPoint = self:getAtkPoint()
-    local defPoint = target:getDefPoint()
-
-    local point = math.max(atkPoint - defPoint / 2, 1)
-    target.hp = math.max(target.hp - point, 0)
-
-    -- dispatch event
-    target:dispatchEvent(Actor.EVENT_DAMEGE, {damegeHP = point})
-    if target.hp <= 0 then
-        target:dispatchEvent(Actor.EVENT_DEAD)
-    end
-    target:dispatchEvent(Actor.EVENT_UPDATE)
-
-    --logger.debug("Attack! NAME:%s, HP:%s", target.name, target.hp)
-end
-
----
--- 攻撃力を返します.
--- @return 攻撃力
-function Actor:getAtkPoint()
-    local total = self.str
-    for i, item in ipairs(self.equipItems) do
-        total = total + item.atk
-    end
-    return total
-end
-
----
--- 防御力を返します.
--- @return 防御力
-function Actor:getDefPoint()
-    local total = self.vit
-    for i, item in ipairs(self.equipItems) do
-        total = total + item.def
-    end
-    return total
-end
-
---------------------------------------------------------------------------------
--- @type Player
--- ユーザが操作するプレイヤーを表すエンティティです.
--- アクターを継承します.
---------------------------------------------------------------------------------
-Player = class(Actor)
-M.Player = Player
-
-function Player:init()
-    Player.__super.init(self)
-    self.id = 0
-    self.gold = 0
-    self.actor = nil    
-end
-
-function Player:loadData(data)
-    self.id = data.id
-    self.gold = data.gold
-    self.actor = repositry:getActorById(data.actor_id)
-end
-
-function Player:saveData()    
-    local player = {}
-    player.id = self.id
-    player.gold = self.gold
-    player.actor_id = self.actor.id
-    return player
-end
-
---------------------------------------------------------------------------------
--- @type Enemy
--- マップ上に配置するエネミーを表すエンティティです.
--- アクターを継承します.
---------------------------------------------------------------------------------
-Enemy = class(Actor)
-M.Enemy = Enemy
-
----
--- コンストラクタです.
-function Enemy:init()
-    Enemy.__super.init(self)
 end
 
 M.initialize()

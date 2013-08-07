@@ -4,6 +4,7 @@ local FpsMonitor = require "hanappe/extensions/FpsMonitor"
 
 local entities = require "libs/entities"
 local repositry = entities.repositry
+local entityPool = entities.entityPool
 
 local MapControlView = views.MapControlView
 
@@ -75,13 +76,18 @@ end
 --EVENTOS DO RPGMap
 
 function onEnter(e)
-    effect = BalloonEffect(repositry:getEffectById(2))
-    effect:play(playerObject)    
+    --repositry:savePlayer(1)
+    --entityPool:saveEntities(1)
+    repositry:savePlayerById(1,1)
+    --effect = BalloonEffect(repositry:getEffectById(2))
+   -- effect:play(playerObject)    
 end
 
-function onTalk(e)    
+function onTalk(e)
+    stopWorld()
     local actor = e.data
-    local id = tonumber(actor:getProperty('actor_id')) 
+    --actor:getProperty('actor_id')
+    local id = tonumber(2) 
     
     talkView = TalkView {
         actor = repositry:getActorById(id),
@@ -92,6 +98,7 @@ function onTalk(e)
 end
 
 function talkView_onClose(e)
+    startWorld()
     talkView:setVisible(false)
     local actions = e.data.talk:getActionByIdAnswer(e.data.id)        
     if actions.action == "minigame" then
@@ -135,7 +142,7 @@ function buttonProfile_Click(e)
 end
 
 function buttonOption_Click(e)  
-    flower.openScene(scenes.MENU, {animation = "overlay"})
+    --flower.openScene(scenes.MENU, {animation = "overlay"})
 end
 
 

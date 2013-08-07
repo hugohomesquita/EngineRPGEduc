@@ -17,5 +17,5 @@ function onStart(e)
     local nextSceneName = data.nextSceneName
     local nextSceneParams = data.nextSceneParams
     
-    flower.gotoScene(nextSceneName, nextSceneParams)
+    flower.gotoScene(nextSceneName, nextSceneParams)    
 end

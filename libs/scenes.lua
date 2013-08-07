@@ -11,6 +11,7 @@ local M = {
     --BATTLE = "scenes/battle_scene",
     MENU = "scenes/menu_scene",
     DIALOG = "scenes/dialog_scene",
+    NEW_GAME = "scenes/new_game_scene"
 }
 
 return M

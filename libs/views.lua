@@ -1,9 +1,7 @@
 ----------------------------------------------------------------------------------------------------
--- ビュークラスを定義するモジュールです.
+-- Módulo que define as classes Views.
 -- 
--- ビューとは、複数のウィジェットで構成される部品の集まりです.
--- 
--- 
+-- A View é uma coleção de peças que consiste em mais de um widget.
 ----------------------------------------------------------------------------------------------------
 
 
@@ -30,6 +28,7 @@ local Panel = widget.Panel
 local ListBox = widget.ListBox
 local ListItem = widget.ListItem
 local TextBox = widget.TextBox
+
 local ActorStatusBox = widgets.ActorStatusBox
 local ActorDetailBox = widgets.ActorDetailBox
 --local ItemListBox = widgets.ItemListBox
@@ -38,6 +37,7 @@ local MemberListBox = widgets.MemberListBox
 
 -- classes
 local TitleMenuView
+local NewGameView
 local AvatarView
 
 -- consts
@@ -59,39 +59,143 @@ local WIDGET_WIDTH = 320
 
 --------------------------------------------------------------------------------
 -- @type TitleMenuView
--- タイトルメニューを表示するためのビュークラスです.
+-- Classe de visualização para exibir o menu de títulos.
 --------------------------------------------------------------------------------
 TitleMenuView = class(UIView)
 M.TitleMenuView = TitleMenuView
 
 ---
--- オブジェクトを生成します.
+-- Criando um Objeto.
 function TitleMenuView:_createChildren()
     TitleMenuView.__super._createChildren(self)
     
-    self.titleImage = NineImage("title.png", flower.viewWidth, flower.viewHeight)    
+    self.titleImage = NineImage("bg_main.png", flower.viewWidth, flower.viewHeight)    
     self:addChild(self.titleImage)
-    
+            
     self.newButton = Button {
-        text = "Novo Jogo",
-        size = {200, 50},
+        text = "Novo Jogo",        
+        textColor = {1,1,1,1},        
+        fontName = "SHOWG.TTF",
+        normalTexture = "minigames/assets/button-normal.png",
+        selectedTexture = "minigames/assets/button-selected.png",
         pos = {math.floor(flower.viewWidth / 2 - 100), math.floor(flower.viewHeight / 2)},
         parent = self,
         onClick = function(e)
             self:dispatchEvent("newGame")
-        end,
-    }
-    self.newButton:setFontName('Livingst.ttf')
+        end,        
+    }    
     self.loadButton = Button {
-        text = "Carregar Jogo",
-        size = {200, 50},
+        text = "Carregar Jogo",        
+        textColor = {1,1,1,1},        
+        fontName = "SHOWG.TTF",
+        normalTexture = "minigames/assets/button-normal.png",
+        selectedTexture = "minigames/assets/button-selected.png",
         pos = {self.newButton:getLeft(), self.newButton:getBottom() + 10},
         parent = self,
         onClick = function(e)
             self:dispatchEvent("loadGame")
-        end,
+        end,        
     }
+    self.optionButton = Button {
+        text = "Opcões",        
+        textColor = {1,1,1,1},        
+        fontName = "SHOWG.TTF",
+        normalTexture = "minigames/assets/button-normal.png",
+        selectedTexture = "minigames/assets/button-selected.png",
+        pos = {self.loadButton:getLeft(), self.loadButton:getBottom() + 10},
+        parent = self,
+        onClick = function(e)
+            self:dispatchEvent("optionGame")
+        end,        
+    }    
+    
 end
+
+function TitleMenuView:updateDisplay()
+    TitleMenuView.__super.updateDisplay(self)
+    
+    local vw, vh = flower.getViewSize()
+    local midVW = math.floor(vw / 2)
+    local midVH = math.floor(vh / 2)
+   
+    local sizeButtonW, sizeButtonH = midVW, midVH / 3    
+    local posButtonX, posButtonY = midVW - sizeButtonW / 2, midVH - sizeButtonH / 2
+    
+    self.newButton:setPos(posButtonX, posButtonY)
+    self.newButton:setSize(sizeButtonW,sizeButtonH)               
+
+    self.loadButton:setPos(self.newButton:getLeft(), self.newButton:getBottom() + 10)
+    self.loadButton:setSize(sizeButtonW,sizeButtonH)
+    
+    self.optionButton:setPos(self.loadButton:getLeft(), self.loadButton:getBottom() + 10)
+    self.optionButton:setSize(sizeButtonW,sizeButtonH)
+            
+end
+
+--------------------------------------------------------------------------------
+-- @type NewGameView
+-- Classe de visualização para exibir o menu de títulos.
+--------------------------------------------------------------------------------
+NewGameView = class(UIView)
+M.NewGameView = NewGameView
+
+---
+-- Criando um Objeto.
+function NewGameView:_createChildren()
+    NewGameView.__super._createChildren(self)
+    
+    self.titleImage = NineImage("bg_main.png", flower.viewWidth, flower.viewHeight)    
+    self:addChild(self.titleImage)
+    
+    self.male = NineImage("avatars/avatar1.png", flower.viewWidth, flower.viewHeight)    
+    self:addChild(self.male)
+    
+    self.female = NineImage("avatars/avatar2.png", flower.viewWidth, flower.viewHeight)    
+    self:addChild(self.female)
+    
+    self.name = widget.TextInput {
+        size = {50,20},
+        pos = {0,0},
+        textColor = {0,0,0,1},
+        parent = self
+    }
+    
+    self.iniciar = Button {
+        text = "Iniciar Jogo",        
+        textColor = {1,1,1,1},        
+        fontName = "SHOWG.TTF",
+        normalTexture = "minigames/assets/button-normal.png",
+        selectedTexture = "minigames/assets/button-selected.png",      
+        parent = self,
+        onClick = function(e)
+            self:dispatchEvent("initGame")
+        end,        
+    }
+    
+end
+
+function NewGameView:updateDisplay()
+    NewGameView.__super.updateDisplay(self)
+    
+    local vw, vh = flower.getViewSize()
+    local mW = math.floor(vw / 2)
+    local mH = math.floor(vh / 2)
+    local sizeButtonW, sizeButtonH = mW, mH / 3  
+    
+    self.male:setSize(200, 200)
+    self.male:setPos(mW - self.male:getWidth() - 50, mH - self.male:getHeight()/2 - 100)
+           
+    self.female:setSize(200, 200)
+    self.female:setPos(mW + 50, self.male:getTop())  
+    
+    self.name:setSize(mW/2, 50)
+    self.name:setPos(mW - self.name:getWidth()/2, self.male:getBottom() + 60)
+    
+    self.iniciar:setSize(sizeButtonW, sizeButtonH)
+    self.iniciar:setPos(mW - self.iniciar:getWidth()/2, self.name:getBottom() + 60)
+end
+
+
 
 --------------------------------------------------------------------------------
 -- @type MapControlView
