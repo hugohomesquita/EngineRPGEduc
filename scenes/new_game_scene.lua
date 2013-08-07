@@ -1,14 +1,11 @@
 ----------------------------------------------------------------------------------------------------
--- タイトルを表示するシーンモジュールです.
+-- Módulo de cena que mostra a cena new_game
 --
 ----------------------------------------------------------------------------------------------------
 
 module(..., package.seeall)
 
--- import
-local Image = flower.Image
-local UIView = widget.UIView
-local Button = widget.Button
+-- imports
 local NewGameView = views.NewGameView
 
 -- variables
@@ -23,12 +20,11 @@ function onCreate(e)
         scene = scene,        
     }
     
-    --titleMenuView:addEventListener("newGame", onNewGame)
-    --titleMenuView:addEventListener("loadGame", onLoadGame)
-    
+    newGameView:addEventListener("initGame", onInitGame)
+    newGameView:addEventListener("back", onBack)    
 end
 
-function onNewGame(e)
+function onInitGame(e)
     flower.gotoScene(scenes.LOADING, {
         animation = "fade",
         nextSceneName = scenes.MAP,
@@ -36,6 +32,10 @@ function onNewGame(e)
     })
 end
 
-function onLoadGame(e)
-    
+function onBack(e)
+    flower.gotoScene(scenes.LOADING, {
+        animation = "fade",
+        nextSceneName = scenes.TITLE,
+        nextSceneParams = {animation = "fade"},
+    })
 end

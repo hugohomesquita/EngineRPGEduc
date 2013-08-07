@@ -19,12 +19,12 @@ local class = flower.class
 local table = flower.table
 local Event = flower.Event
 local Image = flower.Image
+local Label = flower.Label
 local ImageButton = widget.ImageButton
 local NineImage = flower.NineImage
 local UIView = widget.UIView
 local Joystick = widget.Joystick
 local Button = widget.Button
-local Panel = widget.Panel
 local ListBox = widget.ListBox
 local ListItem = widget.ListItem
 local TextBox = widget.TextBox
@@ -134,7 +134,7 @@ end
 
 --------------------------------------------------------------------------------
 -- @type NewGameView
--- Classe de visualização para exibir o menu de títulos.
+-- Classe de visualização para exibir o menu de criação do avatar.
 --------------------------------------------------------------------------------
 NewGameView = class(UIView)
 M.NewGameView = NewGameView
@@ -147,13 +147,41 @@ function NewGameView:_createChildren()
     self.titleImage = NineImage("bg_main.png", flower.viewWidth, flower.viewHeight)    
     self:addChild(self.titleImage)
     
-    self.male = NineImage("avatars/avatar1.png", flower.viewWidth, flower.viewHeight)    
-    self:addChild(self.male)
+    local font = flower.getFont("fonts/SHOWG.TTF", nil, 18)  
     
-    self.female = NineImage("avatars/avatar2.png", flower.viewWidth, flower.viewHeight)    
-    self:addChild(self.female)
+    self.genderLabel = Label("Selecione o sexo do seu avatar", nil, nil, font, 30)    
+    self:addChild(self.genderLabel)
     
-    self.name = widget.TextInput {
+    self.male = Button {                
+        normalTexture = "avatars/avatar1-button-normal.png",
+        selectedTexture = "avatars/avatar1-button-selected.png",      
+        parent = self,        
+        onClick = function(e)
+            self:dispatchEvent("selectMale")
+        end,        
+    }    
+    self.maleLabel = Label("Masculino", nil, nil, font, 16)    
+    self:addChild(self.maleLabel)
+    
+    self.female = Button {        
+        normalTexture = "avatars/avatar2-button-normal.png",
+        selectedTexture = "avatars/avatar2-button-selected.png",      
+        parent = self,
+        onClick = function(e)
+            self:dispatchEvent("selectFemale")
+        end,        
+    }
+    self:addEventListener("selectMale", self.onSelectGender, self)
+    self:addEventListener("selectFemale", self.onSelectGender, self)
+    
+    self.femaleLabel = Label("Feminino", nil, nil, font, 16)    
+    self:addChild(self.femaleLabel)
+    
+    
+    self.nameLabel = Label("Insira o nome do Avatar", nil, nil, font, 30)    
+    self:addChild(self.nameLabel)
+    
+    self.nameInput = widget.TextInput {
         size = {50,20},
         pos = {0,0},
         textColor = {0,0,0,1},
@@ -172,6 +200,24 @@ function NewGameView:_createChildren()
         end,        
     }
     
+    self._backButton = ImageButton {                        
+      normalTexture = "assets/back.png",
+      selectedTexture = "assets/backHover.png",      
+      onClick = function(e)
+          self:dispatchEvent("back", e)
+      end,      
+      parent = self
+    } 
+end
+
+function NewGameView:onSelectGender(e)
+    if(e.type == "selectMale") then
+        self.female:setNormalTexture("avatars/avatar2-button-normal.png")
+        self.male:setNormalTexture("avatars/avatar1-button-selected.png")
+    else
+        self.male:setNormalTexture("avatars/avatar1-button-normal.png")
+        self.female:setNormalTexture("avatars/avatar2-button-selected.png")
+    end    
 end
 
 function NewGameView:updateDisplay()
@@ -182,17 +228,32 @@ function NewGameView:updateDisplay()
     local mH = math.floor(vh / 2)
     local sizeButtonW, sizeButtonH = mW, mH / 3  
     
+    self.genderLabel:setPos(mW - self.genderLabel:getWidth()/2, 50)
+    
     self.male:setSize(200, 200)
-    self.male:setPos(mW - self.male:getWidth() - 50, mH - self.male:getHeight()/2 - 100)
-           
+    self.male:setPos(mW - self.male:getWidth() - 50, self.genderLabel:getBottom() + 20)    
+    self.maleLabel:setSize(self.male:getLeft() + self.male:getRight(), self.maleLabel:getHeight())
+    self.maleLabel:setPos(0, self.male:getBottom() + 5)      
+    self.maleLabel:setAlignment(MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY)
+    
+    
     self.female:setSize(200, 200)
     self.female:setPos(mW + 50, self.male:getTop())  
+    self.femaleLabel:setSize(self.female:getLeft() + self.female:getRight(), self.femaleLabel:getHeight())
+    self.femaleLabel:setPos(0, self.female:getBottom() + 5)
+    self.femaleLabel:setAlignment(MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY)
+            
+    self.nameLabel:setSize(self.male:getLeft() + self.female:getRight(), self.nameLabel:getHeight())
+    self.nameLabel:setPos(0, self.femaleLabel:getBottom() + 40)
+    self.nameLabel:setAlignment(MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY)
     
-    self.name:setSize(mW/2, 50)
-    self.name:setPos(mW - self.name:getWidth()/2, self.male:getBottom() + 60)
+    self.nameInput:setSize(mW/2, 50)
+    self.nameInput:setPos(mW - self.nameInput:getWidth()/2, self.nameLabel:getBottom() + 10)
     
     self.iniciar:setSize(sizeButtonW, sizeButtonH)
-    self.iniciar:setPos(mW - self.iniciar:getWidth()/2, self.name:getBottom() + 60)
+    self.iniciar:setPos(mW - self.iniciar:getWidth()/2, self.nameInput:getBottom() + 60)
+    
+    self._backButton:setPos(self.titleImage:getLeft(),self.titleImage:getBottom() - self._backButton:getHeight())
 end
 
 
