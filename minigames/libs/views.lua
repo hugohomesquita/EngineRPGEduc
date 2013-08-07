@@ -304,9 +304,7 @@ function MessageView:updateDisplay()
     MessageView.__super.updateDisplay(self)    
         
     self.mainPanel:setSize(self:getWidth() / 2, self:getHeight() / 2)
-    self.mainPanel:setPos(self:getWidth() / 2 - self.mainPanel:getWidth()/2, self:getHeight() / 2 - self.mainPanel:getHeight()/2)
-    
-    --self.msg:setSize(self.mainPanel:getWidth(),40)
+    self.mainPanel:setPos(self:getWidth() / 2 - self.mainPanel:getWidth()/2, self:getHeight() / 2 - self.mainPanel:getHeight()/2)      
     
     self.msg:setPos(self.mainPanel:getWidth()/2 , self.mainPanel:getHeight() - self.msg:getHeight()/2)
     self.msg:setAlignment(MOAITextBox.CENTER_JUSTIFY, MOAITextBox.LEFT_JUSTIFY)
@@ -363,7 +361,7 @@ end
 function MenuPrincipalView:_createChildren()    
     MenuPrincipalView.__super._createChildren(self)    
     
-    local font = flower.getFont("minigames/assets/fonts/SHOWG.TTF", nil, 18)    
+    local font = flower.getFont("fonts/SHOWG.TTF", nil, 18)    
     
     -- BACKGROUND
     self._mainBackground = Panel {

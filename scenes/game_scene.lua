@@ -14,7 +14,7 @@ local AvatarInfoBox = widgets.AvatarInfoBox
 local BalloonEffect = effects.BalloonEffect
 
 local RPGMap = rpgmap.RPGMap
-
+local PLAYER_ID = nil
 local mapPlayerInfo = nil
 local rpgMap = nil
 local worldFreeze  = false
@@ -22,7 +22,9 @@ colidindo = false
 local fpsMonitor = FpsMonitor(1)
 
 function onCreate(e)           
-    flower.Runtime:addEventListener("resize", onResize)
+    assert(e.data.PLAYER_ID)
+    PLAYER_ID = e.data.PLAYER_ID    
+    flower.Runtime:addEventListener("resize", onResize)                
     
     rpgMap = RPGMap()
     rpgMap:setScene(scene)
@@ -44,7 +46,7 @@ function onCreate(e)
     
     
     --INFO PLAYER
-    player = repositry:getPlayerById(1)
+    player = repositry:getPlayerById(PLAYER_ID)
     avatarInfoBox = AvatarInfoBox{
         scene = scene,
         player = player

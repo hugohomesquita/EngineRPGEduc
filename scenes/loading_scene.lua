@@ -16,6 +16,6 @@ function onStart(e)
     local data = e.data
     local nextSceneName = data.nextSceneName
     local nextSceneParams = data.nextSceneParams
-    
+    nextSceneParams.PLAYER_ID = data.PLAYER_ID
     flower.gotoScene(nextSceneName, nextSceneParams)    
 end

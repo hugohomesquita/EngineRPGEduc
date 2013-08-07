@@ -37,7 +37,7 @@ function M.initialize()
     repositry = EntityRepositry()
     entityPool = EntityPool()
     entityPool:initEntities()
-
+    
     M.repositry = repositry    
     --VERIFICAR
     M.entityPool = entityPool
@@ -105,7 +105,7 @@ end
 ---
 -- Carrega as entidades salvas para a memória
 function EntityPool:loadEntities(saveId)
-    self.actors = self:createEntities(Actor, dofile("save" .. saveId .. "/actor_data.lua"))    
+    --self.actors = self:createEntities(Actor, dofile("save" .. saveId .. "/actor_data.lua"))    
 end
 
 ---
@@ -136,7 +136,7 @@ function EntityPool:saveEntity(entityList, path)
     local file = io.open(path, 'wb')
     file:write("return {\n")
     for i, entity in pairs(entityList) do
-        self:save(entity, file)
+        self:save(entity:saveData(), file)
     end
     file:write("\n}")
     file:close()
@@ -247,6 +247,20 @@ end
 ---
 -- 
 -- 
+function EntityRepositry:createPlayer(playerData)
+    local lastId = #entityPool.players    
+    local player = Player()
+    player.id = lastId + 1  
+    player.name = playerData.name  
+    player.actor = repositry:getActorById(playerData.gender)          
+    table.insertElement(entityPool.players, player)       
+    return player.id
+end
+
+function EntityRepositry:savePlayers()
+    entityPool:saveEntity(entityPool.players, "data/player_data.lua")
+end
+
 function EntityRepositry:getPlayers()
     return entityPool.players
 end
@@ -393,7 +407,7 @@ end
 --------------------------------------------------------------------------------
 -- @type Player
 -- Classe que representa os jogadores.
--- Herda Actor.
+-- Herda Entity.
 --------------------------------------------------------------------------------
 Player = class(Entity)
 M.Player = Player
@@ -403,11 +417,11 @@ M.Player = Player
 function Player:init()
     Player.__super.init(self)
     self.id = 0
-    self.gold = 0
+    self.gold = 1000
     self.name = nil
     self.current_map = nil
-    self.actor = nil    
-    self.level = 0    
+    self.actor = nil
+    self.level = 1    
     self.exp = 0      
     self.str = 0
     self.vit = 0
@@ -422,7 +436,7 @@ function Player:loadData(data)
     self.id = data.id
     self.gold = data.gold
     self.name = data.name
-    self.current_map = data.current_map
+    self.current_map = data.current_map    
     self.actor = repositry:getActorById(data.actor_id)
     self.level = data.level    
     self.exp = data.exp        
@@ -445,7 +459,8 @@ function Player:saveData()
     data.id = self.id
     data.gold = self.gold
     data.name = self.name
-    data.actor_id = self.actor.id                
+    data.current_map = self.current_map
+    data.actor_id = self.actor.id
     data.level = self.level    
     data.exp = self.exp        
     data.str = self.str

@@ -144,6 +144,10 @@ M.NewGameView = NewGameView
 function NewGameView:_createChildren()
     NewGameView.__super._createChildren(self)
     
+    --1 = MASCULINO
+    --2 = FEMININO
+    self.genderPlayer = nil
+    
     self.titleImage = NineImage("bg_main.png", flower.viewWidth, flower.viewHeight)    
     self:addChild(self.titleImage)
     
@@ -196,7 +200,9 @@ function NewGameView:_createChildren()
         selectedTexture = "minigames/assets/button-selected.png",      
         parent = self,
         onClick = function(e)
-            self:dispatchEvent("initGame")
+            e.name = self.nameInput:getText()
+            e.gender = self.genderPlayer
+            self:dispatchEvent("initGame", e)
         end,        
     }
     
@@ -214,9 +220,11 @@ function NewGameView:onSelectGender(e)
     if(e.type == "selectMale") then
         self.female:setNormalTexture("avatars/avatar2-button-normal.png")
         self.male:setNormalTexture("avatars/avatar1-button-selected.png")
+        self.genderPlayer = 1
     else
         self.male:setNormalTexture("avatars/avatar1-button-normal.png")
         self.female:setNormalTexture("avatars/avatar2-button-selected.png")
+        self.genderPlayer = 2
     end    
 end
 
