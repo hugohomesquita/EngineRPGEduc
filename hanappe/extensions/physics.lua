@@ -8,7 +8,7 @@
 local M = {}
 
 -- import
-local flower = require "hanappe/flower"
+local flower = require "flower"
 local class = flower.class
 local table = flower.table
 local PropertyUtils = flower.PropertyUtils
@@ -26,13 +26,14 @@ local B2Fixture
 -- variables
 local MOAIBox2DWorldInterface = MOAIBox2DWorld.getInterfaceTable()
 local MOAIBox2DBodyInterface = MOAIBox2DBody.getInterfaceTable()
-local MOAIBox2DFixtureInterface = MOAIBox2DFixture.getInterfaceTable()
+local MOAIBox2DFixtureInterface = MOAIBox2DFixture,getInterfaceTable()
 
 ----------------------------------------------------------------------------------------------------
 -- @type B2World
 ----------------------------------------------------------------------------------------------------
 B2World = class()
-B2World.__factory = MOAIBox2DWorld
+B2World.__index = MOAIBox2DWorldInterface
+B2World.__moai_class = MOAIBox2DWorld
 M.B2World = B2World
 
 --- Default Gravity

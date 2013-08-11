@@ -2,14 +2,15 @@
 -- Widget Themes.
 -- 
 -- @author Makoto
+-- @release V2.1.2
 ----------------------------------------------------------------------------------------------------
 
 -- module
 local M = {}
 
 -- import
-local flower = require "hanappe/flower"
-local widget = require "hanappe/extensions/widget"
+local flower = require "flower"
+local widget = require "widget"
 local ClassFactory = flower.ClassFactory
 local MsgBox = widget.MsgBox
 local ListItem = widget.ListItem
@@ -101,6 +102,7 @@ M.NORMAL = {
     },
     ListBox = {
         backgroundTexture = "skins/panel.9.png",
+        scrollBarTexture = "skins/scrollbar_vertical.9.png",
         rowHeight = 35,
         listItemFactory = ClassFactory(ListItem),
     },
@@ -111,9 +113,6 @@ M.NORMAL = {
         textSize = 20,
         textColor = {1, 1, 1, 1},
         textAlign = {"left", "top"},
-    },
-    PictureBox = {
-        backgroundTexture = "skins/panel.9.png",
     },
 }
 
