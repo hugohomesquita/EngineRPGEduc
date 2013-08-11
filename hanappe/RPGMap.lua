@@ -82,8 +82,7 @@ function RPGMap:initLayer()
     local layer = Layer()
     --layer:setPriority(1)
     layer:setSortMode(MOAILayer.SORT_PRIORITY_ASCENDING)
-    layer:setCamera(self.camera)
-    self.camera:addLoc(-400, -150, 0)
+    layer:setCamera(self.camera)    
     self:setLayer(layer)
 end
 
@@ -142,7 +141,11 @@ function RPGMap:onLoadedData(e)
     end  
     
     self.backgroundLayer:setPriority(1)  
-   
+    
+    for i, system in ipairs(self.systems) do      
+        system:onUpdate()        
+    end 
+    
     --self:setInvisibleLayerByName("MapBackground")
     --self:setInvisibleLayerByName("MapObject")
 end
