@@ -1825,9 +1825,9 @@ end
 ---
 -- Sets the object's parent, inheriting its color and transform.
 -- @param parent parent
-function DisplayObject:setParent(parent)
+function DisplayObject:setParent(parent, noAttr)
     self.parent = parent
-
+  
     self:clearAttrLink(MOAIColor.INHERIT_COLOR)
     self:clearAttrLink(MOAITransform.INHERIT_TRANSFORM)
 
@@ -1837,7 +1837,9 @@ function DisplayObject:setParent(parent)
     end
 
     if parent then
-        self:setAttrLink(MOAIColor.INHERIT_COLOR, parent, MOAIColor.COLOR_TRAIT)
+        if noAttr ~= "notAttr" then
+          self:setAttrLink(MOAIColor.INHERIT_COLOR, parent, MOAIColor.COLOR_TRAIT)          
+        end          
         self:setAttrLink(MOAITransform.INHERIT_TRANSFORM, parent, MOAITransform.TRANSFORM_TRAIT)
 
         -- Conditions compatibility

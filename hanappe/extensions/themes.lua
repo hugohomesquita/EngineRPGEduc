@@ -9,8 +9,8 @@
 local M = {}
 
 -- import
-local flower = require "flower"
-local widget = require "widget"
+local flower = require "hanappe/flower"
+local widget = require "hanappe/extensions/widget"
 local ClassFactory = flower.ClassFactory
 local MsgBox = widget.MsgBox
 local ListItem = widget.ListItem

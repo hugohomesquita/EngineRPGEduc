@@ -9,7 +9,7 @@
 local M = {}
 
 -- import
-local flower = require "flower"
+local flower = require "hanappe/flower"
 local class = flower.class
 
 -- classes

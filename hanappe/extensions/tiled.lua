@@ -10,7 +10,7 @@
 local M = {}
 
 -- import
-local flower = require "flower"
+local flower = require "hanappe/flower"
 local class = flower.class
 local table = flower.table
 local Resources = flower.Resources
@@ -154,7 +154,7 @@ function TileMap:loadMapData(data)
     
     self:dispatchEvent(TileMap.EVENT_LOADED_DATA, data)
     
-    self:updateRenderOrder()
+    --self:updateRenderOrder()
 end
 
 ---
@@ -745,7 +745,9 @@ end
 function TileObject:updatePriority()
     if self.parent then
         local parentPriority = self.parent:getPriority()
-        self:setPriority(parentPriority + self:getTop())
+        if not self.notUpdateRender then
+          self:setPriority(parentPriority + self:getTop())  
+        end
     end    
 end
 
@@ -770,7 +772,7 @@ end
 -- @param z z-position.
 function TileObject:setLoc(x, y, z)
     MOAIPropInterface.setLoc(self, x, y, z)
-    self:updatePriority()
+    --self:updatePriority()
 end
 
 ---

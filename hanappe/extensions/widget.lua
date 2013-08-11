@@ -13,7 +13,7 @@
 local M = {}
 
 -- import
-local flower = require "flower"
+local flower = require "hanappe/flower"
 local class = flower.class
 local table = flower.table
 local Executors = flower.Executors
