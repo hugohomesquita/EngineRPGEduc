@@ -31,7 +31,6 @@ local TextBox = widget.TextBox
 
 local ActorStatusBox = widgets.ActorStatusBox
 local ActorDetailBox = widgets.ActorDetailBox
---local ItemListBox = widgets.ItemListBox
 local SkillListBox = widgets.SkillListBox
 local MemberListBox = widgets.MemberListBox
 
@@ -264,6 +263,122 @@ function NewGameView:updateDisplay()
     self._backButton:setPos(self.titleImage:getLeft(),self.titleImage:getBottom() - self._backButton:getHeight())
 end
 
+--------------------------------------------------------------------------------
+-- @type LoadGameView
+-- Classe de visualização para exibir o menu para carregar o jogo salvo.
+--------------------------------------------------------------------------------
+LoadGameView = class(UIView)
+M.LoadGameView = LoadGameView
+
+function LoadGameView:init(params)
+    self._players = assert(params.players)        
+    
+    LoadGameView.__super.init(self, params)
+end
+
+---
+-- Criando um Objeto.
+function LoadGameView:_createChildren()
+    LoadGameView.__super._createChildren(self)
+    local font = flower.getFont("fonts/SHOWG.TTF", nil, 18)
+                      
+    self.titleImage = NineImage("bg_main.png", flower.viewWidth, flower.viewHeight)    
+    self:addChild(self.titleImage)
+           
+    self.titleLabel = Label("Selecione um perfil para carregar", nil, nil, font, 30)    
+    self:addChild(self.titleLabel)
+        
+    self._slot1 = Button {
+        text = "",        
+        textColor = {1,1,1,1},        
+        fontName = "SHOWG.TTF",
+        normalTexture = "minigames/assets/button-normal.png",
+        selectedTexture = "minigames/assets/button-selected.png",      
+        parent = self,
+        onClick = function(e)          
+            self:dispatchEvent("initGame", e)
+        end,        
+    }
+    
+    self._slot2 = Button {
+          text = "",        
+          textColor = {1,1,1,1},        
+          fontName = "SHOWG.TTF",
+          normalTexture = "minigames/assets/button-normal.png",
+          selectedTexture = "minigames/assets/button-selected.png",      
+          parent = self,
+          onClick = function(e)            
+              self:dispatchEvent("initGame", e)
+          end,        
+    }
+    
+    self._slot3 = Button {
+        text = "",        
+        textColor = {1,1,1,1},        
+        fontName = "SHOWG.TTF",
+        normalTexture = "minigames/assets/button-normal.png",
+        selectedTexture = "minigames/assets/button-selected.png",      
+        parent = self,
+        onClick = function(e)
+            self:dispatchEvent("initGame", e)
+        end,        
+    }
+    
+    local slotEmpty = "Slot vazio"
+    
+    if (self._players[1] == nil) then
+       self._slot1:setText(slotEmpty)
+    else
+       self._slot1:setText(self._players[1].name)
+       self._slot1.player = self._players[1]
+    end
+    
+    if (self._players[2] == nil) then
+       self._slot2:setText(slotEmpty)
+    else
+       self._slot2:setText(self._players[2].name) 
+    end
+    if (self._players[3] == nil) then
+       self._slot3:setText(slotEmpty)
+    else
+       self._slot3:setText(self._players[3].name)
+    end
+    
+    
+    
+    self._backButton = ImageButton {                        
+      normalTexture = "assets/back.png",
+      selectedTexture = "assets/backHover.png",      
+      onClick = function(e)
+          self:dispatchEvent("back", e)
+      end,      
+      parent = self
+    } 
+end
+
+function LoadGameView:setPlayers(players)
+    self._players = players    
+end
+
+function LoadGameView:updateDisplay()
+    LoadGameView.__super.updateDisplay(self)
+    
+    local vw, vh = flower.getViewSize()
+    local mW = math.floor(vw / 2)
+    local mH = math.floor(vh / 2)
+    local sizeButtonW, sizeButtonH = mW, mH / 3      
+    local posButtonX, posButtonY = mW - sizeButtonW / 2, mW - sizeButtonH / 2
+    
+    self._slot1:setSize(sizeButtonW, sizeButtonH)
+    self._slot2:setSize(sizeButtonW, sizeButtonH)
+    self._slot3:setSize(sizeButtonW, sizeButtonH)
+    
+    self._slot1:setPos(posButtonX, posButtonY)
+    self._slot2:setPos(self._slot1:getLeft(), self._slot1:getBottom() + 20)    
+    self._slot3:setPos(self._slot2:getLeft(), self._slot2:getBottom() + 20) 
+    
+    self._backButton:setPos(self.titleImage:getLeft(),self.titleImage:getBottom() - self._backButton:getHeight())
+end
 
 
 --------------------------------------------------------------------------------
@@ -399,7 +514,7 @@ end
 
 --------------------------------------------------------------------------------
 -- @type MenuControlView
--- メニューシーンをコントロールするためのビュークラスです.
+-- 
 --------------------------------------------------------------------------------
 MenuControlView = class(UIView)
 M.MenuControlView = MenuControlView

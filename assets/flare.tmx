@@ -119,7 +119,6 @@
    eJztmE1uwjAQhYdblLaHcX8FiCK13bWLSl100U3vwKInqcQWQrgftoql6TQZZ2zHISZPesKKB7544GEDQD+ktM9HABfa14m5VrlwH7TvajxFdTOmznoh4CpmbkXGW8drSXrCcaWScovD+MuDhZ/ju15XH13qS59DZN6jdQdcLBf3Ctlk9CcCcwn/M041HkUANRDlnAVwd4JayrlBngDf58sG91jCb59ftZ+ROSntDTNfMHNUT4JaJag9Ne7aMe/LDd0XUvWZfuZicSVZlXLn8DfPNNtUNKPYb8L7rJOquCZZ08CtlznX4j2S6kX7EeTnVpc+G9TY74/7iNz3w+M3U2PnYvYcr5fbp2JzcZ5d+Y2VVypVcS1Fjj464qqEXPu79Bjza5Vbfl1qM78lmc85vwM3b+4thJ2RfWUyhfdCk6G2skOl0DjFWrHsf8F90x7qCkGs
   </data>
  </layer>
- <objectgroup name="Enemy" width="30" height="50"/>
  <objectgroup name="Object" width="30" height="50">
   <object name="hugo" type="Player" gid="297" x="352" y="256"/>
   <object name="Everton" type="Actor" gid="333" x="480" y="192">

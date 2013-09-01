@@ -106,8 +106,7 @@ function RPGMap:setWorldPhysics(world)
 end
 
 function RPGMap:initSystems()
-    self.systems = {
-        UpdatingSystem(self),
+    self.systems = {        
         MovementSystem(self),        
         CameraSystem(self),
         --RenderSystem(self),
@@ -119,14 +118,14 @@ function RPGMap:initEventListeners()
     self:addEventListener("savedData", self.onSavedData, self)
 end
 
-function RPGMap:isCollison(x, y)
+function RPGMap:isCollision(x, y)
     local gid = self.collisionLayer:getGid(x, y)
     return gid > 0
 end
 
 function RPGMap:onLoadedData(e)
     self.objectLayer = assert(self:findMapLayerByName("Object"))
-    self.playerObject = assert(self.objectLayer:findObjectByName("hugo"))
+    self.player = assert(self.objectLayer:findObjectByName("Player"))
     self.collisionLayer = assert(self:findMapLayerByName("MapCollision"))
     self.eventLayer = assert(self:findMapLayerByName("Event"))
     self.backgroundLayer = assert(self:findMapLayerByName("MapBackground"))
@@ -154,9 +153,9 @@ end
 function RPGMap:getPositionHotSpot(index)
     for i, event in ipairs(self.eventLayer.children) do
         if event.type == 'teleport' then
-            local hotspotIndex = event:getProperty('hotspot')             
-            if hotspotIndex == tostring(index) then
-                return event.tileX,event.tileY
+            local hotspotIndex = event:getProperty('hotSpot')                         
+            if hotspotIndex == tostring(index) then                
+                return event.physics.body:getPosition()
             end
         end
     end
@@ -189,7 +188,7 @@ function string:split(separator)
     end
 end
 
-function RPGMap:createPhysicsEvent()
+function RPGMap:createPhysicsEvent()  
   for i, object in ipairs(self.eventLayer.children) do   
       object.physics = {} 
       local body = self.world:addBody(MOAIBox2DBody.KINEMATIC)        
@@ -214,7 +213,7 @@ function RPGMap:createPhysicsEvent()
           i = i + 1
         end          
       end   
-                  
+      
       p2x = 32 * size.x
       p2y = p2x / 2 - 16
       
@@ -308,44 +307,6 @@ function RPGMap:updateRenderOrdem()
     local bg = self:findMapLayerByName("MapBackground")
     bg:setPriority(1)   
 end
-
-----------------------------------------------------------------------------------------------------
--- @type UpdatingSystem
-----------------------------------------------------------------------------------------------------
-UpdatingSystem = class()
-
-function UpdatingSystem:init(tileMap)    
-    self.tileMap = tileMap
-    self.tileMap:addEventListener(MapEvent.EVENT_COLLISION_BEGIN, self.onCollisionBegin, self)
-    --self.tileMap:addEventListener(MapObject.EVENT_COLLISION_PRE_SOLVE, self.collisionPreSolve, self)
-    --self.tileMap:addEventListener(MapObject.EVENT_COLLISION_END, self.onCollisionEnd, self)
-end
-
-function UpdatingSystem:onUpdate() 
-    for i, object in ipairs(self.tileMap.objectLayer:getObjects()) do
-        object:onUpdate()
-    end    
-end
-
-function UpdatingSystem:onCollisionBegin(e)     
-    local object = e.data.objectB    
-    if object.type == 'Actor' then
-        e.data.objectA:stopWalk()        
-        e.data.objectB:stopWalk()        
-        self.tileMap:dispatchEvent(MapEvent.TALK, object)        
-    end
-    if object.type == 'MiniGame' then
-        self.tileMap:dispatchEvent(MapEvent.MINIGAME, object)
-    end
-    if object.type == 'Teleport' then
-        self.tileMap:dispatchEvent(MapEvent.TELEPORT, object)
-    end
-end
-function UpdatingSystem:collisionPreSolve(e)  
-end
-function UpdatingSystem:onCollisionEnd(e)      
-end
-
 ----------------------------------------------------------------------------------------------------
 -- @type MovementSystem
 ----------------------------------------------------------------------------------------------------
@@ -362,6 +323,7 @@ end
 function MovementSystem:onUpdate()
     for i, object in ipairs(self.tileMap.objectLayer:getObjects()) do
         self:moveObject(object)
+        object:onUpdate()
     end
 end
 
@@ -374,16 +336,25 @@ function MovementSystem:moveObject(object)
     if object:isColliding() then                      
         return
     end       
-  
-    object.physics.body:setLinearVelocity(object.speedX, object.speedY)    
-    object:setPos(object.physics.body:getPosition())
+    if object.physics.body then
+        object.physics.body:setLinearVelocity(object.speedX, object.speedY)    
+        object:setPos(object.physics.body:getPosition())
+    end
 end
 
-function MovementSystem:onCollisionBegin(e)      
-    local object = e.data.objectB    
-    if object.type == 'Actor' then      
-        
-    end    
+function MovementSystem:onCollisionBegin(e)            
+    local object = e.data.objectB        
+    if object.type == 'actor' then               
+        e.data.objectB:stopWalk()        
+        self.tileMap:dispatchEvent(MapEvent.TALK, object)        
+    end
+    if object.type == 'minigame' then
+        self.tileMap:dispatchEvent(MapEvent.MINIGAME, object)
+    end
+    if object.type == 'teleport' then        
+        self.tileMap:dispatchEvent(MapEvent.TELEPORT, object)
+    end
+    e.data.objectA:stopWalk()
 end
 function MovementSystem:collisionPreSolve(e)  
     --print(e.data.name)
@@ -422,7 +393,7 @@ function CameraSystem:scrollCamera(x, y)
 end
 
 function CameraSystem:scrollCameraToFocusObject()
-    local x,y = self.tileMap.playerObject:getLoc()
+    local x,y = self.tileMap.player:getLoc()
     self:scrollCameraToCenter(x, y)
 end
 
@@ -564,13 +535,15 @@ function MapObject:loadData(data)
     self.mapX = math.floor(data.x / self.tileMap.tileWidth)
     self.mapY = math.floor(data.y / self.tileMap.tileHeight) - 1
     
-    if self.type == "Player" then
-        self.controller = PlayerController(self)        
-        self.physics.fixture:setCollisionHandler(function(phase, a, b, arbiter)
+    if self.type == "Actor" then
+        self.controller = PlayerController(self)    
+        if self.physics.fixture then
+            self.physics.fixture:setCollisionHandler(function(phase, a, b, arbiter)
                                  self:onCollide(phase, a, b, arbiter)
                               end, MOAIBox2DArbiter.ALL)
-    elseif self.type == "Actor" then            
-        self.controller = ActorController(self)
+        end
+    --elseif self.type == "Actor" then            
+      --  self.controller = ActorController(self)
     end
 end
 
@@ -585,7 +558,7 @@ end
 function MapObject:onCollide(phase, fixtureA, fixtureB, arbiter)   
   local objectA = fixtureA:getBody()   
   local objectB = fixtureB:getBody() 
-  local objects = {}
+  local objects = {}  
   if phase == MOAIBox2DArbiter.BEGIN then       
       
     if objectB.object then      
@@ -603,6 +576,7 @@ function MapObject:onCollide(phase, fixtureA, fixtureB, arbiter)
       objectA.object.physics.body:resetMassData()
       
       self.tileMap:dispatchEvent(MapEvent.EVENT_COLLISION_BEGIN, objects)
+      
     end         
 	end
 	
@@ -679,13 +653,18 @@ function MapObject:setSpeed(direction)
 end
 
 function MapObject:onUpdate()
-    self:setPriority(self:vertexZ())
+    self:setPriority(self:vertexZ())      
 end
 --
 --
 --
 function MapObject:getMapPos()
     return self.mapX, self.mapY
+end
+
+function MapObject:toHotSpot(hotSpot)    
+    local posX, posY = self.tileMap:getPositionHotSpot(hotSpot)    
+    self.physics.body:setTransform(posX,posY)
 end
 
 function MapObject:getDirectionByIndex()
@@ -719,7 +698,7 @@ end
 
 function MapObject:vertexZ()     
   local px,py = self:getIsoPos() 
-  local z = (py/32) * self.tileMap.mapWidth + (px/32) +1
+  local z = (py/32) * self.tileMap.mapWidth + (px/32) + 5
   return z  
 end
 

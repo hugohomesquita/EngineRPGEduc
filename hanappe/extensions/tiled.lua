@@ -782,7 +782,7 @@ end
 -- @param z z-position.
 function TileObject:addLoc(x, y, z)
     MOAIPropInterface.addLoc(self, x, y, z)
-    self:updatePriority()
+    --self:updatePriority()
 end
 
 ---
@@ -1269,7 +1269,7 @@ function IsometricLayerRenderer:createRenderer(x, y, gid)
 
     -- TODO:Flip, rotation not implemented.
     local renderer = SheetImage(texture)
-    renderer:setPriority(self:getPriority())
+    --renderer:setPriority(self:getPriority())
     renderer:setIndex(tileNo)
     renderer:setTileSize(tileWidth, tileHeight, spacing, margin)
 
@@ -1278,7 +1278,8 @@ function IsometricLayerRenderer:createRenderer(x, y, gid)
     posX = posX + tileset.tileOffsetX
     posY = posY + tileset.tileOffsetY + tileMap.tileHeight - tileHeight
     renderer:setPos(posX, posY)
-
+    renderer:setPriority(y * mapWidth + x + 1)
+	
     self:addChild(renderer)
     self.renderers[y * mapWidth + x + 1] = renderer
     

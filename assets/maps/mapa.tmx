@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="isometric" width="10" height="10" tilewidth="64" tileheight="32">
+ <tileset firstgid="1" name="tiled_dungeon" tilewidth="64" tileheight="128">
+  <image source="tiled_dungeon.png" width="1024" height="1920"/>
+ </tileset>
+ <tileset firstgid="241" name="human" tilewidth="96" tileheight="96">
+  <image source="human.png" width="864" height="768"/>
+ </tileset>
+ <tileset firstgid="313" name="set_rules" tilewidth="64" tileheight="32">
+  <image source="set_rules.png" width="128" height="128"/>
+ </tileset>
+ <layer name="MapBackground" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJxjYWBgYBnFgwYDAD0/AZE=
+  </data>
+ </layer>
+ <layer name="MapCollision" width="10" height="10" visible="0">
+  <data encoding="base64" compression="zlib">
+   eJyzY2RgsEPDIIAuBhPHBpDl8KnDpQefGmqah00dsn9JtRubGlzhRaz7ADuDBqY=
+  </data>
+ </layer>
+ <objectgroup name="Event" width="10" height="10">
+  <object name="Mudar Mapa" type="teleport" x="160" y="0" width="32" height="32">
+   <properties>
+    <property name="hotSpot" value="2"/>
+    <property name="size" value="1,1"/>
+    <property name="toMap" value="mapa2"/>
+    <property name="toMapHotSpot" value="1"/>
+   </properties>
+  </object>
+  <object type="teleport" x="96" y="64" width="32" height="32">
+   <properties>
+    <property name="hotSpot" value="1"/>
+    <property name="size" value="1,1"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer name="MapObject" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJyzY2BgMAPiECgNwklIbBg2ZMANpiGx8alDBsSoW06CeZFkqkP2LzIA2buRgFmTGTDdtxwJIwNbIt0HAP5hCcg=
+  </data>
+ </layer>
+ <objectgroup name="Object" width="10" height="10">
+  <object name="Player" type="Actor" gid="241" x="256" y="224"/>
+ </objectgroup>
+</map>

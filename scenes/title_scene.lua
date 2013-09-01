@@ -37,5 +37,9 @@ function onNewGame(e)
 end
 
 function onLoadGame(e)
-    
+    flower.gotoScene(scenes.LOADING, {
+        animation = "fade",
+        nextSceneName = scenes.LOAD_GAME,
+        nextSceneParams = {animation = "fade"},
+    })
 end
