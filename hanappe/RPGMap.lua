@@ -9,6 +9,7 @@ local M = {}
 -- import
 local flower = require "hanappe/flower"
 local tiled = require "hanappe/extensions/tiled"
+local MapEvent = require "hanappe/MapEvent"
 
 local entities = require "libs/entities"
 local repositry = entities.repositry
@@ -24,10 +25,8 @@ local ClassFactory = flower.ClassFactory
 local Group = flower.Group
 
 -- class
-local MapEvent
 local MapObject
 local RPGMap
-
 local UpdatingSystem
 local MovementSystem
 local CameraSystem
@@ -35,24 +34,6 @@ local RenderSystem
 
 local ActorController
 local PlayerController
-
---------------------------------------------------------------------------------
--- @type MapEvent
--- 
---------------------------------------------------------------------------------
-MapEvent = class(Event)
-M.MapEvent = MapEvent
-
-MapEvent.EVENT_COLLISION_BEGIN = "collisionBegin"
-MapEvent.EVENT_COLLISION_END = "collisionEnd"
-MapEvent.EVENT_COLLISION_PRE_SOLVE = "collisionPreSolve"
-MapEvent.EVENT_COLLISION_POST_SOLVE = "collisionPostSolve"
-
-MapEvent.TALK = "talk"
-
-MapEvent.TELEPORT = "teleport"
-
-MapEvent.MINIGAME = "minigame"
 
 
 ----------------------------------------------------------------------------------------------------

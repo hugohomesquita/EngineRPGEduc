@@ -40,6 +40,11 @@
     <property name="size" value="1,1"/>
    </properties>
   </object>
+  <object name="Quiz" type="minigame" x="288" y="160" width="32" height="32">
+   <properties>
+    <property name="name" value="quiz"/>
+   </properties>
+  </object>
  </objectgroup>
  <layer name="MapObject" width="10" height="10">
   <data encoding="base64" compression="zlib">

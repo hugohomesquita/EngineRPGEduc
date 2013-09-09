@@ -33,9 +33,13 @@ function onCreate(e)
     
     rpgMap = RPGMap()
     rpgMap:setScene(scene)
-    rpgMap:addEventListener("talk",onTalk)       
+    
+    -- EVENTS LISTENERS DO MAPA    
+    --rpgMap:addEventListener("talk",onTalk)       
     rpgMap:addEventListener("teleport",onTeleport)
-    --rpgMap:addEventListener("minigame",onMinigame)    
+    rpgMap:addEventListener("minigame",onMinigame)        
+    
+    
     loadRPGMap("assets/maps/"..e.data.MAP..".lua", e.data.hotSpot)    
     
     playerObject = rpgMap.player
@@ -135,6 +139,14 @@ function talkView_onClose(e)
     end      
 end
 
+--
+--  MINI-GAMES
+--
+function onMinigame(e)
+   local name = e.data:getProperty("name")
+   openMinigame(name)
+end
+
 function openMinigame(nameMinigame)
     stopWorld()
     MINIGAME = flower.openScene("minigames/"..nameMinigame , {animation = "overlay"})   
@@ -145,9 +157,9 @@ function onCloseMiniGame(e)
     startWorld()         
 end
 
-function updateHUD()
-    avatarInfoBox:updateDisplay()
-end
+
+
+
 ---
 ---   FUNCTIONS
 ---
@@ -193,8 +205,7 @@ function onUpdate(e)
 end
 
 function updateMap()
-    rpgMap:onUpdate(e)
-    --rpgMap:updateRenderOrder()
+    rpgMap:onUpdate(e)    
 end
 
 function updatePlayer()
@@ -206,8 +217,12 @@ function updatePlayer()
     end    
 end
 
+function updateHUD()
+    avatarInfoBox:updateDisplay()
+end
+
 --
---
+-- HANDLERS THIS SCENE
 --
 
 function onStop(e)

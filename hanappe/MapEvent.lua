@@ -6,27 +6,14 @@
 -- module
 local M = {}
 
--- import
-local flower = require "hanappe/flower"
-local class = flower.class
+M.EVENT_COLLISION_BEGIN = "collisionBegin"
+M.EVENT_COLLISION_END = "collisionEnd"
+M.EVENT_COLLISION_PRE_SOLVE = "collisionPreSolve"
+M.EVENT_COLLISION_POST_SOLVE = "collisionPostSolve"
 
--- class
-local MapEvent
---------------------------------------------------------------------------------
--- @type MapEvent
--- 
---------------------------------------------------------------------------------
-MapEvent = class()
-M.MapEvent = MapEvent
-
-MapEvent.EVENT_COLLISION_BEGIN = "collisionBegin"
-MapEvent.EVENT_COLLISION_END = "collisionEnd"
-MapEvent.EVENT_COLLISION_PRE_SOLVE = "collisionPreSolve"
-MapEvent.EVENT_COLLISION_POST_SOLVE = "collisionPostSolve"
-
-MapEvent.TALK = "talk"
-MapEvent.TELEPORT = "teleport"
-MapEvent.MINIGAME = "minigame"
+M.TALK = "talk"
+M.TELEPORT = "teleport"
+M.MINIGAME = "minigame"
 
 
 
