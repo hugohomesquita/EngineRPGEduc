@@ -547,11 +547,17 @@ M.ProfileView = ProfileView
 
 ---
 -- I will create a child object.
+
+function ProfileView:init(params)
+    self._actor = assert(params.actor)
+    ProfileView.__super.init(self, params)    
+end    
+
 function ProfileView:_createChildren()
     ProfileView.__super._createChildren(self)
                 
     self.detailBox = ActorDetailBox {
-        actor = {repositry:getActorById(1)},
+        actor = {self._actor},
         parent = self,
         size = {self:getWidth()/2,260},
         pos = {self:getWidth()/2-200, self:getHeight()/2-130},        
@@ -561,6 +567,11 @@ end
 
 function ProfileView:onTouchDown(e)
     self:dispatchEvent("back", e.data)
+end
+
+function ProfileView:setActor(actor)
+    self._actor = actor    
+    self:updateDisplay()
 end
 
 -----

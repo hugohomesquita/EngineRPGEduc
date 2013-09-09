@@ -148,6 +148,7 @@ function ActorDetailBox:updateHeaderLabel()
     local a = self._actor
     local text = string.format("%s\nLEVEL:%d\nXP:%d", a.name, a.level, a.exp)
     self._headerLabel:setString(text)
+    self._faceImage:setFace(self._actor.actor.id)
 end
 
 ---
@@ -307,19 +308,6 @@ end
 function TalkBox:setTalk(talk)
     self._talk = talk   
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -540,7 +528,7 @@ function AvatarInfoBox:_createChildren()
     }       
     self:addChild(self._mainPanel)
        
-    self._avatarImage = flower.Image("avatars/avatar1.png", 80, 80)
+    self._avatarImage = FaceImage(1)
     self._avatarImage:setPos(self._mainPanel:getLeft() + 2, self._mainPanel:getTop() + 5)
     self:addChild(self._avatarImage)   
        
@@ -569,10 +557,8 @@ end
 
 function AvatarInfoBox:updateDisplay()
     AvatarInfoBox.__super.updateDisplay(self)   
-    
-    local texture = self._player.actor.texture
-    self._avatarImage:setTexture(texture)
-    self._avatarImage:setSize(80,80)
+        
+    self._avatarImage:setFace(self._player.actor.id)    
     
     local gold = tostring(self._player.gold)    
     self._avatarGOLD:setString(gold)

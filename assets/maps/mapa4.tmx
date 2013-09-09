@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="isometric" width="15" height="15" tilewidth="64" tileheight="32">
+ <tileset firstgid="1" name="set_rules" tilewidth="64" tileheight="32">
+  <image source="set_rules.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="9" name="human" tilewidth="96" tileheight="96">
+  <image source="human.png" width="864" height="768"/>
+ </tileset>
+ <tileset firstgid="81" name="tiled_cave" tilewidth="64" tileheight="128">
+  <image source="tiled_cave.png" width="1024" height="1920"/>
+ </tileset>
+ <layer name="MapBackground" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJwLZGBgCBzFo3gUDxgGAL1bRzI=
+  </data>
+ </layer>
+ <layer name="MapCollision" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUDCQAAAOEAAE=
+  </data>
+ </layer>
+ <objectgroup name="Event" width="15" height="15">
+  <object name="entrada1" type="teleport" x="160" y="64" width="32" height="32">
+   <properties>
+    <property name="hotSpot" value="1"/>
+    <property name="size" value="1,1"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer name="MapObject" width="15" height="15">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUDCQAAAOEAAE=
+  </data>
+ </layer>
+ <objectgroup name="Object" width="15" height="15">
+  <object name="Player" type="Actor" gid="45" x="96" y="160"/>
+ </objectgroup>
+</map>

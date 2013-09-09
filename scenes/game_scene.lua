@@ -35,8 +35,7 @@ function onCreate(e)
     rpgMap:setScene(scene)
     rpgMap:addEventListener("talk",onTalk)       
     rpgMap:addEventListener("teleport",onTeleport)
-    --rpgMap:addEventListener("minigame",onMinigame)
-    
+    --rpgMap:addEventListener("minigame",onMinigame)    
     loadRPGMap("assets/maps/"..e.data.MAP..".lua", e.data.hotSpot)    
     
     playerObject = rpgMap.player
@@ -114,14 +113,13 @@ function onEnter(e)
    -- effect:play(playerObject)    
 end
 
-function onTalk(e)
+function onTalk(e)  
     stopWorld()
     local actor = e.data
-    --actor:getProperty('actor_id')
-    local id = tonumber(2) 
-    
+       
+    print('onTalk')
     talkView = TalkView {
-        actor = repositry:getActorById(id),
+        actor = repositry:getActorById(tonumber(2)),
         talk = repositry:getTalkById(1),
         scene = scene,        
     }           

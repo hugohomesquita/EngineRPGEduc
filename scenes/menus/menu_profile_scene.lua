@@ -6,21 +6,17 @@ module(..., package.seeall)
 local MenuControlView = views.MenuControlView
 local ProfileView = views.ProfileView
 
+local entities = require "libs/entities"
+local repositry = entities.repositry
 --------------------------------------------------------------------------------
 -- Event Handler
 --------------------------------------------------------------------------------
 
 function onCreate(e)
     ProfileView = ProfileView {
-        scene = scene,
-    }
-    
-    --menuControlView = MenuControlView {
-    --    scene = scene,
-    --}
-    
-    -- event listeners
-    --menuControlView:addEventListener("back", menuControlView_OnBack)
+        scene = scene,   
+        actor = repositry:getPlayerById(1)
+    }     
     ProfileView:addEventListener("back", onBack)
 end
 

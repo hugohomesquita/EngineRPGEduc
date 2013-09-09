@@ -16,8 +16,6 @@ local entities = require "libs/entities"
 local repositry = entities.repositry
 local entityPool = entities.entityPool
 
-Resources.addResourceDirectory("assets/fonts")
-
 local closeScene = false
 local result = nil
 --------------------------------------------------------------------------------

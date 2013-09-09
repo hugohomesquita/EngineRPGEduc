@@ -14,7 +14,7 @@
    eJxjYWBgYBnFgwYDAD0/AZE=
   </data>
  </layer>
- <layer name="MapCollision" width="10" height="10" visible="0">
+ <layer name="MapCollision" width="10" height="10">
   <data encoding="base64" compression="zlib">
    eJyzY2RgsEPDIIAuBhPHBpDl8KnDpQefGmqah00dsn9JtRubGlzhRaz7ADuDBqY=
   </data>
@@ -28,7 +28,13 @@
     <property name="toMapHotSpot" value="1"/>
    </properties>
   </object>
-  <object type="teleport" x="96" y="64" width="32" height="32">
+  <object name="Som Baú" type="sound" x="288" y="224" width="32" height="32">
+   <properties>
+    <property name="load" value="bau"/>
+    <property name="size" value="1,1"/>
+   </properties>
+  </object>
+  <object name="Início Mapa" type="teleport" x="64" y="64" width="32" height="32">
    <properties>
     <property name="hotSpot" value="1"/>
     <property name="size" value="1,1"/>
@@ -41,6 +47,12 @@
   </data>
  </layer>
  <objectgroup name="Object" width="10" height="10">
-  <object name="Player" type="Actor" gid="241" x="256" y="224"/>
+  <object name="Everton" type="Actor" gid="286" x="288" y="96">
+   <properties>
+    <property name="id" value="2"/>
+    <property name="minigame" value="quiz"/>
+   </properties>
+  </object>
+  <object name="Player" type="Actor" gid="286" x="256" y="192"/>
  </objectgroup>
 </map>

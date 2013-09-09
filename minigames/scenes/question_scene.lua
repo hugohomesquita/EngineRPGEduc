@@ -42,7 +42,7 @@ function onCreate(e)
     quizQuestionView:addEventListener('selectAnswer', quizQuestionView_onSelectAnswer)        
     quizQuestionView:addEventListener('finnishQuestions', quizQuestionView_onFinish)
     quizQuestionView:addEventListener('pular', quizQuestionView_onPular)
-    quizQuestionView:addEventListener('verResposta', quizQuestionView_onVerResposta)
+    --quizQuestionView:addEventListener('verResposta', quizQuestionView_onVerResposta)
     quizQuestionView:nextQuestion()
     
 end
@@ -68,7 +68,7 @@ function quizQuestionView_onSelectAnswer(e)
           questionNumber = questionNumber + 1
           sceneResult = flower.openScene("minigames/scenes/message_view_scene",
             {animation="overlay", message="PERGUNTA Nº ".. tostring(questionNumber) .." de ".. tostring(totalQuestions) ..""})          
-        end
+        end        
     else
         sceneResult = flower.openScene("minigames/scenes/message_view_scene",{animation="overlay", message="VOCÊ ERROU!"})
         closeScene = true     

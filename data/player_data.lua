@@ -4,7 +4,7 @@ return {
       gold = 15000,        
       name = "HugoMesq",		
       actor_id = 1,
-      current_map = "world_map",				
+      current_map = "mapa",				
       level = 5,
       exp = 550,		
       str = 20,

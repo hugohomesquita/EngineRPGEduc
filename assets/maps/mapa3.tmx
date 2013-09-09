@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="isometric" width="30" height="30" tilewidth="64" tileheight="32">
+ <tileset firstgid="1" name="human" tilewidth="96" tileheight="96">
+  <image source="human.png" width="864" height="768"/>
+ </tileset>
+ <tileset firstgid="73" name="set_rules" tilewidth="64" tileheight="32">
+  <image source="set_rules.png" width="128" height="128"/>
+ </tileset>
+ <tileset firstgid="81" name="tiled_cave" tilewidth="64" tileheight="128">
+  <image source="tiled_cave.png" width="1024" height="1920"/>
+ </tileset>
+ <layer name="MapBackground" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJztwwENAAAMw6CqnH8pF3JIWDVVVVXfPcIwLmg=
+  </data>
+ </layer>
+ <layer name="MapCollision" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJzzY2Bg8BsgTG8wau+ovaP2UsfegQCDIZwD0DC97KUnGLV31N5RewfWXkrKlqHiX2qVn9S0lxQ3DVRblhp2klN/DZV0NVzsHQgMAIwBJnk=
+  </data>
+ </layer>
+ <objectgroup name="Event" width="30" height="30">
+  <object name="Entrada1" type="teleport" x="0" y="288" width="32" height="32">
+   <properties>
+    <property name="hotSpot" value="1"/>
+    <property name="size" value="1,1"/>
+    <property name="toMap" value="mapa2"/>
+    <property name="toMapHotSpot" value="2"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer name="MapObject" width="30" height="30">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo2AUjALSQOIA4YEGV4H4ChBfBOKbA+yWUTAKRsHwBCOhbBkoP+KzdySEOwjcZBg5fh0FxAMAXuoTyA==
+  </data>
+ </layer>
+ <objectgroup name="Object" width="30" height="30">
+  <object name="Player" type="Actor" gid="28" x="96" y="288"/>
+ </objectgroup>
+</map>

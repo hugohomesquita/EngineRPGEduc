@@ -344,8 +344,8 @@ end
 
 function MovementSystem:onCollisionBegin(e)            
     local object = e.data.objectB        
-    if object.type == 'actor' then               
-        e.data.objectB:stopWalk()        
+    if object.type == 'Actor' and object.name ~= "Player" then               
+        e.data.objectB:stopWalk()            
         self.tileMap:dispatchEvent(MapEvent.TALK, object)        
     end
     if object.type == 'minigame' then

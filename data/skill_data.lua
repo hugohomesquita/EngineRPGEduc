@@ -2,7 +2,7 @@ return {
     {
         id = 1,
         name = "Matemática",
-        descripsion = "炎で敵単体を攻撃する。",
+        descripsion = "",
         effectId = 1,
         useMp = 0,
         atkPoint = 1,
@@ -10,7 +10,7 @@ return {
     {
         id = 2,
         name = "Português",
-        descripsion = "炎で画面内の敵を攻撃する。",
+        descripsion = "",
         effectId = 1,
         useMp = 0,
         atkPoint = 1,
@@ -18,7 +18,7 @@ return {
     {
         id = 3,
         name = "História",
-        descripsion = "氷で敵単体を攻撃する。",
+        descripsion = "",
         effectId = 1,
         useMp = 0,
         atkPoint = 1,
@@ -26,7 +26,7 @@ return {
     {
         id = 4,
         name = "Geografia",
-        descripsion = "吹雪で画面内の敵を攻撃する。",
+        descripsion = "",
         effectId = 1,
         useMp = 0,
         atkPoint = 1,
@@ -34,7 +34,7 @@ return {
     {
         id = 5,
         name = "Inglês",
-        descripsion = "雷で敵単体を攻撃する。",
+        descripsion = "",
         effectId = 1,
         useMp = 0,
         atkPoint = 1,
@@ -42,7 +42,7 @@ return {
     {
         id = 6,
         name = "Conhecimentos Gerais",
-        descripsion = "雷の嵐で画面内の敵を攻撃する。",
+        descripsion = "",
         effectId = 1,
         useMp = 0,
         atkPoint = 1,
@@ -50,7 +50,7 @@ return {
     {
         id = 7,
         name = "Biologia",
-        descripsion = "味方一人のHPを少し回復する。",
+        descripsion = "",
         effectId = 1,
         useMp = 0,
         atkPoint = 1,
