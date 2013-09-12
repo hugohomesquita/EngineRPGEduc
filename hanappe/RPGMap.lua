@@ -48,8 +48,7 @@ function RPGMap:init()
               
     self.objectLayer = nil
     self.collisionLayer = nil    
-    self.worldFreeze = false
-    
+    self.worldFreeze = false    
     self:initLayer()
     self:initPhysics()
     self:initSystems()
@@ -99,10 +98,12 @@ function RPGMap:initEventListeners()
     self:addEventListener("savedData", self.onSavedData, self)
 end
 
+
 function RPGMap:isCollision(x, y)
     local gid = self.collisionLayer:getGid(x, y)
     return gid > 0
 end
+
 
 function RPGMap:onLoadedData(e)
     self.objectLayer = assert(self:findMapLayerByName("Object"))
@@ -125,6 +126,14 @@ function RPGMap:onLoadedData(e)
     for i, system in ipairs(self.systems) do      
         system:onUpdate()        
     end 
+    
+    -- INICIALIZANDO O AUDIO
+    -- CARREGA OS DADOS DEFINIDOS COMO PROPRIEDADE DO TILEMAP
+    if self:getProperty("sound_name") ~= nil then      
+        looping = self:getProperty("sound_loop") and true or false
+        volume = tonumber(self:getProperty("sound_volume")) or 1        
+        audio.play("assets/sounds/"..self:getProperty("sound_name"), volume, looping)    
+    end
     
     --self:setInvisibleLayerByName("MapBackground")
     --self:setInvisibleLayerByName("MapObject")
@@ -334,15 +343,20 @@ function MovementSystem:onCollisionBegin(e)
     end
     if object.type == 'teleport' then        
         self.tileMap:dispatchEvent(MapEvent.TELEPORT, object)
-    end
+    end        
+    if object:getProperty("sound_name") ~= nil then                     
+        looping = object:getProperty("sound_loop") and true or false
+        volume = tonumber(object:getProperty("sound_volume")) or 1         
+        self.tileMap.sound = "assets/sounds/"..object:getProperty("sound_name")           
+    end    
+    
     e.data.objectA:stopWalk()
 end
 function MovementSystem:collisionPreSolve(e)  
     --print(e.data.name)
     --print(e.data.collisionSide)
 end
-function MovementSystem:onCollisionEnd(e)  
-    
+function MovementSystem:onCollisionEnd(e)      
 end
 
 

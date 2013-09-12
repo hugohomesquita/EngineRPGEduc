@@ -7,6 +7,7 @@ flower = require "hanappe/flower"
 themes = require "hanappe/extensions/themes"
 tiled = require "hanappe/extensions/tiled"
 widget = require "hanappe/extensions/widget"
+audio = require "hanappe/extensions/audio"
 
 -- game library
 --fonts =  "libs/fonts"

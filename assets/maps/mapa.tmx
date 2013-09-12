@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="isometric" width="10" height="10" tilewidth="64" tileheight="32">
+ <properties>
+  <property name="sound_loop" value="true"/>
+  <property name="sound_name" value="underground.ogg"/>
+  <property name="sound_volume" value="1"/>
+ </properties>
  <tileset firstgid="1" name="tiled_dungeon" tilewidth="64" tileheight="128">
   <image source="tiled_dungeon.png" width="1024" height="1920"/>
  </tileset>
@@ -45,6 +50,14 @@
     <property name="name" value="quiz"/>
    </properties>
   </object>
+  <object name="teste" type="teste" x="160" y="192" width="32" height="32">
+   <properties>
+    <property name="sound_loop" value="false"/>
+    <property name="sound_name" value="mono16.wav"/>
+    <property name="sound_volume" value="1"/>
+   </properties>
+  </object>
+  <object x="640" y="224"/>
  </objectgroup>
  <layer name="MapObject" width="10" height="10">
   <data encoding="base64" compression="zlib">

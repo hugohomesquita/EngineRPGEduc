@@ -24,7 +24,7 @@ local mapPlayerInfo = nil
 local rpgMap = nil
 local worldFreeze  = false
 
-function onCreate(e)           
+function onCreate(e)             
     e.data.PLAYER_ID = 1    
     --assert(e.data.PLAYER_ID)
     
@@ -114,7 +114,7 @@ function onEnter(e)
     --entityPool:saveEntities(1)
     --repositry:savePlayerById(1,1)
     --effect = BalloonEffect(repositry:getEffectById(2))
-   -- effect:play(playerObject)    
+   -- effect:play(playerObject)       
 end
 
 function onTalk(e)  

@@ -1,5 +1,5 @@
-config = require "config"
 modules = require "modules"
+config = require "config"
 rpgmap = require "hanappe/RPGMap"
 
 --SCREEN SETTINGS 
