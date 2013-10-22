@@ -14,7 +14,7 @@ M.EVENT_COLLISION_POST_SOLVE = "collisionPostSolve"
 M.TALK = "talk"
 M.TELEPORT = "teleport"
 M.MINIGAME = "minigame"
-M.AUDIO = "audio"
+M.SOUND = "sound"
 
 
 

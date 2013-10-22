@@ -40,7 +40,7 @@ function FaceImage:setFace(faceNo)
 end
 
 function FaceImage:getFaceTexturePath(faceNo)  
-    return "avatars/face" .. faceNo .. ".png"
+    return "faces/face" .. faceNo .. ".png"
 end
 
 --------------------------------------------------------------------------------

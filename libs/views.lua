@@ -559,8 +559,8 @@ function ProfileView:_createChildren()
     self.detailBox = ActorDetailBox {
         actor = {self._actor},
         parent = self,
-        size = {self:getWidth()/2,260},
-        pos = {self:getWidth()/2-200, self:getHeight()/2-130},        
+        size = {300, 280},
+        pos = {self:getWidth() / 2 - 200, self:getHeight() / 2 - 130},        
     }
     self.detailBox:addEventListener(Event.TOUCH_DOWN, self.onTouchDown, self)     
 end
@@ -570,7 +570,7 @@ function ProfileView:onTouchDown(e)
 end
 
 function ProfileView:setActor(actor)
-    self._actor = actor    
+    self._actor = actor        
     self:updateDisplay()
 end
 

@@ -129,12 +129,13 @@ function RPGMap:onLoadedData(e)
     
     -- INICIALIZANDO O AUDIO
     -- CARREGA OS DADOS DEFINIDOS COMO PROPRIEDADE DO TILEMAP
-    if self:getProperty("sound_name") ~= nil then      
-        looping = self:getProperty("sound_loop") and true or false
-        volume = tonumber(self:getProperty("sound_volume")) or 1        
-        audio.play("assets/sounds/"..self:getProperty("sound_name"), volume, looping)    
+    if self:getProperty("sound") ~= nil then                      
+        sound = {}
+        sound.file = self:getProperty("sound")
+        sound.looping = self:getProperty("sound_loop") and true or false
+        sound.volume = tonumber(self:getProperty("sound_volume")) or 1        
+        --self:dispatchEvent(MapEvent.SOUND, sound)  
     end
-    
     --self:setInvisibleLayerByName("MapBackground")
     --self:setInvisibleLayerByName("MapObject")
 end
@@ -344,12 +345,14 @@ function MovementSystem:onCollisionBegin(e)
     if object.type == 'teleport' then        
         self.tileMap:dispatchEvent(MapEvent.TELEPORT, object)
     end        
-    if object:getProperty("sound_name") ~= nil then                     
-        looping = object:getProperty("sound_loop") and true or false
-        volume = tonumber(object:getProperty("sound_volume")) or 1         
-        self.tileMap.sound = "assets/sounds/"..object:getProperty("sound_name")           
-    end    
-    
+    if object:getProperty("sound") ~= nil then          
+        sound = {}        
+        sound.looping = object:getProperty("sound_loop")        
+        sound.volume = tonumber(object:getProperty("sound_volume")) or 1
+        sound.file = object:getProperty("sound")
+        self.tileMap:dispatchEvent(MapEvent.SOUND, sound)                 
+    end        
+                                          
     e.data.objectA:stopWalk()
 end
 function MovementSystem:collisionPreSolve(e)  

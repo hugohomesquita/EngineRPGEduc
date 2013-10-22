@@ -11,12 +11,14 @@ local repositry = entities.repositry
 --------------------------------------------------------------------------------
 -- Event Handler
 --------------------------------------------------------------------------------
+local player = nil
 
 function onCreate(e)
+    player = repositry:getPlayerById(1)     
     ProfileView = ProfileView {
         scene = scene,   
-        actor = repositry:getPlayerById(1)
-    }     
+        actor = repositry:getActorById(player.actor.id)
+    }    
     ProfileView:addEventListener("back", onBack)
 end
 

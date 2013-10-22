@@ -382,7 +382,10 @@ function Actor:init()
     Actor.__super.init(self)
     self.id = 0
     self.name = nil
-    self.texture = nil    
+    self.texture = nil
+    self.level = nil
+    self.exp = nil
+    self.equipSkills = {}  
 end
 
 ---
@@ -390,26 +393,41 @@ end
 function Actor:loadData(data)
     self.id = data.id
     self.name = data.name
-    self.texture = data.texture            
+    self.texture = data.texture     
+    self.level = data.level
+    self.exp = data.exp
+    
+    for i, skillId in ipairs(data.equipSkills) do
+        local skill = assert(repositry:getSkillById(skillId), "Not Found Skill", skillId)
+        self.equipSkills[i] = skill
+    end
 end
 
 ---
 -- 
 function Actor:saveData()    
-    local data = {}
-    data.id = self.id
-    data.name = self.name
-    data.texture = self.texture         
+    local data = {}          
     return data
 end
 
+function Actor:getSkills()
+    return self.equipSkills
+end
+
+function Actor:addSkill(skill)
+    table.insertElement(self.equipSkills, skill)
+end
+
+function Actor:removeSkill(skill)
+    table.removeElement(self.equipSkills, skill)
+end
 
 --------------------------------------------------------------------------------
 -- @type Player
 -- Classe que representa os jogadores.
 -- Herda Entity.
 --------------------------------------------------------------------------------
-Player = class(Entity)
+Player = class(Actor)
 M.Player = Player
 
 ---
@@ -417,39 +435,18 @@ M.Player = Player
 function Player:init()
     Player.__super.init(self)
     self.id = 0
-    self.gold = 1000
-    self.name = nil
+    self.gold = 0    
     self.current_map = nil
-    self.actor = nil
-    self.level = 1    
-    self.exp = 0      
-    self.str = 0
-    self.vit = 0
-    self.int = 0    
-    self.spd = 0    
-    self.equipSkills = {}        
+    self.actor = nil    
 end
 
 ---
 -- 
 function Player:loadData(data)
     self.id = data.id
-    self.gold = data.gold
-    self.name = data.name
+    self.gold = data.gold    
     self.current_map = data.current_map    
-    self.actor = repositry:getActorById(data.actor_id)
-    self.level = data.level    
-    self.exp = data.exp        
-    self.str = data.str
-    self.vit = data.vit
-    self.int = data.int    
-    self.spd = data.spd   
-    
-    for i, skillId in ipairs(data.equipSkills) do
-        local skill = assert(repositry:getSkillById(skillId), "Not Found Skill", skillId)
-        self.equipSkills[i] = skill
-    end
-    
+    self.actor = repositry:getActorById(data.actor_id)      
 end
 
 ---
@@ -457,42 +454,14 @@ end
 function Player:saveData()
     local data = {}
     data.id = self.id
-    data.gold = self.gold
-    data.name = self.name
+    data.gold = self.gold    
     data.current_map = self.current_map
-    data.actor_id = self.actor.id
-    data.level = self.level    
-    data.exp = self.exp        
-    data.str = self.str
-    data.vit = self.vit
-    data.int = self.int    
-    data.spd = self.spd       
-    data.equipSkills = {}
-    
-    for i, skill in ipairs(self.equipSkills) do
-      data.equipSkills[i] = skill.id
-    end    
-    
+    data.actor_id = self.actor.id            
     return data
 end
 
 ---
 -- 
-function Player:getSkills()
-    return self.equipSkills
-end
-
----
--- 
-function Player:addSkill(skill)
-    table.insertElement(self.equipSkills, skill)
-end
-
----
--- 
-function Player:removeSkill(skill)
-    table.removeElement(self.equipSkills, skill)
-end
 
 M.initialize()
 

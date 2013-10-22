@@ -43,7 +43,7 @@ local AvatarInfoBox
 --local InventoryListBox
 
 -- ウィジェットの最大の横幅
-local WIDGET_WIDTH = 400
+local WIDGET_WIDTH = 200
 
 --------------------------------------------------------------------------------
 -- @type ActorDetailBox
@@ -83,8 +83,7 @@ end
 function ActorDetailBox:_createChildren()
     ActorDetailBox.__super._createChildren(self)
     self:_createFaceImage()
-    self:_createHeaderLabel()
-    self:_createStatusLabel()
+    self:_createHeaderLabel()    
     self:_createSkillsLabel()
     self:setSize(WIDGET_WIDTH, 260)
 end
@@ -105,28 +104,10 @@ function ActorDetailBox:_createHeaderLabel()
     self:addChild(self._headerLabel)    
 end
 
----
--- ステータスラベルを生成します.
-function ActorDetailBox:_createStatusLabel()
-    local offsetX, offsetY = self._faceImage:getLeft(), 5 + self._faceImage:getBottom()
-    for i, name in ipairs(ActorDetailBox.STATUS_LABEL_NAMES) do
-        local nameLabel = Label(name, 150, 30, nil, 18)
-        nameLabel:setPos(offsetX, offsetY + (i - 1) * nameLabel:getHeight())
-
-        local valueLabel = Label("", 50, 30, nil, 18)
-        valueLabel:setPos(nameLabel:getRight(), offsetY + (i - 1) * nameLabel:getHeight())
-
-        self:addChild(nameLabel)
-        self:addChild(valueLabel)
-        table.insert(self._statusNameLabels, nameLabel)
-        table.insert(self._statusValueLabels, valueLabel)
-    end
-end
-
 
 function ActorDetailBox:_createSkillsLabel()             
     self._skillsLabel = Label("Habilidades", 150, 30, nil, 22)
-    self._skillsLabel:setPos(self._headerLabel:getRight() + 10,10)
+    self._skillsLabel:setPos(self._faceImage:getLeft(), self._faceImage:getBottom() + 10)
     self:addChild(self._skillsLabel)         
 end
 
@@ -134,8 +115,7 @@ end
 -- 表示を更新します.
 function ActorDetailBox:updateDisplay()
     ActorDetailBox.__super.updateDisplay(self)
-    self:updateHeaderLabel()
-    self:updateStatusLabel()
+    self:updateHeaderLabel()    
     self:updateSkillsLabel()
 end
 
@@ -148,21 +128,9 @@ function ActorDetailBox:updateHeaderLabel()
     local a = self._actor
     local text = string.format("%s\nLEVEL:%d\nXP:%d", a.name, a.level, a.exp)
     self._headerLabel:setString(text)
-    self._faceImage:setFace(self._actor.actor.id)
+    self._faceImage:setFace(a.id)
 end
 
----
--- ステータスラベルの表示を更新します.
-function ActorDetailBox:updateStatusLabel()
-    if not self._actor then
-        return
-    end
-    local actor = self._actor
-    self._statusValueLabels[1]:setString(tostring(actor.str))
-    self._statusValueLabels[2]:setString(tostring(actor.vit))
-    self._statusValueLabels[3]:setString(tostring(actor.int))    
-    self._statusValueLabels[4]:setString(tostring(actor.spd))
-end
 
 function ActorDetailBox:updateSkillsLabel()
     if not self._actor then
@@ -564,15 +532,15 @@ function AvatarInfoBox:updateDisplay()
     self._avatarGOLD:setString(gold)
     self._avatarGOLD:fitSize(#gold)
     
-    local name = self._player.name
+    local name = self._player.actor.name
     self._avatarName:setString(name)
     self._avatarName:fitSize(#name)    
     
-    local level = string.format("LEVEL  %d", self._player.level)
+    local level = string.format("LEVEL  %d", self._player.actor.level)
     self._avatarLVL:setString(level)
     self._avatarLVL:fitSize(#level)
     
-    local xp = string.format("XP  %d/%d", self._player.exp,(self._player.level+1)*100)
+    local xp = string.format("XP  %d/%d", self._player.actor.exp,(self._player.actor.level +1 ) * 100)
     self._avatarXP:setString(xp)
     self._avatarXP:fitSize(#xp)
 end

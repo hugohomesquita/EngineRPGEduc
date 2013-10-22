@@ -38,7 +38,7 @@ function onCreate(e)
     --rpgMap:addEventListener("talk",onTalk)       
     rpgMap:addEventListener("teleport",onTeleport)
     rpgMap:addEventListener("minigame",onMinigame)        
-    
+    rpgMap:addEventListener("sound",onSound)
     
     loadRPGMap("assets/maps/"..e.data.MAP..".lua", e.data.hotSpot)    
     
@@ -85,15 +85,17 @@ function onResize(e)
    mapControlView:updateLayout()
 end
 
-function onTeleport(e)    
-    stopWorld()
-    flower.gotoScene(scenes.LOADING, {
-        MAP = e.data:getProperty("toMap"),
-        hotSpot = e.data:getProperty("toMapHotSpot"),
-        animation = "fade",
-        nextSceneName = scenes.GAME,
-        nextSceneParams = {animation = "fade"},
-    }) 
+function onTeleport(e)        
+    if e.data:getProperty("toMap") then
+        stopWorld()
+        flower.gotoScene(scenes.LOADING, {
+            MAP = e.data:getProperty("toMap"),
+            hotSpot = e.data:getProperty("toMapHotSpot"),
+            animation = "fade",
+            nextSceneName = scenes.GAME,
+            nextSceneParams = {animation = "fade"},
+        })
+    end
 end
 --EVENTOS DO RPGMap
 priorite = 0
@@ -138,6 +140,12 @@ function talkView_onClose(e)
         openMinigame('quiz')
     end      
 end
+
+
+function onSound(e)      
+    audio.play("assets/sounds/"..e.data.file,e.data.volume, false)
+end
+
 
 --
 --  MINI-GAMES
