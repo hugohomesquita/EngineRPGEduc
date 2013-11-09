@@ -16,6 +16,4 @@ M.TELEPORT = "teleport"
 M.MINIGAME = "minigame"
 M.SOUND = "sound"
 
-
-
 return M

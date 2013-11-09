@@ -24,6 +24,11 @@
    eJyzY2RgsEPDIIAuBhPHBpDl8KnDpQefGmqah00dsn9JtRubGlzhRaz7ADuDBqY=
   </data>
  </layer>
+ <layer name="MapObject" width="10" height="10">
+  <data encoding="base64" compression="zlib">
+   eJyzY2BgMAPiECgNwklIbBg2ZMANpiGx8alDBsSoW06CeZFkqkP2LzIA2buRgFmTGTDdtxwJIwNbIt0HAP5hCcg=
+  </data>
+ </layer>
  <objectgroup name="Event" width="10" height="10">
   <object name="Mudar Mapa" type="teleport" x="160" y="0" width="32" height="32">
    <properties>
@@ -59,11 +64,6 @@
   </object>
   <object x="640" y="224"/>
  </objectgroup>
- <layer name="MapObject" width="10" height="10">
-  <data encoding="base64" compression="zlib">
-   eJyzY2BgMAPiECgNwklIbBg2ZMANpiGx8alDBsSoW06CeZFkqkP2LzIA2buRgFmTGTDdtxwJIwNbIt0HAP5hCcg=
-  </data>
- </layer>
  <objectgroup name="Object" width="10" height="10">
   <object name="Everton" type="Actor" gid="286" x="288" y="96">
    <properties>

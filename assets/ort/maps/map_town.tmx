@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="50" height="50" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="tile0" tilewidth="32" tileheight="32">
+  <image source="tile/tile0.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="257" name="tile1" tilewidth="32" tileheight="32">
+  <image source="tile/tile1.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="513" name="actor50" tilewidth="32" tileheight="32">
+  <image source="actor/actor50.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="525" name="actor1" tilewidth="32" tileheight="32">
+  <image source="actor/actor1.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="537" name="actor52" tilewidth="32" tileheight="32">
+  <image source="actor/actor52.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="549" name="actor53" tilewidth="32" tileheight="32">
+  <image source="actor/actor53.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="561" name="actor54" tilewidth="32" tileheight="32">
+  <image source="actor/actor54.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="573" name="actor55" tilewidth="32" tileheight="32">
+  <image source="actor/actor55.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="585" name="actor56" tilewidth="32" tileheight="32">
+  <image source="actor/actor56.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="597" name="actor57" tilewidth="32" tileheight="32">
+  <image source="actor/actor57.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="609" name="actor58" tilewidth="32" tileheight="32">
+  <image source="actor/actor58.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="621" name="actor51" tilewidth="32" tileheight="32">
+  <image source="actor/actor51.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="633" name="flag" tilewidth="32" tileheight="32">
+  <image source="tile/flag.png" width="512" height="512"/>
+  <tile id="0">
+   <properties>
+    <property name="name" value="mapWarp"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="889" name="actor2" tilewidth="32" tileheight="32">
+  <image source="actor/actor2.png" width="96" height="128"/>
+ </tileset>
+ <tileset firstgid="901" name="actor3" tilewidth="32" tileheight="32">
+  <image source="actor/actor3.png" width="96" height="128"/>
+ </tileset>
+ <layer name="MapBackground" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztmEtOwzAQQL2DnKDkBGm22UCXwAmAEwCn4gLlc4AKOAAgToUtPFI0sufjOs5HWTzRlknHL7YnU3fGmE/L90z5sHSed8vvTDkgj26mhDyeCELfcWY5zUid0YP6i2ksOyUb4n9NJM+l5QpxfcR8YB+X90IJdU3M48Zyi7g7Yj7G8ri3PCAeE+cjND/UmDYZPVL3B4fEY2v4fV352BP/fooe0n3fj83pwdXSWuiRQt9DMg7Kg6ulTSEPyTg4Dy5XKQ9JbA4Pbi/jfczRjuSh3ccSxvDQ1DYtWg/Xw//0csJaqdB1sDbaQh6Scbi4L+8AfTzkxGsC6H8uGZu0Z44hGUeHxq+9dyU8tGh6qilT8v4MOR/Plhf/GnqByr/Hdb9WxJXy2HsH9xrqbr8XCNX9Rhmn2XOphJ4f0potjVs9Vo8leXD9a6uMG8tD2o9K41I9NHW61Lno0M/okh6l19VSPKDfyHnejD1y54jVXcke5qDqLpeDOscO5Uh5fkjhPLhrNTlWj9VDkuN8IR47ZY6pemhzLNmD6mNj52Hafndr9Oe+VI6Ufhev45R+l/pdryXmIUHbL8Xic/Vdq8e0zgCX3LfP3ePN/J8t5gTOWsFjP0AOx+vA9wnmGDwOA+f7A1bQprM=
+  </data>
+ </layer>
+ <layer name="MapObject" width="50" height="50">
+  <data encoding="base64" compression="zlib">
+   eJztmEtKBDEQQKf8nMADDS5EERxBEEWYGXHnEQQ/ay+hA7p0pzfQjUcQhLmAh7BCT6C7SKcr/+5MHhShm6pU5Z/UaFQopOUb4vjZRz8Hjr7+QF0KfhR1T/DfscbnITRF2giuSSk5w+/zSH0mmaG/ucbnBTRF2ghuSOkT3Xj45hGapcTHvPLJ2DKWFPNKsoRKhs4vVDJ0chmPEIj9fOLQN3dQSZ17/H6I3N9iP58pfN6u2bjLNauSHOOg5xX9PlH467JJAT2vOOeXjY0LG6TuHUNfe6D/tmUzUJufsN5nlIVh/bZ2qbgaSJy5w1kfIfcq+jYTiPvBEdjp6ejaq1zaqXqbifvBFOz0XHDZk+nbzFWvDyxXd4Cu+zhXjztPXlDntcf9xJ0n76jz0eN2cPnENnyhvEXe42KSMgdRKOSCuFvo8s6xuCS5kracdhvzjrxznZDv9SnJlYTMadfPcO6ZLu1M8wVtOW2OD46ExDU/We9jXUltuOPBjcFnfSmpt8F0nfcV03VOx7NtfLl6vjBd5+vGlkO/bGfSpzJ3ws0x7lq2+3RlF+vNwo2TGw/Vi/lm4cTIjSflW0vl23Y+FQq++Acz4n1E
+  </data>
+ </layer>
+ <layer name="MapCollision" width="50" height="50">
+  <properties>
+   <property name="visible" value="false"/>
+  </properties>
+  <data encoding="base64" compression="zlib">
+   eJztldsOAyEIRE3//4v71KcmDeEy4OCq6SSmuxWBo+COMcb7dfb46uk8mBynqsIh7br2Vu5zhePXV8S7iiOytfJDpdWoZ2PloOWU9WE9R76jOWSNx7P6PLw5bR7ZF0Z/ZFSpJ68fWOc76wOphVUcaGy5jqFKHlGfo7GYup1Ds2NzZOufVbMIRyZWJ8fKuoretfXemmweyHlo8TMcVnyUA8kDOU/Eb5eyHF3xutY9pVPy3EVWz8j3il0mNiv/HTnQ+08+o3dg9q6sis1RtVshi4Npp9kgjNnaRPLT1mTOupIfgyMaGbuqPD/y/505EEaP40T9OfZStT/Q4cVlxridIyPLPuJAfFr3kvVr/YdI2iN+onOL9gblYNQP4zwiMc8D8W3ZIPOInw6OTPzsfGd/ZHOZiVHhsPo3yolRV9E6Rp9LvzPfD8THzPfjBo4T5XHI/dpFVl3IZ2m3kgOJVeVYqWrsW/ujY8h4K+J07pP2ztYH78hTqg==
+  </data>
+ </layer>
+ <objectgroup name="Event" width="50" height="50"/>
+ <objectgroup name="Object" width="50" height="50">
+  <object name="Player" type="Actor" gid="525" x="768" y="1536">
+   <properties>
+    <property name="PlayAnim" value="WalkDown"/>
+   </properties>
+  </object>
+  <object name="WeaponShop" type="Actor" gid="538" x="192" y="448">
+   <properties>
+    <property name="playAnim" value="walkDown"/>
+   </properties>
+  </object>
+  <object name="ArmorShop" type="Actor" gid="538" x="320" y="448">
+   <properties>
+    <property name="playAnim" value="walkDown"/>
+   </properties>
+  </object>
+  <object name="Hotel" type="Actor" gid="622" x="960" y="1120"/>
+  <object name="ItemShop" type="Actor" gid="622" x="1344" y="448"/>
+  <object type="Actor" gid="562" x="576" y="224"/>
+  <object name="Elder" type="Actor" gid="577" x="896" y="384"/>
+  <object type="Actor" gid="520" x="1280" y="192"/>
+  <object name="Men1" type="Actor" gid="514" x="544" y="832">
+   <properties>
+    <property name="moveType" value="moveTypeRandom"/>
+   </properties>
+  </object>
+  <object name="Men1" type="Actor" gid="514" x="160" y="832">
+   <properties>
+    <property name="PlayAnim" value="WalkDown"/>
+   </properties>
+  </object>
+  <object type="Actor" gid="622" x="224" y="1152"/>
+  <object type="Actor" gid="538" x="416" y="1152"/>
+  <object type="Actor" gid="899" x="160" y="1216"/>
+  <object type="Actor" gid="905" x="512" y="1152"/>
+ </objectgroup>
+</map>

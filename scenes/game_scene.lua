@@ -11,6 +11,10 @@ local repositry = entities.repositry
 local entityPool = entities.entityPool
 local RPGMap = rpgmap.RPGMap
 
+
+local flower = require "hanappe/flower"
+local tiled = require "hanappe/extensions/tiled"
+
 -- views
 local MapControlView = views.MapControlView
 local TalkView = views.TalkView
@@ -39,9 +43,9 @@ function onCreate(e)
     rpgMap:addEventListener("teleport",onTeleport)
     rpgMap:addEventListener("minigame",onMinigame)        
     rpgMap:addEventListener("sound",onSound)
-    
-    loadRPGMap("assets/maps/"..e.data.MAP..".lua", e.data.hotSpot)    
-    
+    --tiled.TileMap:loadMapData(dofile("assets/ort/maps/mapa_town.lua"))
+    --loadRPGMap("assets/maps/"..e.data.MAP..".lua", e.data.hotSpot)    
+    loadRPGMap("assets/ort/maps/map_town.lua", e.data.hotSpot)    
     playerObject = rpgMap.player
 
     --INICIALIZANDO A GUI    
@@ -76,7 +80,7 @@ function loadRPGMap(mapName, hotSpot)
 
     rpgMap:loadMapData(mapData)    
     playerObject = rpgMap.player
-    playerObject:toHotSpot(hotSpot)
+    --playerObject:toHotSpot(hotSpot)
 end
 
 

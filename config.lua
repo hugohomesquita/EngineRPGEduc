@@ -15,6 +15,7 @@ local viewScale = math.floor(math.max(math.min(screenWidth / 1280, screenHeight 
 
 -- Resources setting
 flower.Resources.addResourceDirectory("assets")
+flower.Resources.addResourceDirectory("assets/ort/maps")
 flower.Resources.addResourceDirectory("assets/fonts")
 -- Set the screen size
 flower.DEFAULT_SCREEN_WIDTH = screenWidth

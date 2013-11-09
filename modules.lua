@@ -8,6 +8,7 @@ themes = require "hanappe/extensions/themes"
 tiled = require "hanappe/extensions/tiled"
 widget = require "hanappe/extensions/widget"
 audio = require "hanappe/extensions/audio"
+util = require "libs/util"
 
 -- game library
 --fonts =  "libs/fonts"

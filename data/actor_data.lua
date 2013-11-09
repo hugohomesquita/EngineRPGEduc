@@ -10,7 +10,7 @@ return {
             1,
             2,
         },        
-    } ,
+    },
     {
         id = 2,
         name = "LAMPIÃO",

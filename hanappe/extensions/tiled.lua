@@ -1327,7 +1327,7 @@ M.TileLayerRendererFactory = TileLayerRendererFactory
 function TileLayerRendererFactory:newInstance(layer)
     local tileMap = layer.tileMap
 
-    if tileMap:isOrthogonal() then
+    if tileMap:isOrthogonal() then        
         return TileLayerRenderer(layer)
     elseif tileMap:isIsometric() then
         return IsometricLayerRenderer(layer)
