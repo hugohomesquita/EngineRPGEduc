@@ -54,12 +54,13 @@ function RPGMap:init()
     self.mapBackgroundLayer = nil    
         
     self.worldFreeze = false   
-    
+    self.DEBUG = false
     
     self:initEventListeners()   
     self:initLayer()
     self:initPhysics()
     self:initSystems()    
+    
 end
 
 
@@ -69,6 +70,7 @@ function RPGMap:initLayer()
     local layer = Layer()
     --layer:setPriority(1)
     layer:setSortMode(MOAILayer.SORT_PRIORITY_ASCENDING)
+    layer:setTouchEnabled(true)
     layer:setCamera(self.camera)    
     self:setLayer(layer)
 end
@@ -101,9 +103,12 @@ end
 
 function RPGMap:initEventListeners()
     self:addEventListener("loadedData", self.onLoadedData, self)
-    self:addEventListener("savedData", self.onSavedData, self)
+    self:addEventListener("savedData", self.onSavedData, self)    
+    self:addEventListener("touchDown", self.OnTouchDown, self)
+    self:addEventListener("touchUp", self.OnTouchUp, self)
+    self:addEventListener("touchMove", self.OnTouchMove, self)
+    self:addEventListener("touchCancel", self.OnTouchUp, self)
 end
-
 
 function RPGMap:isCollision(x, y)
     local gid = self.mapCollisionLayer:getGid(x, y)
@@ -254,5 +259,59 @@ function RPGMap:createPhysicsCollision()
         end
     end       
 end
+
+---
+--  FUNÇÕES UTILIZADAS NO DEBUG
+---
+
+function RPGMap:debug()
+    if self.DEBUG then
+        self.DEBUG = false       
+    else
+        self.DEBUG = true        
+    end
+end
+
+function RPGMap:OnTouchDown(e)
+    if self.lastTouchEvent then
+        return
+    end
+    self.lastTouchIdx = e.idx
+    self.lastTouchX = e.x
+    self.lastTouchY = e.y    
+end
+
+function RPGMap:OnTouchUp(e)
+    if not self.lastTouchIdx then
+        return
+    end
+    if self.lastTouchIdx ~= e.idx then
+        return
+    end
+    self.lastTouchIdx = nil
+    self.lastTouchX = nil
+    self.lastTouchY = nil    
+end
+
+function RPGMap:OnTouchMove(e)
+    if not self.lastTouchIdx then
+        return
+    end
+    if self.lastTouchIdx ~= e.idx then
+        return
+    end
+    
+    local moveX = e.x - self.lastTouchX
+    local moveY = e.y - self.lastTouchY
+    local x, y, z = self.camera:getLoc()
+    x = math.min(math.max(0, x - moveX), math.max(self:getWidth() - flower.viewWidth, 0))
+    y = math.min(math.max(0, y - moveY), math.max(self:getHeight() - flower.viewHeight, 0))
+    self.camera:setLoc(x, y, z)
+
+    self.lastTouchX = e.x
+    self.lastTouchY = e.y
+end
+
+
 
 return M

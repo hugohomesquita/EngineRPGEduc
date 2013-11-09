@@ -14,7 +14,7 @@ local RPGMap = rpgmap.RPGMap
 
 local flower = require "hanappe/flower"
 local tiled = require "hanappe/extensions/tiled"
-
+local InputMgr = flower.InputMgr
 -- views
 local MapControlView = views.MapControlView
 local TalkView = views.TalkView
@@ -33,7 +33,9 @@ function onCreate(e)
     --assert(e.data.PLAYER_ID)
     
     PLAYER_ID = e.data.PLAYER_ID    
-    flower.Runtime:addEventListener("resize", onResize)                
+    flower.Runtime:addEventListener("resize", onResize)                  
+    
+    InputMgr:addEventListener("keyDown", onKeyboard)
     
     rpgMap = RPGMap()
     rpgMap:setScene(scene)
@@ -43,6 +45,8 @@ function onCreate(e)
     rpgMap:addEventListener("teleport",onTeleport)
     rpgMap:addEventListener("minigame",onMinigame)        
     rpgMap:addEventListener("sound",onSound)
+     
+      
     --tiled.TileMap:loadMapData(dofile("assets/ort/maps/mapa_town.lua"))
     --loadRPGMap("assets/maps/"..e.data.MAP..".lua", e.data.hotSpot)    
     loadRPGMap("assets/ort/maps/map_town.lua", e.data.hotSpot)    
@@ -202,9 +206,16 @@ end
 --
 --    UPDATES THE GAME  
 --
-
+function onKeyboard(e)
+  local key = e.key
+  -- 112 = P
+  if key == 112 then
+      rpgMap:debug()
+  end
+end
 function onUpdate(e)
-       
+  
+ 
   if worldFreeze then
       playerObject:stopWalk()
   end

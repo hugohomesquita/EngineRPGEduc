@@ -20,7 +20,9 @@ function CameraSystem:onLoadedData(e)
 end
 
 function CameraSystem:onUpdate()
-    self:scrollCameraToFocusObject()
+    if self.tileMap.DEBUG == false then
+      self:scrollCameraToFocusObject()
+    end
 end
 
 function CameraSystem:scrollCameraToCenter(x, y)
