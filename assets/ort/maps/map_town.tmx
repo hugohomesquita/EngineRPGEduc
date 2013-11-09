@@ -68,7 +68,13 @@
    eJztldsOAyEIRE3//4v71KcmDeEy4OCq6SSmuxWBo+COMcb7dfb46uk8mBynqsIh7br2Vu5zhePXV8S7iiOytfJDpdWoZ2PloOWU9WE9R76jOWSNx7P6PLw5bR7ZF0Z/ZFSpJ68fWOc76wOphVUcaGy5jqFKHlGfo7GYup1Ds2NzZOufVbMIRyZWJ8fKuoretfXemmweyHlo8TMcVnyUA8kDOU/Eb5eyHF3xutY9pVPy3EVWz8j3il0mNiv/HTnQ+08+o3dg9q6sis1RtVshi4Npp9kgjNnaRPLT1mTOupIfgyMaGbuqPD/y/505EEaP40T9OfZStT/Q4cVlxridIyPLPuJAfFr3kvVr/YdI2iN+onOL9gblYNQP4zwiMc8D8W3ZIPOInw6OTPzsfGd/ZHOZiVHhsPo3yolRV9E6Rp9LvzPfD8THzPfjBo4T5XHI/dpFVl3IZ2m3kgOJVeVYqWrsW/ujY8h4K+J07pP2ztYH78hTqg==
   </data>
  </layer>
- <objectgroup name="Event" width="50" height="50"/>
+ <objectgroup name="Event" width="50" height="50">
+  <object name="Quiz" type="minigame" x="768" y="1440" width="32" height="32">
+   <properties>
+    <property name="name" value="quiz"/>
+   </properties>
+  </object>
+ </objectgroup>
  <objectgroup name="Object" width="50" height="50">
   <object name="Player" type="Actor" gid="525" x="768" y="1536">
    <properties>

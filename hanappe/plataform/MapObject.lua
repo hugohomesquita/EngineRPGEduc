@@ -37,11 +37,18 @@ MapObject.ORT_DIR_TO_ANIM = {
 }
 
 
-MapObject.DIR_TO_INDEX = {
+MapObject.ISO_DIR_TO_INDEX = {
     north = 10,
     south = 46,
     east = 28,
     west = 64,
+}
+
+MapObject.ORT_DIR_TO_INDEX = {
+    north = 11,
+    south = 2,
+    east = 8,
+    west = 5,
 }
 
 MapObject.ISO_DIR_TO_VELOCITY = {
@@ -154,7 +161,11 @@ end
 function MapObject:stopWalkAnim()
     if self.renderer and self.renderer:isBusy() then
         self.renderer:stopAnim()
-        self.renderer:setIndex(MapObject.DIR_TO_INDEX[self.direction])
+        if self.tileMap:isOrthogonal() then
+          self.renderer:setIndex(MapObject.ORT_DIR_TO_INDEX[self.direction])
+        elseif self.tileMap:isIsometric() then
+          self.renderer:setIndex(MapObject.ISO_DIR_TO_INDEX[self.direction])
+        end
     end
 end
 
@@ -209,7 +220,9 @@ function MapObject:setSpeed(direction)
 end
 
 function MapObject:onUpdate()
-    self:setPriority(self:vertexZ())      
+    if self.tileMap:isIsometric() then
+        self:setPriority(self:vertexZ()) 
+    end        
 end
 --
 --

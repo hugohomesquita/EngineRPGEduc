@@ -45,7 +45,7 @@ function ActorController:initController()
     
     if self.tileMap:isOrthogonal() then
         if object.renderer then   
-            object.renderer:setPos(-8,-16)  
+            object.renderer:setPos(-2,-2)  
             object.renderer:setAnimDatas(ActorController.ORT_ANIM_DATA_LIST)
             object:setDirection(object:getDirectionByIndex())
         end
@@ -68,10 +68,10 @@ function ActorController:initPhysics()
     local poly = nil
     if self.tileMap:isOrthogonal() then
         poly = {
-            0, 20,
-            0, 0,
-            20, 0,
-            20, 20,
+            4, 30,
+            4, 4,
+            25, 4,
+            25, 30,
         } 
     elseif self.tileMap:isIsometric() then       
         poly = {

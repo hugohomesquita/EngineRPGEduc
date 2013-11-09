@@ -398,7 +398,7 @@ function MapControlView:_createChildren()
 
     --JOYSTICK
     self.joystick = Joystick {
-        stickMode = "digital",
+        stickMode = "analog",
         parent = self,        
         color = {0.6, 0.6, 0.6, 0.6},
         OnStickChanged = function(e)          
