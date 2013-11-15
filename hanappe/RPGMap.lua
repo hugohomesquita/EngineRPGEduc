@@ -166,9 +166,9 @@ end
 function RPGMap:getPositionHotSpot(index)
     for i, event in ipairs(self.mapEventLayer.children) do
         if event.type == 'teleport' then
-            local hotspotIndex = event:getProperty('hotSpot')                         
+            local hotspotIndex = event:getProperty('hotSpot')                                     
             if hotspotIndex == tostring(index) then                
-                --return event.physics.body:getPosition()
+                return event.physics.body:getPosition()
             end
         end
     end
@@ -271,13 +271,15 @@ function RPGMap:createPhysicsEvent()
         
         object:setPos(xMin, yMin)              
         body:setTransform(posX,posY)                 
-        
+
         poly = {
-          0, 32, 
+          0, height, 
           0, 0, 
-          32, 0, 
-          32, 32, 
+          width, 0, 
+          width, height, 
         }
+        
+        
         body:setFixedRotation(0)  
         body:resetMassData()
         

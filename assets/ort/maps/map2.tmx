@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="20" height="20" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="FLAGS" tilewidth="32" tileheight="32">
+  <image source="tile/flag.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="257" name="tile0" tilewidth="32" tileheight="32">
+  <image source="tile/tile0.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="513" name="world_tiles" tilewidth="32" tileheight="32">
+  <image source="tile/world_tiles.png" width="1024" height="512"/>
+ </tileset>
+ <tileset firstgid="1025" name="tile1" tilewidth="32" tileheight="32">
+  <image source="tile/tile1.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="1281" name="tile1e" tilewidth="32" tileheight="32">
+  <image source="tile/tile1e.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="1537" name="actor1" tilewidth="32" tileheight="32">
+  <image source="actor/actor1.png" width="96" height="128"/>
+ </tileset>
+ <layer name="MapBackground" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzt0kEKwCAMBMD4Lp/aEr/qRanIJq62PenC3sIQgyIiKTyNpW/yp5eOt5XH/J86U+eQdwU861meh/qlp413g3tYnrWbgv2sN7Be/2bvJrPe6MasNyrrMUafFc/LrMdmxdFy4wxAcEtr
+  </data>
+ </layer>
+ <layer name="MapObject" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzrZWTACrqB4j1k4N5R84atef0EzAPJz4HiPjxmwNTMJWAestxsLGb2Q82AAQdW3ObJsKKqxRYG2PTiMg+Xm6lp3mxoOPGyIsKLEvPmM2JiSszDZiY6qAeK1ZLpRmwAX5rGZR4+ADIP5MYaEt2JDKqR9CPHP6l+h5lVh6QfPf+QYibMLOQ8hy1PwvxPCMPchZwOAS4kdZs=
+  </data>
+ </layer>
+ <layer name="MapCollision" width="20" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxrYsAOmnCIEwK49I2aN/zNQ8fUUIeLT6waQvrx8XGJ4QK0MI9QWJEbj/jspLZ5Q8WNlOQJYtInKWaRK0+OWmzpDBdGBwCkSCaZ
+  </data>
+ </layer>
+ <objectgroup name="Event" width="20" height="20">
+  <object name="HouseTeleport" type="teleport" x="32" y="0" width="160" height="32">
+   <properties>
+    <property name="hotSpot" value="1"/>
+    <property name="toMap" value="map1"/>
+    <property name="toMapHotSpot" value="2"/>
+   </properties>
+  </object>
+  <object name="MAPA CIDADE" type="teleport" x="608" y="288" width="32" height="224">
+   <properties>
+    <property name="hotSpot" value="2"/>
+    <property name="toMap" value="map3"/>
+    <property name="toMapHotSpot" value="1"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="Object" width="20" height="20">
+  <object name="Player" type="Actor" gid="1537" x="96" y="32"/>
+ </objectgroup>
+</map>

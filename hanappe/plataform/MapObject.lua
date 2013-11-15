@@ -20,7 +20,7 @@ MapObject.DIR_RIGHT = "east"
 MapObject.DIR_DONW = "south"
 
 -- Move speed
-MapObject.MOVE_SPEED = 100
+MapObject.MOVE_SPEED = 80
 
 -- Direction to AnimationName
 MapObject.ISO_DIR_TO_ANIM = {
@@ -224,9 +224,7 @@ function MapObject:onUpdate()
         self:setPriority(self:vertexZ()) 
     end        
 end
---
---
---
+
 function MapObject:getMapPos()
     return self.mapX, self.mapY
 end

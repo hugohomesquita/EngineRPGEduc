@@ -48,8 +48,8 @@ function onCreate(e)
      
       
     --tiled.TileMap:loadMapData(dofile("assets/ort/maps/mapa_town.lua"))
-    --loadRPGMap("assets/maps/"..e.data.MAP..".lua", e.data.hotSpot)    
-    loadRPGMap("assets/ort/maps/map_town.lua", e.data.hotSpot)    
+    loadRPGMap("assets/ort/maps/"..e.data.MAP..".lua", e.data.hotSpot)    
+    --loadRPGMap("assets/ort/maps/map1.lua", e.data.hotSpot)    
     playerObject = rpgMap.player
 
     --INICIALIZANDO A GUI    
@@ -83,8 +83,8 @@ function loadRPGMap(mapName, hotSpot)
     --mapData.tilesets[9].tileoffsety = 96       
 
     rpgMap:loadMapData(mapData)    
-    playerObject = rpgMap.player
-    --playerObject:toHotSpot(hotSpot)
+    playerObject = rpgMap.player    
+    playerObject:toHotSpot(hotSpot)    
 end
 
 
@@ -94,7 +94,7 @@ function onResize(e)
 end
 
 function onTeleport(e)        
-    if e.data:getProperty("toMap") then
+    if e.data:getProperty("toMap") then          
         stopWorld()
         flower.gotoScene(scenes.LOADING, {
             MAP = e.data:getProperty("toMap"),

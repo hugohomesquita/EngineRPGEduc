@@ -50,14 +50,23 @@
  <tileset firstgid="901" name="actor3" tilewidth="32" tileheight="32">
   <image source="actor/actor3.png" width="96" height="128"/>
  </tileset>
+ <tileset firstgid="913" name="tile1e" tilewidth="32" tileheight="32">
+  <image source="tile/tile1e.png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="1169" name="38189036[1]" tilewidth="32" tileheight="32">
+  <image source="tile/38189036[1].png" width="512" height="512"/>
+ </tileset>
+ <tileset firstgid="1425" name="gallery_17644_149_304443" tilewidth="32" tileheight="32">
+  <image source="tile/gallery_17644_149_304443.png" width="512" height="512"/>
+ </tileset>
  <layer name="MapBackground" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJztmEtOwzAQQL2DnKDkBGm22UCXwAmAEwCn4gLlc4AKOAAgToUtPFI0sufjOs5HWTzRlknHL7YnU3fGmE/L90z5sHSed8vvTDkgj26mhDyeCELfcWY5zUid0YP6i2ksOyUb4n9NJM+l5QpxfcR8YB+X90IJdU3M48Zyi7g7Yj7G8ri3PCAeE+cjND/UmDYZPVL3B4fEY2v4fV352BP/fooe0n3fj83pwdXSWuiRQt9DMg7Kg6ulTSEPyTg4Dy5XKQ9JbA4Pbi/jfczRjuSh3ccSxvDQ1DYtWg/Xw//0csJaqdB1sDbaQh6Scbi4L+8AfTzkxGsC6H8uGZu0Z44hGUeHxq+9dyU8tGh6qilT8v4MOR/Plhf/GnqByr/Hdb9WxJXy2HsH9xrqbr8XCNX9Rhmn2XOphJ4f0potjVs9Vo8leXD9a6uMG8tD2o9K41I9NHW61Lno0M/okh6l19VSPKDfyHnejD1y54jVXcke5qDqLpeDOscO5Uh5fkjhPLhrNTlWj9VDkuN8IR47ZY6pemhzLNmD6mNj52Hafndr9Oe+VI6Ufhev45R+l/pdryXmIUHbL8Xic/Vdq8e0zgCX3LfP3ePN/J8t5gTOWsFjP0AOx+vA9wnmGDwOA+f7A1bQprM=
+   eJztmE1OQjEQgLtTTqCc4MGWxKhL9QTq1o16DH8ugOjaKLIh8WdNRL2AxlPZFzuhmUw7nb7yHiUsvoBQmH5Mpx3bU0p9ab4z5VPTM3xofjPlHXn0MoXyuPdAfcemZj0h7YQevkdModlNSOGIs6fZRxxUyAf2KePuJMTlcag5QhxXyEdTHqeaM8R5ZD6o/NTlEVsfHBKPNeWv7VYmHiH1PQ8Pbi9tCz1i11XIPHwe3F5a1OQRMg/O48RDnR4hY1N4dJjcQw1ztQ50G/IIrWHJmd6ERwgTwVgbqUfZw/9YHrBWWmj+sDa6NXnY86DOI1iDpcdUzfp48LBzbHvYr4d4TAgkHtT5gteo7UGdbxx1eIQCHlS8HJgaqHykhMvHiOBCc8lwZcbifDxrXsxr0Au0zN94328LxsV49DU3mjvNI+LWvDdweJTPYd+1ewFq3y+E40rGjnxRubg2DkPNE+LBuIR6hOzZ5eOWB4kHrCWfA9B3eMDzJjxg/jcWA8f8bddF84BaCPHoq1nNDBfMA9Z7qAfkAfB5cP1rVzjO5wG1a+9Frtqg6sLnEdqPSvpWn4e9F9kO44oe82BcgUXzqPL5kZWvnD04KA/ujiLmvhl7pI7h2ncl/4NydxmUBxdjQxgj5vyIufegPLjPSmKsPFYeITG2l8QD3yvk6iGNscwevj7WdR8m7Xc7Sn7v64sR0+/idRzT78be+7pixPZX0n7JNT5V37XySEeTHlKa6Ntz93hT//ejOfI6599pSjDPeH9MJ/OZ
   </data>
  </layer>
  <layer name="MapObject" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJztmEtKBDEQQKf8nMADDS5EERxBEEWYGXHnEQQ/ay+hA7p0pzfQjUcQhLmAh7BCT6C7SKcr/+5MHhShm6pU5Z/UaFQopOUb4vjZRz8Hjr7+QF0KfhR1T/DfscbnITRF2giuSSk5w+/zSH0mmaG/ucbnBTRF2ghuSOkT3Xj45hGapcTHvPLJ2DKWFPNKsoRKhs4vVDJ0chmPEIj9fOLQN3dQSZ17/H6I3N9iP58pfN6u2bjLNauSHOOg5xX9PlH467JJAT2vOOeXjY0LG6TuHUNfe6D/tmUzUJufsN5nlIVh/bZ2qbgaSJy5w1kfIfcq+jYTiPvBEdjp6ejaq1zaqXqbifvBFOz0XHDZk+nbzFWvDyxXd4Cu+zhXjztPXlDntcf9xJ0n76jz0eN2cPnENnyhvEXe42KSMgdRKOSCuFvo8s6xuCS5kracdhvzjrxznZDv9SnJlYTMadfPcO6ZLu1M8wVtOW2OD46ExDU/We9jXUltuOPBjcFnfSmpt8F0nfcV03VOx7NtfLl6vjBd5+vGlkO/bGfSpzJ3ws0x7lq2+3RlF+vNwo2TGw/Vi/lm4cTIjSflW0vl23Y+FQq++Acz4n1E
+   eJztmUtL3UAUxzPWbAXrSi1qddUq1m3blQsfFKogiKVw7aU7d26Valvopl25duEDxZXVQt2JD9CNYD9AoXC/QD+D+B+SQDhOkjMzeRnvD/6EyZ2Zc85kJnMy13GaNCmWK5GPnQnYmbS09V+or5K/ir7rwlMUb8Rd1UmZMod773Ias4B52PsQY/O9SFYWxD2PvEhjXpnQgM1F4V3ToIh5JZH+f0kxjqKQ/q9FxNHpOk4X1A09cb1yD9QL9UE3rXw7Y+h/PMOxiptXz+Drc2gQGnK98jD0AhqB2tzs/Aqzzog/q3k1jf6moG94ZnuPHGcbWtaIe0V4CrOK8ucIP+PmlQ3yfT5P+vyBOD7d83Woyz8RLRO+aqzlLP2Igu5XtDyjsJfUJswr3H9NfhtE+WXKcdD9irN/mbSxoYX03aFpa0zEl7l0kjk5ZDhHk9iAf5vQlqafpu2K4uM98bPqcNZHlvn5gqJfmR+8FWb14kh6V9nEuaRoJ/ODmjCrZ4PNO/k7sx23Xhlo+DlAUv7HrcedJzuos1viceLOk9+oc1TiOLhcIIZLaD/nd1yemK79A7Q5hH6Ju/fPFPd/VmCsjhHDSQXiuEYMfyoQR5mQucU0GdN2fNs/hjpyOqOR1P2zkoAgD1LlQypkbkHPnZ/C/35ogMSR9ndymBo5KwnyIFU+ZEt4D+fu6UE73fOCIA/i5kNxZxRZn1tQbM/DwmMcd6VtuM+D60Oa/RVJOAbddV5WdNc5fZ5Rz5dbLy101/lDo9ViXNyKjGlwdkLPUGQOfern0eehXHrUMO5Zv11e3yxcP7n+0Hp5/m/K8ZHrT1H/90bZNp1PTZqkxS0+dJrl
   </data>
  </layer>
  <layer name="MapCollision" width="50" height="50">
@@ -65,22 +74,20 @@
    <property name="visible" value="false"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJztldsOAyEIRE3//4v71KcmDeEy4OCq6SSmuxWBo+COMcb7dfb46uk8mBynqsIh7br2Vu5zhePXV8S7iiOytfJDpdWoZ2PloOWU9WE9R76jOWSNx7P6PLw5bR7ZF0Z/ZFSpJ68fWOc76wOphVUcaGy5jqFKHlGfo7GYup1Ds2NzZOufVbMIRyZWJ8fKuoretfXemmweyHlo8TMcVnyUA8kDOU/Eb5eyHF3xutY9pVPy3EVWz8j3il0mNiv/HTnQ+08+o3dg9q6sis1RtVshi4Npp9kgjNnaRPLT1mTOupIfgyMaGbuqPD/y/505EEaP40T9OfZStT/Q4cVlxridIyPLPuJAfFr3kvVr/YdI2iN+onOL9gblYNQP4zwiMc8D8W3ZIPOInw6OTPzsfGd/ZHOZiVHhsPo3yolRV9E6Rp9LvzPfD8THzPfjBo4T5XHI/dpFVl3IZ2m3kgOJVeVYqWrsW/ujY8h4K+J07pP2ztYH78hTqg==
+   eJztVdFuAzEIq/b/X7ynPk3KEGCbQG6phnTqNQFjh8C9Xp9j3193P6uOW62iw/pNna0954qOFQvptXuo7hEPpANpjvixxnBVzj3C8daRjqweDP6OPVmPXQwPr6M/KnkzjOm5eVLHJI+sPyrn110PZUYrfBj9u1bh8a/j9ztbe/bp1KHkmtaB+qKzHtl/Lz6Lset2T+lzJl7hVNVhuXnrtm4VHZNWqcdEvqk4D+eETec5pUMxdab9xKyxFifCVfxY3hGnbN7aGBsfaYzydOnIzsvLiXQws1yd+YyW6lxXdFT9WP4ojukPyy/jpPpFfBBGVIcdHVEexs9bz2qKdKBcaE4wfb3T5xk+0s/qiM4r4uPts3qYfUZHhoG4M1hVU+/VZL4p3Jt0oJz2nelf9snyduaozF2F0206lHUmB5pL0W+0xhg7l61PVjd0NqyOjj7oqAeyznow2JEPs8/gTOhQ8qv7k/2hctnJUdER9S/i1HGvUFxHn1vcne8Hg7Hz/XhSR+av6HjalPNYY7z39T+Ldcqie2Hfrd9JHUyuqo6TVs39F/ujYt79ufX5JHsDGd4/+g==
   </data>
  </layer>
  <objectgroup name="Event" width="50" height="50">
-  <object name="Quiz" type="minigame" x="768" y="1440" width="32" height="32">
+  <object name="MAPA 2" type="teleport" x="0" y="576" width="32" height="96">
    <properties>
-    <property name="name" value="quiz"/>
+    <property name="hotSpot" value="1"/>
+    <property name="toMap" value="map2"/>
+    <property name="toMapHotSpot" value="2"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup name="Object" width="50" height="50">
-  <object name="Player" type="Actor" gid="525" x="768" y="1536">
-   <properties>
-    <property name="PlayAnim" value="WalkDown"/>
-   </properties>
-  </object>
+  <object name="Player" type="Actor" gid="525" x="32" y="640"/>
   <object name="WeaponShop" type="Actor" gid="538" x="192" y="448">
    <properties>
     <property name="playAnim" value="walkDown"/>
@@ -92,23 +99,15 @@
    </properties>
   </object>
   <object name="Hotel" type="Actor" gid="622" x="960" y="1120"/>
-  <object name="ItemShop" type="Actor" gid="622" x="1344" y="448"/>
-  <object type="Actor" gid="562" x="576" y="224"/>
-  <object name="Elder" type="Actor" gid="577" x="896" y="384"/>
-  <object type="Actor" gid="520" x="1280" y="192"/>
-  <object name="Men1" type="Actor" gid="514" x="544" y="832">
-   <properties>
-    <property name="moveType" value="moveTypeRandom"/>
-   </properties>
-  </object>
-  <object name="Men1" type="Actor" gid="514" x="160" y="832">
-   <properties>
-    <property name="PlayAnim" value="WalkDown"/>
-   </properties>
-  </object>
+  <object name="Cleide" type="Actor" gid="622" x="1344" y="448"/>
+  <object name="Arthur" type="Actor" gid="562" x="672" y="288"/>
+  <object name="Julia" type="Actor" gid="520" x="1280" y="192"/>
+  <object name="A2" type="Actor" gid="514" x="544" y="832"/>
+  <object name="A1" type="Actor" gid="514" x="160" y="832"/>
   <object type="Actor" gid="622" x="224" y="1152"/>
   <object type="Actor" gid="538" x="416" y="1152"/>
   <object type="Actor" gid="899" x="160" y="1216"/>
   <object type="Actor" gid="905" x="512" y="1152"/>
+  <object gid="911" x="896" y="224"/>
  </objectgroup>
 </map>

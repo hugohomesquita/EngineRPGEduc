@@ -48,7 +48,7 @@ function MovementSystem:onCollisionBegin(e)
         self.tileMap:dispatchEvent(MapEvent.MINIGAME, object)
     end
     if object.type == 'teleport' then        
-        self.tileMap:dispatchEvent(MapEvent.TELEPORT, object)
+        self.tileMap:dispatchEvent(MapEvent.TELEPORT, object)        
     end        
     if object:getProperty("sound") ~= nil then          
         sound = {}        
