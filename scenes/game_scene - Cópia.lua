@@ -2,6 +2,7 @@
 -- Módulo de cena mostra o mapa
 --
 ----------------------------------------------------------------------------------------------------
+
 module(..., package.seeall)
 
 -- imports
@@ -26,9 +27,6 @@ local PLAYER_ID = nil
 local mapPlayerInfo = nil
 local rpgMap = nil
 local worldFreeze  = false
-
-
-
 
 function onCreate(e)             
     e.data.PLAYER_ID = 1    
@@ -73,89 +71,82 @@ end
 
 function loadRPGMap(mapName, hotSpot)
     local mapData = dofile(mapName)
+    --mapData.tilesets[7].tileoffsetx = 0
+    --mapData.tilesets[7].tileoffsety = 48
     
+    --mapData.tilesets[4].tileoffsetx = 0
+    --mapData.tilesets[4].tileoffsety = 16
+    
+   -- mapData.tilesets[9].tileoffsetx = 32
+    --mapData.tilesets[9].tileoffsety = 96       
+
     rpgMap:loadMapData(mapData)    
     playerObject = rpgMap.player    
     playerObject:toHotSpot(hotSpot)    
 end
 
 
-function onResize(e)  
+function onResize(e)
+  --RPGMapPlayerInfo:updateDisplay()
    mapControlView:updateLayout()
 end
 
+function onTeleport(e)        
+    if e.data:getProperty("toMap") then          
+        stopWorld()
+        flower.gotoScene(scenes.LOADING, {
+            MAP = e.data:getProperty("toMap"),
+            hotSpot = e.data:getProperty("toMapHotSpot"),
+            animation = "fade",
+            nextSceneName = scenes.GAME,
+            nextSceneParams = {animation = "fade"},
+        })
+    end
+end
 --EVENTOS DO RPGMap
+priorite = 0
 function onEnter(e)             
-  
+    --for i,layer in  ipairs(rpgMap:getMapLayers()) do
+    --  if layer.name == "MapObject" then
+    --    print(layer.name)
+     --   for i,tile in  ipairs(layer.tiles) do
+      --    print(tile)
+      --  end
+     -- end
+    --end
+    --priorite = playerObject:getPriority() - 5     
+    --playerObject:setPriority(priorite)
+    --repositry:savePlayer(1)
+    --entityPool:saveEntities(1)
+    --repositry:savePlayerById(1,1)    
+    --effect = BalloonEffect(repositry:getEffectById(4))
+    --effect:play(playerObject)       
 end
 
-function onTalk(e) 
+function onTalk(e)  
+    stopWorld()
     local actor = e.data
-    if tonumber(actor:getProperty("talkId")) ~= nil then        
-        stopWorld()
-        mapControlView:setVisible(false)  
-            
-        view = widget.UIView {
-            scene = scene,
-        }
-            
-        local idTalk = 0       
-        idTalk = tonumber(actor:getProperty("talkId"))
-        
-        talk = repositry:getTalkById(idTalk)
-        
-        msgbox = widget.MsgBox {
-            size = {flower.viewWidth - 10, 100},
-            pos = {5, flower.viewHeight - 105},
-            text = talk.text,
-            parent = view,
-        }
-        msgbox:showPopup()
-        msgbox:addEventListener("msgEnd",talkView_onClose)
-        
-        --[[local actor = e.data
-               
-        talkView = TalkView {
-            actor = repositry:getActorById(tonumber(1)),
-            talk = repositry:getTalkById(1),
-            scene = scene,        
-        }           
-        talkView:addEventListener("close", talkView_onClose)]]
-    end
+       
+    print('onTalk')
+    talkView = TalkView {
+        actor = repositry:getActorById(tonumber(2)),
+        talk = repositry:getTalkById(2),
+        scene = scene,        
+    }           
+    talkView:addEventListener("close", talkView_onClose)
 end
 
 function talkView_onClose(e)
-    GV.FALOU_COM_A_MAE = true    
     startWorld()
-    mapControlView:setVisible(true)  
-    msgbox:hidePopup()
-    --local actions = e.data.talk:getActionByIdAnswer(e.data.id)        
-    --if actions.action == "minigame" then
-    --    openMinigame('quiz')
-    --end      
+    talkView:setVisible(false)
+    local actions = e.data.talk:getActionByIdAnswer(e.data.id)        
+    if actions.action == "minigame" then
+        openMinigame('quiz')
+    end      
 end
 
 function onSound(e)      
     audio.play("assets/sounds/"..e.data.file,e.data.volume, false)
-end
-
-function onTeleport(e)         
-   if GV.FALOU_COM_A_MAE then
-      Teleport(e)
-   end   
-end
-
-function Teleport(e)
-    if e.data:getProperty("toMap") then
-      stopWorld()
-      flower.gotoScene(scenes.LOADING, {
-          MAP = e.data:getProperty("toMap"),
-          hotSpot = e.data:getProperty("toMapHotSpot"),
-          animation = "fade",
-          nextSceneName = scenes.GAME,
-          nextSceneParams = {animation = "fade"},
-      })
-    end
 end
 
 --
@@ -175,6 +166,8 @@ end
 function onCloseMiniGame(e)    
     startWorld()         
 end
+
+
 
 
 ---

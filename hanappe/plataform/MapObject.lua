@@ -91,8 +91,6 @@ function MapObject:loadData(data)
                                  self:onCollide(phase, a, b, arbiter)
                               end, MOAIBox2DArbiter.ALL)
         end
-    --elseif self.type == "Actor" then            
-      --  self.controller = ActorController(self)]]
     end
 end
 

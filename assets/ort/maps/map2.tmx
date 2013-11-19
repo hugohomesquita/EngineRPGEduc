@@ -20,28 +20,28 @@
  </tileset>
  <layer name="MapBackground" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJzt0kEKwCAMBMD4Lp/aEr/qRanIJq62PenC3sIQgyIiKTyNpW/yp5eOt5XH/J86U+eQdwU861meh/qlp413g3tYnrWbgv2sN7Be/2bvJrPe6MasNyrrMUafFc/LrMdmxdFy4wxAcEtr
+   eJzt0EEKwCAMBEB9l0+tpF/10AaKbJLV6qHQwN7CkGxKe+bMV1ZamvLS/b3veIXwdUf3kHdkvOtZnoey0pOHV0EflmfdJuA+6wfW63/2Ohn1oo5ZLwrrMUY/M543ox47M47cHTc9HUf7
   </data>
  </layer>
  <layer name="MapObject" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJzrZWTACrqB4j1k4N5R84atef0EzAPJz4HiPjxmwNTMJWAestxsLGb2Q82AAQdW3ObJsKKqxRYG2PTiMg+Xm6lp3mxoOPGyIsKLEvPmM2JiSszDZiY6qAeK1ZLpRmwAX5rGZR4+ADIP5MYaEt2JDKqR9CPHP6l+h5lVh6QfPf+QYibMLOQ8hy1PwvxPCMPchZwOAS4kdZs=
+   eJztlNkNgCAMQOGDTzdwGPfyGsCDATxY1Rol1CqGNn7a5CUi5tm0BaW+jV4rNeiw7vTxTooFFuSb4HkGRqEP54ZDmufvCz579obTnzcf3psSnTFfbq5zlFqDmE9aU47Pz3pmQl0pHJ/Td1ZEYXi+J+dKaIFamOMe1MetoSPflrCuEP2ZY8XM08dbz1vyrxQa5nlMvUP9vHzhw+doA9YSjes=
   </data>
  </layer>
  <layer name="MapCollision" width="20" height="20">
   <data encoding="base64" compression="zlib">
-   eJxrYsAOmnCIEwK49I2aN/zNQ8fUUIeLT6waQvrx8XGJ4QK0MI9QWJEbj/jspLZ5Q8WNlOQJYtInKWaRK0+OWmzpDBdGBwCkSCaZ
+   eJztkTsKADAIQ3N2T949VPETOzUQdNBHIABg5KnM2bss5k1yen+fp+FV+4l4t95VvOi2erPJy1ilLZ6KaTS7DM41yRn9ZPvb6vOFDjqfJhc=
   </data>
  </layer>
  <objectgroup name="Event" width="20" height="20">
-  <object name="HouseTeleport" type="teleport" x="32" y="0" width="160" height="32">
+  <object name="HouseTeleport" type="teleport" x="64" y="32" width="64" height="32">
    <properties>
     <property name="hotSpot" value="1"/>
     <property name="toMap" value="map1"/>
     <property name="toMapHotSpot" value="2"/>
    </properties>
   </object>
-  <object name="MAPA CIDADE" type="teleport" x="608" y="288" width="32" height="224">
+  <object name="MAPA CIDADE" type="teleport" x="576" y="416" width="32" height="64">
    <properties>
     <property name="hotSpot" value="2"/>
     <property name="toMap" value="map3"/>
@@ -50,6 +50,6 @@
   </object>
  </objectgroup>
  <objectgroup name="Object" width="20" height="20">
-  <object name="Player" type="Actor" gid="1537" x="96" y="32"/>
+  <object name="Player" type="Actor" gid="1537" x="96" y="64"/>
  </objectgroup>
 </map>

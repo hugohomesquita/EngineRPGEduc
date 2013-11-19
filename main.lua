@@ -1,5 +1,6 @@
 modules = require "modules"
 config = require "config"
+GV = require "global_variables"
 rpgmap = require "hanappe/RPGMap"
 
 --SCREEN SETTINGS 

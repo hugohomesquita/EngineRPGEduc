@@ -30,8 +30,7 @@ ActorController.ORT_ANIM_DATA_LIST = {
 function ActorController:init(mapObject)    
     self.mapObject = mapObject
     self.tileMap = mapObject.tileMap
-    
-    --self:initEventListeners()    
+        
     self:initController()
     self:initPhysics()
     --self.mapObject:setIsoPos(320,224)
@@ -57,10 +56,6 @@ function ActorController:initController()
         end
     end
     
-end
-
-function ActorController:initEventListeners()
-    local obj = self.mapObject
 end
 
 function ActorController:initPhysics()

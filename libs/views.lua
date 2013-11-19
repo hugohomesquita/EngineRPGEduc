@@ -38,6 +38,7 @@ local MemberListBox = widgets.MemberListBox
 local TitleMenuView
 local NewGameView
 local AvatarView
+local TalkView
 
 -- consts
 local STICK_TO_DIR = {
@@ -53,7 +54,7 @@ KeyCode.RIGHT = string.byte("d")
 KeyCode.UP = string.byte("w")
 KeyCode.DOWN = string.byte("s")
 
--- ウィジェットの最大の横幅
+-- 
 local WIDGET_WIDTH = 320
 
 --------------------------------------------------------------------------------
@@ -520,7 +521,7 @@ MenuControlView = class(UIView)
 M.MenuControlView = MenuControlView
 
 ---
--- オブジェクトを生成します.
+-- 
 function MenuControlView:_createChildren()
     MenuControlView.__super._createChildren(self)
 
@@ -583,7 +584,7 @@ TalkView = class(UIView)
 M.TalkView = TalkView
 
 function TalkView:init(params)
-    self._actor = assert(params.actor)    
+    --self._actor = assert(params.actor)    
     self._talk = assert(params.talk)
     
     TalkView.__super.init(self, params)
@@ -594,20 +595,27 @@ end
 function TalkView:_createChildren()
     TalkView.__super._createChildren(self)
        
-    self.talkBox = TalkBox {
+    --[[self.talkBox = TalkBox {
         actor = self._actor,
         talk = self._talk,
         parent = self,        
-        size = {self:getWidth()/2,180},
-        pos = {self:getWidth()/2-200, self:getHeight()/2-130},        
-    }    
+        size = {self:getWidth() / 2, 180},
+        pos = {self:getWidth() / 2 - 200, self:getHeight() / 2 - 130},        
+    }   ]]    
+    self.talkBox = widget.MsgBox {
+        size = {flower.viewWidth - 10, 100},
+        pos = {5, flower.viewHeight - 105},
+        text = "",
+        parent = self,
+    }
+    self.talkBox:showPopup()
     
-    self.talkBox:addEventListener("resposta", self.onResposta, self)       
+    self.talkBox:addEventListener("msgEnd", self.onResposta, self)       
 end
 
 function TalkView:onResposta(e)    
-    e.data.talk = self._talk
-    e.data.actor = self._actor
+    --e.data.talk = self._talk
+    --e.data.actor = self._actor
     self.talkBox:setVisible(false)
     self:dispatchEvent("close", e.data)    
 end
@@ -623,13 +631,13 @@ end
 
 --------------------------------------------------------------------------------
 -- @type MenuItemView
--- アイテムメニューのビュークラスです.
+-- 
 --------------------------------------------------------------------------------
 MenuItemView = class(UIView)
 M.MenuItemView = MenuItemView
 
 ---
--- 子オブジェクトを生成します.
+-- 
 function MenuItemView:_createChildren()
     MenuItemView.__super._createChildren(self)
 

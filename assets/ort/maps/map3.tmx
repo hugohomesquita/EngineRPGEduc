@@ -61,7 +61,7 @@
  </tileset>
  <layer name="MapBackground" width="50" height="50">
   <data encoding="base64" compression="zlib">
-   eJztmE1OQjEQgLtTTqCc4MGWxKhL9QTq1o16DH8ugOjaKLIh8WdNRL2AxlPZFzuhmUw7nb7yHiUsvoBQmH5Mpx3bU0p9ab4z5VPTM3xofjPlHXn0MoXyuPdAfcemZj0h7YQevkdModlNSOGIs6fZRxxUyAf2KePuJMTlcag5QhxXyEdTHqeaM8R5ZD6o/NTlEVsfHBKPNeWv7VYmHiH1PQ8Pbi9tCz1i11XIPHwe3F5a1OQRMg/O48RDnR4hY1N4dJjcQw1ztQ50G/IIrWHJmd6ERwgTwVgbqUfZw/9YHrBWWmj+sDa6NXnY86DOI1iDpcdUzfp48LBzbHvYr4d4TAgkHtT5gteo7UGdbxx1eIQCHlS8HJgaqHykhMvHiOBCc8lwZcbifDxrXsxr0Au0zN94328LxsV49DU3mjvNI+LWvDdweJTPYd+1ewFq3y+E40rGjnxRubg2DkPNE+LBuIR6hOzZ5eOWB4kHrCWfA9B3eMDzJjxg/jcWA8f8bddF84BaCPHoq1nNDBfMA9Z7qAfkAfB5cP1rVzjO5wG1a+9Frtqg6sLnEdqPSvpWn4e9F9kO44oe82BcgUXzqPL5kZWvnD04KA/ujiLmvhl7pI7h2ncl/4NydxmUBxdjQxgj5vyIufegPLjPSmKsPFYeITG2l8QD3yvk6iGNscwevj7WdR8m7Xc7Sn7v64sR0+/idRzT78be+7pixPZX0n7JNT5V37XySEeTHlKa6Ntz93hT//ejOfI6599pSjDPeH9MJ/OZ
+   eJztmDtOAzEQQN1BTgA5wSZtJASICjgB0NIA4hR8LpAEagQhJZ8yQgS4AIhT4RUeMRqNP+P17mZDiqeE4M34MR57cE8p9aH5bCjvmp7hTfPdUF6JR6+hcB43DrjvWNUsJ6Sd0MP1Ssk0mwnJLHG2NTuE3QL5oD553I2E2Dz2NPuEgwL5qMvjSHNMOInMB5efqjxi68OHxGNJuWu71RCPkPouw8O3l7aFHrHrKmQeLg/fXppV5BEyD5/HoYMqPULGpvDoeHIPNeyrdaBbk0doDUvO9Do8QpgIxmKkHnkP/4U8YK20yPxhbXQr8sDz4M4jWIO5x1T99fHggXOMPfDnIR4TBokHd77QNYo9TtGz0nOwTI9QsEce48USe1aZGrh8pMSXjzHDmebcw4UZS/PxoHk0n0Ev0DI/032/LRgX49HXDDTXmjvClfnd0OKRv4d9F/cC3L6fCcdBXrh8cbm4NA4jzT3h1riEeoTs2fnrmgOJB6wllwPQt3jA+zo8YP4DxNAyf+w6ax5QCyEeffVXM6MZ84D1HuoBeQBcHr7+tSsc5/KA2sV7ka02uLpweYT2o5K+1eWB9yJw2ELEepTBpACz5lHk+THKV5M9fHAevjuKmPtm6pE6hm3flfwP6rvL4Dx8MVaEMWLOj5h7D87D96wkxsJj4RESY31OPOi9QlM9pDHm2cPVx9ruw6T9bkfJ731dMWL6XbqOY/rd2HtfW4zY/orOK3a89HtsLDzSUaeHlFTz/U8ez+r3frSJPJX8d5oylBnvB+iA9WE=
   </data>
  </layer>
  <layer name="MapObject" width="50" height="50">
@@ -74,20 +74,50 @@
    <property name="visible" value="false"/>
   </properties>
   <data encoding="base64" compression="zlib">
-   eJztVdFuAzEIq/b/X7ynPk3KEGCbQG6phnTqNQFjh8C9Xp9j3193P6uOW62iw/pNna0954qOFQvptXuo7hEPpANpjvixxnBVzj3C8daRjqweDP6OPVmPXQwPr6M/KnkzjOm5eVLHJI+sPyrn110PZUYrfBj9u1bh8a/j9ztbe/bp1KHkmtaB+qKzHtl/Lz6Lset2T+lzJl7hVNVhuXnrtm4VHZNWqcdEvqk4D+eETec5pUMxdab9xKyxFifCVfxY3hGnbN7aGBsfaYzydOnIzsvLiXQws1yd+YyW6lxXdFT9WP4ojukPyy/jpPpFfBBGVIcdHVEexs9bz2qKdKBcaE4wfb3T5xk+0s/qiM4r4uPts3qYfUZHhoG4M1hVU+/VZL4p3Jt0oJz2nelf9snyduaozF2F0206lHUmB5pL0W+0xhg7l61PVjd0NqyOjj7oqAeyznow2JEPs8/gTOhQ8qv7k/2hctnJUdER9S/i1HGvUFxHn1vcne8Hg7Hz/XhSR+av6HjalPNYY7z39T+Ldcqie2Hfrd9JHUyuqo6TVs39F/ujYt79ufX5JHsDGd4/+g==
+   eJztVdFuxDAIO+3/f7h72tNJGQJsA0nX05Citkkwdgj09foc+/569lh1PNUqOuy+XWdrz7miY8VCeu0aynvEA+lAmiN+rDFcJ+63N490ZPlg8Dt2Zz66GB7eRH1U4mYYu/vmSR07eWT1UTm/6XwoPVrhw+jvWoXHv47f72zu2TGpQ4m1Wweqi8l8ZN+ef+Zj5+2aUueMv8KpqsNy8+Zt3jy+1zIifbtMzcfV5FXVN3UuUd6m7RR+Nx+Tpva0t8/qa3EiXGUfyzvilPVb62P938/L4eTFsT2gqiM7L7vO6GB6udrzGS3Vvq7oqO5j+SM/pj4sv4yTui/igzCiPHR0RHGYfd58llOkA8VCfYLpT506z/CRflZHdF4RH2+d1cOsMzoyDMSdwaqaeq92xtuF+yQdKKZ9Z+qXHVncyRiVvqtwepoOZZ6JgfpS9IzmGGP7st2T5Q2dDatjog4m8oFsMh8MdrSHWWdwduhQ4qvrO+tD5dKJUdER1S/iNHGvkN9EnVvczv+Dwej8P+7Uke1XdNxtynmsPt77+s1inbLoXth3u++kDiZWVcdJq8b+i/VRMe/+PHV8kv0Apy1Izw==
   </data>
  </layer>
  <objectgroup name="Event" width="50" height="50">
-  <object name="MAPA 2" type="teleport" x="0" y="576" width="32" height="96">
+  <object name="MAPA 2" type="teleport" x="32" y="608" width="32" height="32">
    <properties>
     <property name="hotSpot" value="1"/>
     <property name="toMap" value="map2"/>
     <property name="toMapHotSpot" value="2"/>
    </properties>
   </object>
+  <object name="LOJA ARMAS" type="talk" x="224" y="544" width="96" height="32">
+   <properties>
+    <property name="talkId" value="3"/>
+   </properties>
+  </object>
+  <object name="CASA 2" type="talk" x="512" y="704" width="32" height="32">
+   <properties>
+    <property name="talkId" value="4"/>
+   </properties>
+  </object>
+  <object name="MAPA 2" type="teleport" x="32" y="640" width="32" height="32">
+   <properties>
+    <property name="toMap" value="map2"/>
+    <property name="toMapHotSpot" value="2"/>
+   </properties>
+  </object>
+  <object name="MAPA 2" type="teleport" x="32" y="576" width="32" height="32">
+   <properties>
+    <property name="toMap" value="map2"/>
+    <property name="toMapHotSpot" value="2"/>
+   </properties>
+  </object>
+  <object name="CASA 2" type="talk" x="192" y="704" width="32" height="32">
+   <properties>
+    <property name="talkId" value="4"/>
+   </properties>
+  </object>
+  <object name="FARMACIA" x="1312" y="480" width="96" height="32"/>
+  <object name="BAR" x="352" y="1344" width="96" height="32"/>
+  <object name="HOTEL" x="960" y="1344" width="32" height="32"/>
  </objectgroup>
  <objectgroup name="Object" width="50" height="50">
-  <object name="Player" type="Actor" gid="525" x="32" y="640"/>
+  <object name="Player" type="Actor" gid="525" x="224" y="640"/>
   <object name="WeaponShop" type="Actor" gid="538" x="192" y="448">
    <properties>
     <property name="playAnim" value="walkDown"/>

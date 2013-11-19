@@ -44,6 +44,9 @@ function MovementSystem:onCollisionBegin(e)
         e.data.objectB:stopWalk()            
         self.tileMap:dispatchEvent(MapEvent.TALK, object)        
     end
+    if object.type == 'talk' then
+        self.tileMap:dispatchEvent(MapEvent.TALK, object)
+    end
     if object.type == 'minigame' then
         self.tileMap:dispatchEvent(MapEvent.MINIGAME, object)
     end
@@ -61,8 +64,7 @@ function MovementSystem:onCollisionBegin(e)
     e.data.objectA:stopWalk()
 end
 function MovementSystem:collisionPreSolve(e)  
-    --print(e.data.name)
-    --print(e.data.collisionSide)
+    
 end
 function MovementSystem:onCollisionEnd(e)      
 end

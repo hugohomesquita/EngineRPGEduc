@@ -33,6 +33,7 @@ local RenderSystem
 local MapObject = require "hanappe/plataform/MapObject"
 local MovementSystem = require "hanappe/plataform/MovementSystem" 
 local CameraSystem = require "hanappe/plataform/CameraSystem"
+local EffectSystem = require "hanappe/plataform/EffectSystem"
 
 local ActorController = require "hanappe/plataform/ActorController" 
 local PlayerController = require "hanappe/plataform/PlayerController" 
@@ -124,13 +125,7 @@ function RPGMap:onLoadedData(e)
     self.mapBackgroundLayer = assert(self:findMapLayerByName("MapBackground")) 
     
     self.player = self.mapActorLayer:findObjectByName("Player")
-    
-    if self:isOrthogonal() then
-          
-    elseif self:isIsometric() then
-        
-    end
-    
+
     if self.mapCollisionLayer then        
         self:createPhysicsCollision()
         self.mapCollisionLayer:setVisible(false)
@@ -145,6 +140,9 @@ function RPGMap:onLoadedData(e)
     for i, system in ipairs(self.systems) do      
         system:onUpdate()        
     end 
+    
+    local effect = EffectSystem(self)
+    effect:initEffect()
     
     -- INICIALIZANDO O AUDIO
     -- CARREGA OS DADOS DEFINIDOS COMO PROPRIEDADE DO TILEMAP
@@ -165,7 +163,7 @@ end
 --RETORNA O X,Y DO HOTSPOT
 function RPGMap:getPositionHotSpot(index)
     for i, event in ipairs(self.mapEventLayer.children) do
-        if event.type == 'teleport' then
+        if event.type == 'teleport' or event.type == 'initPosition' then
             local hotspotIndex = event:getProperty('hotSpot')                                     
             if hotspotIndex == tostring(index) then                
                 return event.physics.body:getPosition()
@@ -182,8 +180,6 @@ function RPGMap:setInvisibleLayerByName(layerName)
       end
     end
 end
-
-
 
 function RPGMap:onUpdate(e)          
     for i, system in ipairs(self.systems) do      

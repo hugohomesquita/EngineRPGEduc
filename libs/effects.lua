@@ -1,5 +1,5 @@
 ----------------------------------------------------------------------------------------------------
--- エフェクトを定義するモジュールです.
+-- 
 --
 ----------------------------------------------------------------------------------------------------
 
@@ -17,27 +17,22 @@ local Label = flower.Label
 
 -- classes
 local Effect
-local DamegeEffect
 local BalloonEffect
 
 --------------------------------------------------------------------------------
 -- @type Effect
--- エフェクトの抽象クラスです.
--- 共通的な動作を定義します.
 --------------------------------------------------------------------------------
 Effect = class(Group)
 M.Effect = Effect
 
---- エフェクト完了時のイベントです.
+--- 
 Effect.EVENT_COMPLETE = "complete"
 
 function Effect:init()
     Effect.__super.init(self)
 end
 
----
--- エフェクトを開始します.
--- @param エフェクト対象のターゲット
+
 function Effect:play(target)
     self:setParent(target)
     self:setLayer(target.layer)    
@@ -47,28 +42,24 @@ function Effect:play(target)
         self:_doEffect()
         self:setParent(nil)
         self:setLayer(nil)
-        self:dispatchEvent(Effect.EVENT_COMPLETE)
+        self:dispatchEvent(Effect.EVENT_COMPLETE)        
     end)
 end
 
----
--- 実際にエフェクトを行う関数です.
--- コールチン経由で起動されます.
--- デフォルトでは空実装なので、この関数を継承してください.
+
 function Effect:_doEffect()
 end
 
 --------------------------------------------------------------------------------
 -- @type BalloonEffect
--- ダメージが発生した時のエフェクトです.
--- ダメージポイントを表示します.
+-- 
 --------------------------------------------------------------------------------
 BalloonEffect = class(Effect)
 M.BalloonEffect = BalloonEffect
 
 ---
--- コンストラクタ
--- @param point ダメージポイント
+-- 
+-- @param point
 function BalloonEffect:init(effectEntity)
     BalloonEffect.__super.init(self)
     self._effectImage = MovieClip(effectEntity.texture, effectEntity.tileSize[1], effectEntity.tileSize[2])
@@ -77,11 +68,12 @@ function BalloonEffect:init(effectEntity)
 end
 
 ---
--- ダメージエフェクトを表示します.
+-- 
 function BalloonEffect:_doEffect()
     local parentW, parentH = self.parent:getSize()
     local effectW, effectH = self._effectImage:getSize()
-    self._effectImage:setPos(-16,-92)   
+    --self._effectImage:setPos(-16,-92)   
+    self._effectImage:setPos(0,-33)   
     self._effectImage:setPriority(self.parent:getPriority())
     self._effectImage:playAnim("effect")
     while self._effectImage:isBusy() do
